@@ -6,3 +6,5 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     docs_enabled: bool = True
+    database_url: str = "postgresql+psycopg://app:app@localhost:5432/app"
+    jwt_secret: str = "change-me"
