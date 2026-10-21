@@ -1,0 +1,39 @@
+# Credit products and decision thresholds. Single source of truth:
+# the seed loads products into the database, credit rules read thresholds from here.
+# Agreed in docs/scenarios.md. Change only together with the scenario table.
+products:
+  - id: working_capital
+    name: Оборотный кредит
+    description: >-
+      Деньги на закупку товара, зарплаты и текущие расходы. Без залога,
+      решение по типовым заявкам — автоматически.
+    purposes: [inventory, cash_gap, other]
+    min_amount: 300000
+    max_amount: 10000000
+    min_term_months: 3
+    max_term_months: 24
+    base_rate: 19.5
+    min_business_age_months: 6
+    max_debt_load: 0.5
+    approve_max_pd: 0.12
+    reject_min_pd: 0.25
+    max_auto_amount: 5000000
+    risk_premium: {low: 0.0, medium: 2.0, high: 4.0}
+
+  - id: equipment
+    name: Кредит на оборудование
+    description: >-
+      Покупка оборудования и техники на срок до пяти лет. Ставка ниже,
+      но бизнесу должно быть не меньше года.
+    purposes: [equipment]
+    min_amount: 1000000
+    max_amount: 30000000
+    min_term_months: 12
+    max_term_months: 60
+    base_rate: 16.5
+    min_business_age_months: 12
+    max_debt_load: 0.4
+    approve_max_pd: 0.08
+    reject_min_pd: 0.20
+    max_auto_amount: 15000000
+    risk_premium: {low: 0.0, medium: 1.5, high: 3.0}

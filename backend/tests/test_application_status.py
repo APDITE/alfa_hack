@@ -1,8 +1,7 @@
 from collections import deque
 
 import pytest
-
-from app.domain.application_status import (
+from app.statuses import (
     CLIENT_STAGE,
     FINAL_STATUSES,
     TRANSITIONS,

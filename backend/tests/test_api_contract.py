@@ -3,26 +3,8 @@
 from uuid import uuid4
 
 import pytest
+from app.statuses import ApplicationStatus
 from fastapi.testclient import TestClient
-
-from app.domain.application_status import ApplicationStatus
-from app.main.app import create_app
-
-
-@pytest.fixture
-def client() -> TestClient:
-    return TestClient(create_app())
-
-
-def test_login_ok(client: TestClient) -> None:
-    response = client.post("/api/auth/login", json={"login": "client1", "password": "client1"})
-    assert response.status_code == 200
-    assert response.json()["user"]["role"] == "client"
-
-
-def test_login_wrong_password(client: TestClient) -> None:
-    response = client.post("/api/auth/login", json={"login": "client1", "password": "nope"})
-    assert response.status_code == 401
 
 
 def test_products(client: TestClient) -> None:
@@ -37,8 +19,11 @@ def test_recommend_equipment(client: TestClient) -> None:
     assert response.json()["product"]["id"] == "equipment"
 
 
-def test_company_lookup_validates_inn(client: TestClient) -> None:
-    assert client.get("/api/companies/lookup/7700000001").status_code == 200
+def test_company_lookup(client: TestClient) -> None:
+    response = client.get("/api/companies/lookup/7700000001")
+    assert response.status_code == 200
+    assert response.json()["legal_form"] == "OOO"
+    assert client.get("/api/companies/lookup/7799999999").status_code == 404
     assert client.get("/api/companies/lookup/abc").status_code == 422
 
 

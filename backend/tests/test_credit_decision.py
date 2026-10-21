@@ -1,6 +1,5 @@
 import pytest
-
-from app.domain.credit_decision import annuity_payment
+from app.credit_decision import annuity_payment
 
 
 def test_annuity_payment_matches_reference() -> None:

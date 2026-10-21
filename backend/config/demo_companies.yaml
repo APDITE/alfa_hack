@@ -1,0 +1,79 @@
+# Demo companies for the scenarios in docs/scenarios.md and their test client accounts.
+# Registry data here mirrors the EGRUL mock; financials and credit history live in the mocks.
+# Test accounts: login = password (synthetic data only).
+companies:
+  - inn: "7700000001"
+    name: ООО «Северный ветер»
+    legal_form: OOO
+    okved: "47.11"
+    registration_date: 2019-03-15
+    region: "77"
+    director: Смирнова Анна Викторовна
+    registry_status: active
+    client: {login: client1, full_name: Анна Смирнова}
+  - inn: "7700000002"
+    name: ООО «Пекарня на углу»
+    legal_form: OOO
+    okved: "10.71"
+    registration_date: 2020-06-01
+    region: "77"
+    director: Орлов Дмитрий Сергеевич
+    registry_status: active
+    client: {login: client2, full_name: Дмитрий Орлов}
+  - inn: "7700000003"
+    name: ИП Ковалёва Мария Игоревна
+    legal_form: IP
+    okved: "96.02"
+    registration_date: 2021-09-10
+    region: "50"
+    director: Ковалёва Мария Игоревна
+    registry_status: active
+    client: {login: client3, full_name: Мария Ковалёва}
+  - inn: "7700000004"
+    name: ООО «СтройМонтаж»
+    legal_form: OOO
+    okved: "43.21"
+    registration_date: 2018-02-20
+    region: "77"
+    director: Белов Игорь Петрович
+    registry_status: active
+    client: {login: client4, full_name: Игорь Белов}
+  - inn: "7700000005"
+    name: ООО «Агротех»
+    legal_form: OOO
+    okved: "01.11"
+    registration_date: 2017-04-05
+    region: "36"
+    director: Никитин Сергей Олегович
+    registry_status: active
+    client: {login: client5, full_name: Сергей Никитин}
+  - inn: "7700000006"
+    name: ООО «Вектор»
+    legal_form: OOO
+    okved: "46.90"
+    registration_date: 2016-11-11
+    region: "78"
+    director: Морозов Алексей Иванович
+    registry_status: liquidating
+    client: {login: client6, full_name: Алексей Морозов}
+  - inn: "7700000007"
+    name: ООО «Кофейня Зерно»
+    legal_form: OOO
+    okved: "56.10"
+    registration_date: 2020-01-20
+    region: "77"
+    director: Лебедева Ольга Андреевна
+    registry_status: active
+    client: {login: client7, full_name: Ольга Лебедева}
+  - inn: "7700000008"
+    name: ИП Захаров Павел Николаевич
+    legal_form: IP
+    okved: "49.41"
+    registration_date: 2026-02-01
+    region: "52"
+    director: Захаров Павел Николаевич
+    registry_status: active
+    client: {login: client8, full_name: Павел Захаров}
+
+employees:
+  - {login: analyst, full_name: Пётр Кузнецов}
