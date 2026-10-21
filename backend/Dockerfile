@@ -8,15 +8,14 @@ COPY pyproject.toml uv.lock ./
 
 FROM base AS dev
 RUN uv sync --locked --group dev --no-install-project
-COPY src ./src
-COPY tests ./tests
+COPY . .
 RUN uv sync --locked --group dev
-CMD ["uvicorn", "app.main.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "src"]
+CMD ["sh", "start.sh", "--reload", "--reload-dir", "app"]
 
 FROM base AS prod
 RUN uv sync --locked --no-dev --no-install-project
-COPY src ./src
+COPY . .
 RUN uv sync --locked --no-dev --no-editable
 RUN useradd --system --no-create-home app
 USER app
-CMD ["uvicorn", "app.main.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "start.sh"]

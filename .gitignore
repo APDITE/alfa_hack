@@ -1,6 +1,4 @@
 .env
-letsencrypt/
-certbot/
 __pycache__/
 *.pyc
 .venv/

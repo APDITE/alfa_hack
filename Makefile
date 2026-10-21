@@ -1,39 +1,24 @@
-COMPOSE ?= docker compose
-DEV  = $(COMPOSE) -f docker-compose.dev.yml
-TEST = $(COMPOSE) -f docker-compose.test.yml
-PROD = $(COMPOSE) -f docker-compose.prod.yml
-
 .DEFAULT_GOAL := help
-.PHONY: help env dev dev-down test prod prod-down prod-cert-init prod-cert-renew
+.PHONY: help env up down reset logs test
 
 help: ## List available commands
-	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-18s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-8s %s\n", $$1, $$2}'
 
 env: ## Create .env from .env.example if missing
 	@test -f .env || (cp .env.example .env && echo "Created .env from .env.example")
 
-dev: env ## Start the development stack (HTTP, reload, API docs)
-	$(DEV) up --build
+up: env ## Start everything on http://localhost:8080
+	docker compose up --build
 
-dev-down: ## Stop the development stack
-	$(DEV) down --remove-orphans
+down: ## Stop everything
+	docker compose down --remove-orphans
 
-test: ## Run backend tests and frontend checks in isolation
-	$(TEST) run --rm --build backend-tests
-	$(TEST) run --rm --build frontend-checks
-	$(TEST) down --remove-orphans
+reset: ## Stop everything and delete the database
+	docker compose down --remove-orphans --volumes
 
-prod: env ## Start the production stack (HTTPS, needs a domain)
-	$(PROD) up -d --build
+logs: ## Follow backend logs
+	docker compose logs -f backend
 
-prod-down: ## Stop the production stack
-	$(PROD) down --remove-orphans
-
-prod-cert-init: env ## Obtain the first Let's Encrypt certificate
-	NGINX_CONF=prod-http.conf.template $(PROD) up -d --build nginx
-	$(PROD) run --rm --entrypoint sh certbot -c 'certbot certonly --webroot -w /var/www/certbot -d "$$CERTBOT_DOMAIN" --email "$$LETSENCRYPT_EMAIL" --agree-tos --no-eff-email --non-interactive'
-	$(PROD) up -d --force-recreate nginx
-
-prod-cert-renew: ## Renew certificates and reload Nginx (run daily via cron)
-	$(PROD) run --rm --entrypoint certbot certbot renew --webroot -w /var/www/certbot
-	$(PROD) exec nginx nginx -s reload
+test: ## Run backend and frontend checks locally
+	cd backend && uv run ruff check app tests && uv run mypy app && uv run pytest -q
+	cd frontend && npm run typecheck && npm run build
