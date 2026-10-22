@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+
 from app.products import ProductsConfigError, load_products
 
 CONFIG = Path(__file__).parent.parent / "config" / "products.yaml"

@@ -34,10 +34,15 @@ backend/
     schemas.py          схемы запросов и ответов API
     security.py         пароли, JWT, текущий пользователь
     statuses.py         статусы заявки, переходы, подписи для интерфейса
+    lifecycle.py        единственное место, где меняется статус заявки
+    applications.py     заявки: права доступа, действия клиента и сотрудника
+    pipeline.py         автоматические этапы: проверка, обогащение, скоринг, решение
+    integrations.py     HTTP-клиенты к мокам и сервису скоринга
+    worker.py           воркер конвейера: python -m app.worker
     credit_decision.py  кредитные правила (чистые функции)
     products.py         чтение config/products.yaml
     seed.py             загрузка демо-данных
-    stubs.py            временные заглушки, удаляются по мере готовности API
+    stubs.py            временная заглушка ленты
     routes/             HTTP-эндпоинты
   config/               продукты, пороги, демо-компании
   migrations/           миграции Alembic
@@ -59,6 +64,12 @@ uv sync --group dev
 uv run alembic upgrade head
 uv run python -m app.seed
 uv run uvicorn app.main:create_app --factory --reload
+```
+
+Воркер конвейера (во втором терминале; адреса моков и скоринга — `MOCKS_URL`, `SCORING_URL`):
+
+```bash
+uv run python -m app.worker
 ```
 
 Новая миграция после изменения `app/models.py`:

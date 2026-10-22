@@ -218,9 +218,29 @@ class ApplicationSummary(BaseModel):
     updated_at: datetime
 
 
+class ApplicationAction(StrEnum):
+    """What the current user may do with the application right now."""
+
+    EDIT = "edit"
+    SUBMIT = "submit"
+    ANSWER_CLARIFICATION = "answer_clarification"
+    ACCEPT = "accept"
+    DECLINE = "decline"
+    SIGN = "sign"
+    WITHDRAW = "withdraw"
+    DECIDE = "decide"
+
+
 class ApplicationDetail(ApplicationSummary):
     purpose_category: PurposeCategory | None
     purpose: str | None
+    revenue_year: int | None = Field(default=None, description="Entered by the client, rubles")
+    expenses_year: int | None = None
+    liabilities_total: int | None = None
+    submitted_at: datetime | None = None
+    available_actions: list[ApplicationAction] = Field(
+        default_factory=list, description="Buttons to show to the current user"
+    )
     next_step: str = Field(description="What happens next, for the client")
     waiting_external: bool = Field(description="An external source is unavailable, retrying")
     company: CompanyResponse
@@ -231,10 +251,21 @@ class ApplicationDetail(ApplicationSummary):
     clarification: ClarificationView | None = None
 
 
+class ProposedTerms(BaseModel):
+    """Terms offered by the employee; the monthly payment is calculated by the bank."""
+
+    product_id: ProductId
+    amount: int = Field(gt=0, description="Rubles")
+    term_months: int = Field(gt=0)
+    rate: float | None = Field(
+        default=None, gt=0, description="Annual rate, percent; product rate if omitted"
+    )
+
+
 class ManualDecisionRequest(BaseModel):
     outcome: DecisionOutcome
     comment: str = Field(min_length=1, max_length=2000)
-    terms: LoanTerms | None = Field(default=None, description="Required for counter_offer")
+    terms: ProposedTerms | None = Field(default=None, description="Required for counter_offer")
     requested_fields: list[str] | None = Field(default=None, description="For clarification")
 
 

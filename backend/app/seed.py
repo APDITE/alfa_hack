@@ -41,7 +41,12 @@ def seed_products(session: Session, products: dict[str, ProductConfig]) -> None:
 
 
 def _ensure_user(
-    session: Session, login: str, full_name: str, role: UserRole, company_inn: str | None
+    session: Session,
+    login: str,
+    full_name: str,
+    role: UserRole,
+    company_inn: str | None,
+    bcrypt_rounds: int,
 ) -> None:
     if session.scalar(select(User).where(User.login == login)) is not None:
         return
@@ -49,7 +54,7 @@ def _ensure_user(
     session.add(
         User(
             login=login,
-            password_hash=hash_password(login),
+            password_hash=hash_password(login, bcrypt_rounds),
             full_name=full_name,
             role=role,
             company_inn=company_inn,
@@ -57,7 +62,7 @@ def _ensure_user(
     )
 
 
-def seed_demo_data(session: Session, demo_path: Path) -> None:
+def seed_demo_data(session: Session, demo_path: Path, bcrypt_rounds: int = 12) -> None:
     data: dict[str, Any] = yaml.safe_load(demo_path.read_text(encoding="utf-8")) or {}
     for raw in data.get("companies", []):
         reg_date = raw["registration_date"]
@@ -79,15 +84,22 @@ def seed_demo_data(session: Session, demo_path: Path) -> None:
         if client:
             session.flush()
             _ensure_user(
-                session, client["login"], client["full_name"], UserRole.CLIENT, str(raw["inn"])
+                session,
+                client["login"],
+                client["full_name"],
+                UserRole.CLIENT,
+                str(raw["inn"]),
+                bcrypt_rounds,
             )
     for raw in data.get("employees", []):
-        _ensure_user(session, raw["login"], raw["full_name"], UserRole.EMPLOYEE, None)
+        _ensure_user(
+            session, raw["login"], raw["full_name"], UserRole.EMPLOYEE, None, bcrypt_rounds
+        )
 
 
 def seed_all(session: Session, settings: Settings) -> None:
     seed_products(session, load_products(Path(settings.products_path)))
-    seed_demo_data(session, Path(settings.demo_data_path))
+    seed_demo_data(session, Path(settings.demo_data_path), settings.bcrypt_rounds)
     session.commit()
 
 

@@ -37,7 +37,7 @@ pythonpath = ["."]
 
 [tool.ruff]
 line-length = 100
-src = ["app", "tests"]
+src = [".", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]

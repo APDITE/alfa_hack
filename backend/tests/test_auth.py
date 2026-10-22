@@ -1,8 +1,9 @@
 from collections.abc import Callable
 from uuid import uuid4
 
-from app.security import create_access_token
 from fastapi.testclient import TestClient
+
+from app.security import create_access_token
 
 LoginAs = Callable[[str], dict[str, str]]
 
