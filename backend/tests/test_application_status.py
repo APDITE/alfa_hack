@@ -1,6 +1,7 @@
 from collections import deque
 
 import pytest
+
 from app.statuses import (
     CLIENT_STAGE,
     FINAL_STATUSES,

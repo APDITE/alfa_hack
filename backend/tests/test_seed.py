@@ -1,10 +1,11 @@
+from fastapi import FastAPI
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.config import Settings
 from app.models import Company, Product, User
 from app.security import verify_password
 from app.seed import seed_all
-from fastapi import FastAPI
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session, sessionmaker
 
 
 def test_seed_is_idempotent(app: FastAPI, settings: Settings) -> None:

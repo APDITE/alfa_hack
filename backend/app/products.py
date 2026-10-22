@@ -2,9 +2,10 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
 import yaml
+from fastapi import Depends, Request
 
 from app.credit_decision import ProductParams
 
@@ -83,3 +84,11 @@ def load_products(path: Path) -> dict[str, ProductConfig]:
     if len(result) != len(products):
         raise ProductsConfigError("Duplicate product ids")
     return result
+
+
+def get_products(request: Request) -> dict[str, ProductConfig]:
+    products: dict[str, ProductConfig] = request.app.state.products
+    return products
+
+
+ProductsDep = Annotated[dict[str, ProductConfig], Depends(get_products)]

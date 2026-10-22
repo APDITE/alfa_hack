@@ -34,10 +34,12 @@ backend/
     schemas.py          схемы запросов и ответов API
     security.py         пароли, JWT, текущий пользователь
     statuses.py         статусы заявки, переходы, подписи для интерфейса
+    lifecycle.py        единственное место, где меняется статус заявки
+    applications.py     заявки: права доступа, действия клиента и сотрудника
     credit_decision.py  кредитные правила (чистые функции)
     products.py         чтение config/products.yaml
     seed.py             загрузка демо-данных
-    stubs.py            временные заглушки, удаляются по мере готовности API
+    stubs.py            временная заглушка ленты
     routes/             HTTP-эндпоинты
   config/               продукты, пороги, демо-компании
   migrations/           миграции Alembic

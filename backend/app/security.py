@@ -20,8 +20,8 @@ _ALGORITHM = "HS256"
 bearer_scheme = HTTPBearer(auto_error=False, description="Token from POST /api/auth/login")
 
 
-def hash_password(password: str) -> str:
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+def hash_password(password: str, rounds: int = 12) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds)).decode()
 
 
 def verify_password(password: str, password_hash: str) -> bool:

@@ -1,4 +1,5 @@
 import pytest
+
 from app.credit_decision import annuity_payment
 
 

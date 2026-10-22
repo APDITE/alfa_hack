@@ -1,12 +1,13 @@
 from collections.abc import Callable, Iterator
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
 from app.config import Settings
 from app.db import Base
 from app.main import create_app
 from app.seed import seed_all
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -14,6 +15,7 @@ def settings() -> Settings:
     return Settings(
         database_url="sqlite+pysqlite:///:memory:",
         jwt_secret="test-secret-at-least-32-bytes-long-0001",
+        bcrypt_rounds=4,  # fast hashing in tests
     )
 
 

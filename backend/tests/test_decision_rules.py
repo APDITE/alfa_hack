@@ -2,6 +2,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+
 from app.credit_decision import (
     CompanyFacts,
     LoanRequest,
