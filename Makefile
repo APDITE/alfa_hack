@@ -16,8 +16,8 @@ down: ## Stop everything
 reset: ## Stop everything and delete the database
 	docker compose down --remove-orphans --volumes
 
-logs: ## Follow backend logs
-	docker compose logs -f backend
+logs: ## Follow backend and worker logs
+	docker compose logs -f backend worker
 
 test: ## Run backend and frontend checks locally
 	cd backend && uv run ruff check app tests && uv run mypy app && uv run pytest -q

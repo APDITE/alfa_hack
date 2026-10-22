@@ -33,6 +33,30 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      # Healthy once migrations and seed are done and the API answers.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+
+  worker:
+    build:
+      context: ./backend
+      target: dev
+    command: ["python", "-m", "app.worker"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-app}
+      # Services of ML A; until they exist the worker retries and hands applications to an employee.
+      MOCKS_URL: http://mocks:8000
+      SCORING_URL: http://scoring:8000
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/config:/app/config
+    depends_on:
+      backend:
+        condition: service_healthy
 
   frontend:
     build:
