@@ -15,6 +15,7 @@ import json
 import random
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Any
 
 SEED = 20261020
 # фиксированная "сегодняшняя" дата: возраст компаний не зависит от дня запуска
@@ -64,14 +65,17 @@ def _company(
     legal_form: str = "OOO",
     financials: bool = True,
     credit_history: bool = True,
-    demo: dict | None = None,
-) -> dict:
+    demo: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if registration_date is None:
+        assert age_months is not None, "pass registration_date or age_months"
+        registration_date = _registration_date(age_months)
     return {
         "inn": inn,
         "name": name,
         "legal_form": legal_form,
         "okved": okved,
-        "registration_date": registration_date or _registration_date(age_months),
+        "registration_date": registration_date,
         "region": region,
         "status": status,
         "director": director,
@@ -96,7 +100,7 @@ def _company(
     }
 
 
-def _demo(scenarios: list[int], title: str, expected: str, *requests: tuple[str, int, int]) -> dict:
+def _demo(scenarios: list[int], title: str, expected: str, *requests: tuple[str, int, int]) -> dict[str, Any]:
     return {
         "scenarios": scenarios,
         "title": title,
@@ -107,7 +111,7 @@ def _demo(scenarios: list[int], title: str, expected: str, *requests: tuple[str,
     }
 
 
-def demo_companies() -> list[dict]:
+def demo_companies() -> list[dict[str, Any]]:
     """Восемь компаний под сценарии из docs/scenarios.md, ИНН 7700000001..7700000008.
 
     Реквизиты (название, дата регистрации, регион, директор) совпадают с
@@ -198,7 +202,7 @@ def _inn(rng: random.Random, legal_form: str, used: set[str]) -> str:
             return inn
 
 
-def background_companies(rng: random.Random, count: int, used: set[str]) -> list[dict]:
+def background_companies(rng: random.Random, count: int, used: set[str]) -> list[dict[str, Any]]:
     companies = []
     for _ in range(count):
         legal_form = "OOO" if rng.random() < 0.85 else "IP"
@@ -247,14 +251,14 @@ def background_companies(rng: random.Random, count: int, used: set[str]) -> list
     return companies
 
 
-def generate(seed: int = SEED, background: int = BACKGROUND_COUNT) -> list[dict]:
+def generate(seed: int = SEED, background: int = BACKGROUND_COUNT) -> list[dict[str, Any]]:
     rng = random.Random(seed)
     demos = demo_companies()
     used = {c["inn"] for c in demos}
     return demos + background_companies(rng, background, used)
 
 
-def render(companies: list[dict]) -> str:
+def render(companies: list[dict[str, Any]]) -> str:
     return json.dumps(companies, ensure_ascii=False, indent=2) + "\n"
 
 

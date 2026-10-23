@@ -1,0 +1,88 @@
+### Запросы к сервисам скоринга и моков.
+### Открывается в VS Code (расширение REST Client) и в JetBrains IDE.
+### Сервисы наружу в compose не публикуются: временно добавьте в docker-compose.override.yml
+###   services:
+###     scoring: {ports: ["8001:8000"]}
+###     mocks:   {ports: ["8002:8000"]}
+
+@scoring = http://localhost:8001
+@mocks = http://localhost:8002
+
+### ---- Скоринг ----
+
+### Проверка живости
+GET {{scoring}}/health
+
+### Сильная компания (сценарий 1): ожидается low
+POST {{scoring}}/score
+Content-Type: application/json
+
+{
+  "application": {"product_id": "working_capital", "amount": 1500000, "term_months": 12},
+  "company": {"inn": "7700000001", "okved": "47.11", "age_months": 91,
+              "revenue_year": 24000000, "expenses_year": 21000000, "liabilities_total": 2000000},
+  "credit_history": {"active_loans": 1, "overdue_count": 0, "max_overdue_days": 0}
+}
+
+### Просрочка 120 дней (сценарий 4): ожидается high
+POST {{scoring}}/score
+Content-Type: application/json
+
+{
+  "application": {"product_id": "working_capital", "amount": 3000000, "term_months": 12},
+  "company": {"inn": "7700000004", "okved": "43.21", "age_months": 104,
+              "revenue_year": 30000000, "expenses_year": 28500000, "liabilities_total": 14000000},
+  "credit_history": {"active_loans": 4, "overdue_count": 4, "max_overdue_days": 120}
+}
+
+### Невалидный вход: ожидается 422
+POST {{scoring}}/score
+Content-Type: application/json
+
+{"application": {"product_id": "mortgage", "amount": -1, "term_months": 0}}
+
+### ---- Моки ----
+
+### ЕГРЮЛ/ЕГРИП
+GET {{mocks}}/mock/egrul/7700000001
+
+### Ликвидируемая компания (сценарий 6): status = liquidating
+GET {{mocks}}/mock/egrul/7700000006
+
+### «Прозрачный бизнес»
+GET {{mocks}}/mock/transparent-business/7700000001
+
+### Нет данных (сценарий 3): 404
+GET {{mocks}}/mock/transparent-business/7700000003
+
+### БКИ
+GET {{mocks}}/mock/bki/7700000004
+
+### Своя компания жюри (сценарий 12): синтетика, детерминированная от ИНН
+GET {{mocks}}/mock/egrul/5012345678
+
+###
+GET {{mocks}}/mock/bki/5012345678
+
+### Неверный формат ИНН: 404
+GET {{mocks}}/mock/egrul/abc
+
+### ---- Сценарий 7: БКИ недоступен ----
+
+### Текущее состояние источников
+GET {{mocks}}/mock/admin/availability
+
+### Выключить БКИ (дальше запросы к БКИ отвечают 503)
+POST {{mocks}}/mock/admin/availability
+Content-Type: application/json
+
+{"service": "bki", "available": false}
+
+###
+GET {{mocks}}/mock/bki/7700000001
+
+### Включить БКИ обратно
+POST {{mocks}}/mock/admin/availability
+Content-Type: application/json
+
+{"service": "bki", "available": true}

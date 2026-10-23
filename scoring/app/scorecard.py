@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, model_validator
 
-from app.schemas import Factor, ScoreRequest, ScoreResponse
+from app.schemas import Factor, RiskClass, ScoreRequest, ScoreResponse
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "scorecard.yaml"
 
@@ -43,8 +43,8 @@ class FactorConfig(BaseModel):
         bounds = [b.upto for b in self.bins]
         if bounds[-1] is not None:
             raise ValueError("last bin must have upto: null")
-        finite = bounds[:-1]
-        if any(b is None for b in finite) or finite != sorted(set(finite)):
+        finite = [b for b in bounds[:-1] if b is not None]
+        if len(finite) != len(bounds) - 1 or finite != sorted(set(finite)):
             raise ValueError("bins must go in strictly ascending order of upto")
         return self
 
@@ -75,7 +75,7 @@ class ScorecardConfig(BaseModel):
     factors: dict[str, FactorConfig] = Field(min_length=1)
 
 
-def load_config(path: str | os.PathLike | None = None) -> ScorecardConfig:
+def load_config(path: str | os.PathLike[str] | None = None) -> ScorecardConfig:
     config_path = Path(path or os.environ.get("SCORECARD_CONFIG") or DEFAULT_CONFIG_PATH)
     with config_path.open(encoding="utf-8") as f:
         return ScorecardConfig.model_validate(yaml.safe_load(f))
@@ -124,7 +124,7 @@ def probability_of_default(points_total: float, pd: PdConfig) -> float:
     return min(max(p, pd.min_pd), pd.max_pd)
 
 
-def classify(score: float, classes: RiskClassesConfig) -> str:
+def classify(score: float, classes: RiskClassesConfig) -> RiskClass:
     if score < classes.low_max:
         return "low"
     if score < classes.medium_max:

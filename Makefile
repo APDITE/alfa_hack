@@ -19,6 +19,8 @@ reset: ## Stop everything and delete the database
 logs: ## Follow backend and worker logs
 	docker compose logs -f backend worker
 
-test: ## Run backend and frontend checks locally
+test: ## Run backend, scoring, mocks and frontend checks locally
 	cd backend && uv run ruff check app tests && uv run mypy app && uv run pytest -q
+	cd scoring && uv run ruff check . && uv run mypy app && uv run pytest -q
+	cd mocks && uv run ruff check . && uv run mypy app generate.py && uv run pytest -q
 	cd frontend && npm run typecheck && npm run build
