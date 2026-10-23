@@ -1,25 +1,58 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import "./App.css";
 
-type Health = { status: string };
+type Page = "home" | "client" | "bank";
 
 export default function App() {
-  const [health, setHealth] = useState<Health | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/health")
-      .then((response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json() as Promise<Health>;
-      })
-      .then(setHealth)
-      .catch((e: unknown) => setError(String(e)));
-  }, []);
+  const [page, setPage] = useState<Page>("home");
 
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
-      <h1>Alfa Hack</h1>
-      <p>API status: {health ? health.status : (error ?? "loading…")}</p>
-    </main>
+    <div>
+      <header>
+        <h1>Умный кредитный кабинет</h1>
+        <p>Альфа-Банк — учебный прототип</p>
+      </header>
+
+      <nav>
+        <button onClick={() => setPage("home")}>
+          Главная
+        </button>
+
+        <button onClick={() => setPage("client")}>
+          Кабинет предпринимателя
+        </button>
+
+        <button onClick={() => setPage("bank")}>
+          Кабинет сотрудника банка
+        </button>
+      </nav>
+
+      <main>
+        {page === "home" && (
+          <section>
+            <h2>Главная страница</h2>
+            <p>
+              Добро пожаловать в умный кредитный кабинет.
+              Здесь предприниматели могут подавать заявки
+              на кредит и отслеживать их рассмотрение.
+            </p>
+          </section>
+        )}
+
+        {page === "client" && (
+          <section>
+            <h2>Кабинет предпринимателя</h2>
+            <p>Здесь будут кредитные продукты и заявки.</p>
+          </section>
+        )}
+
+        {page === "bank" && (
+          <section>
+            <h2>Кабинет сотрудника банка</h2>
+            <p>Здесь будет очередь заявок и принятие решений.</p>
+          </section>
+        )}
+      </main>
+    </div>
   );
 }
