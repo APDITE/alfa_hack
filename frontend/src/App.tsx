@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import ProductCatalog from "./components/ProductCatalog";
+import BankDashboard from "./components/BankDashboard";
 
 type Page = "home" | "client" | "bank";
 
@@ -42,12 +43,7 @@ export default function App() {
 
         {page === "client" && <ProductCatalog />}
 
-        {page === "bank" && (
-          <section>
-            <h2>Кабинет сотрудника банка</h2>
-            <p>Здесь будет очередь заявок и принятие решений.</p>
-          </section>
-        )}
+        {page === "bank" && <BankDashboard />}
       </main>
     </div>
   );

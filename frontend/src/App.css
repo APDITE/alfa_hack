@@ -267,3 +267,72 @@ main p {
   border-color: #ef3124;
   color: #ef3124;
 }
+
+.bank-dashboard {
+  width: 100%;
+}
+
+.bank-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.bank-filters button {
+  padding: 10px 18px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: white;
+  color: #333333;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bank-filters button:hover {
+  border-color: #ef3124;
+}
+
+.bank-filters .bank-filter--active {
+  background: #ef3124;
+  border-color: #ef3124;
+  color: white;
+}
+
+.bank-application-list {
+  display: grid;
+  gap: 16px;
+}
+
+.bank-application-card {
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  background: white;
+}
+
+.bank-application-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.bank-application-card__header h3 {
+  margin: 0;
+}
+
+.bank-application-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #f1f1f1;
+  color: #555555;
+  font-size: 13px;
+}
+
+@media (max-width: 650px) {
+  .bank-application-card {
+    padding: 16px;
+  }
+}
