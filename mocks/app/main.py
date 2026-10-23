@@ -1,9 +1,10 @@
 import json
 import logging
 import os
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
@@ -26,14 +27,14 @@ class AvailabilityIn(BaseModel):
     available: bool
 
 
-def load_companies(path: str | os.PathLike | None = None) -> dict[str, dict]:
+def load_companies(path: str | os.PathLike[str] | None = None) -> dict[str, dict[str, Any]]:
     data_path = Path(path or os.environ.get("MOCKS_DATA_PATH") or DEFAULT_DATA_PATH)
     with data_path.open(encoding="utf-8") as f:
         return {c["inn"]: c for c in json.load(f)}
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.companies = load_companies()
     # Доступность живёт в памяти процесса: это мок для демо сценария 7,
     # а не боевое состояние. Перезапуск контейнера включает все источники.
@@ -52,11 +53,11 @@ app = FastAPI(
 )
 
 
-def _lookup(request: Request, service: ServiceName, inn: str) -> dict:
+def _lookup(request: Request, service: ServiceName, inn: str) -> dict[str, Any]:
     if not request.app.state.availability[service]:
         logger.warning("%s unavailable, inn=%s", service, inn)
         raise HTTPException(status_code=503, detail=f"{service} is temporarily unavailable")
-    company = request.app.state.companies.get(inn)
+    company: dict[str, Any] | None = request.app.state.companies.get(inn)
     if company is None and request.app.state.synthetic and is_valid_inn(inn):
         company = synthesize(inn)
     if company is None:
@@ -70,13 +71,13 @@ def health() -> dict[str, str]:
 
 
 @app.get("/mock/egrul/{inn}", tags=["mocks"])
-def egrul(inn: str, request: Request) -> dict:
+def egrul(inn: str, request: Request) -> dict[str, Any]:
     company = _lookup(request, "egrul", inn)
     return {k: company[k] for k in EGRUL_FIELDS}
 
 
 @app.get("/mock/transparent-business/{inn}", tags=["mocks"])
-def transparent_business(inn: str, request: Request) -> dict:
+def transparent_business(inn: str, request: Request) -> dict[str, Any]:
     company = _lookup(request, "transparent_business", inn)
     if company["financials"] is None:
         raise HTTPException(status_code=404, detail="no data for this company")
@@ -84,7 +85,7 @@ def transparent_business(inn: str, request: Request) -> dict:
 
 
 @app.get("/mock/bki/{inn}", tags=["mocks"])
-def bki(inn: str, request: Request) -> dict:
+def bki(inn: str, request: Request) -> dict[str, Any]:
     company = _lookup(request, "bki", inn)
     if company["credit_history"] is None:
         raise HTTPException(status_code=404, detail="no credit history for this company")

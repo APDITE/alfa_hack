@@ -8,6 +8,7 @@
 
 import random
 from datetime import date, timedelta
+from typing import Any
 
 from generate import INITIALS, NAME_SUFFIXES, NAME_WORDS, OKVEDS, REFERENCE_DATE, SURNAMES
 
@@ -18,7 +19,7 @@ def is_valid_inn(inn: str) -> bool:
     return inn.isascii() and inn.isdigit() and len(inn) in VALID_INN_LENGTHS
 
 
-def synthesize(inn: str) -> dict:
+def synthesize(inn: str) -> dict[str, Any]:
     # строковый seed детерминирован между запусками (в отличие от hash())
     rng = random.Random(f"synthetic:{inn}")
     legal_form = "IP" if len(inn) == 12 else "OOO"
