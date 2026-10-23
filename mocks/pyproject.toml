@@ -1,0 +1,20 @@
+[project]
+name = "mocks"
+version = "0.1.0"
+description = "Mocks of EGRUL/EGRIP, Transparent Business and credit bureau on synthetic data"
+requires-python = "==3.12.*"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.30,<1",
+    "pydantic>=2.9,<3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "httpx>=0.27,<1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
