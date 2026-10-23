@@ -1,34 +1,86 @@
-
 import { useState, type FormEvent } from "react";
+import type { CreditApplication } from "../types/application";
+import { saveApplication } from "../utils/applicationStorage";
+import { updateApplication } from "../utils/applicationStorage";
 
 type CreditApplicationFormProps = {
   productName: string;
   onClose: () => void;
+  application?: CreditApplication;
 };
 
 export default function CreditApplicationForm({
   productName,
   onClose,
+  application,
 }: CreditApplicationFormProps) {
-  const [amount, setAmount] = useState("");
-  const [term, setTerm] = useState("");
-  const [purpose, setPurpose] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [inn, setInn] = useState("");
-  const [saved, setSaved] = useState(false);
+  
+    const [amount, setAmount] = useState(
+    application?.amount.toString() ?? ""
+    );
+    const [term, setTerm] = useState(
+    application?.term.toString() ?? ""
+    );
+    const [purpose, setPurpose] = useState(
+    application?.purpose ?? ""
+    );
+    const [companyName, setCompanyName] = useState(
+    application?.companyName ?? ""
+    );
+    const [inn, setInn] = useState(
+    application?.inn ?? ""
+    );
+    const [saved, setSaved] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+
+  
+
+function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+  if (
+  !Number.isSafeInteger(Number(amount)) ||
+  Number(amount) <= 0 ||
+  !Number.isSafeInteger(Number(term)) ||
+  Number(term) <= 0
+    ) {
+    alert("Введите корректную сумму и срок кредита.");
+    return;
+    }
+
+  const updatedData: CreditApplication = {
+    id: application?.id ?? crypto.randomUUID(),
+    productName,
+    amount: Number(amount),
+    term: Number(term),
+    purpose,
+    companyName,
+    inn,
+    status: "draft",
+    createdAt: application?.createdAt ?? new Date().toISOString(),
+  };
+
+  try {
+    if (application) {
+      updateApplication(updatedData);
+    } else {
+      saveApplication(updatedData);
+    }
+
     setSaved(true);
+  } catch {
+    alert("Не удалось сохранить черновик.");
   }
+}
+
+
 
   if (saved) {
     return (
       <section className="application-form">
         <h2>Черновик заявки заполнен</h2>
         <p>
-          Данные прошли проверку формы. Заявка пока не отправлена
-          и не сохранена на сервере.
+            Черновик заявки сохранён в этом браузере.
+            Заявка не отправлена в банк.
         </p>
         <button type="button" onClick={onClose}>
           Вернуться к продуктам
@@ -46,12 +98,18 @@ export default function CreditApplicationForm({
         <label>
           Сумма кредита, ₽
           <input
-            type="number"
-            min="1"
-            step="1"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]+"
+            title="Введите сумму"
             required
             value={amount}
-            onChange={(event) => setAmount(event.target.value)}
+            onChange={(event) => {
+                const value = event.target.value;
+                if (/^\d*$/.test(value)) {
+                setAmount(value);
+                }
+            }}
             placeholder="Например, 1000000"
           />
         </label>
@@ -59,12 +117,18 @@ export default function CreditApplicationForm({
         <label>
           Срок кредита, месяцев
           <input
-            type="number"
-            min="1"
-            step="1"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]+"
+            title="Введите срок целым положительным числом"
             required
             value={term}
-            onChange={(event) => setTerm(event.target.value)}
+            onChange={(event) => {
+                const value = event.target.value;
+                if (/^\d*$/.test(value)) {
+                setTerm(value);
+                }
+            }}
             placeholder="Например, 12"
           />
         </label>

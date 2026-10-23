@@ -1,6 +1,8 @@
 
 import { useState } from "react";
 import CreditApplicationForm from "./CreditApplicationForm";
+import MyApplications from "./MyApplications";
+import type { CreditApplication } from "../types/application";
 
 type Product = {
   id: string;
@@ -23,7 +25,41 @@ const products: Product[] = [
 
 export default function ProductCatalog() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
+  const [showApplications, setShowApplications] = useState(false);
+  const [editingApplication, setEditingApplication] =
+  useState<CreditApplication | null>(null);
+  if (editingApplication) {
+  return (
+    <CreditApplicationForm
+      key={editingApplication.id}
+      productName={editingApplication.productName}
+      application={editingApplication}
+      onClose={() => {
+        setEditingApplication(null);
+        setShowApplications(true);
+      }}
+    />
+  );
+ }
+  if (showApplications) {
+  return (
+    <div>
+      <button
+        type="button"
+        className="catalog-navigation-button"
+        onClick={() => setShowApplications(false)}
+        >
+        К кредитным продуктам
+      </button>
+      <MyApplications
+    onEdit={(application) => {
+    setEditingApplication(application);
+    setShowApplications(false);
+  }}
+/>
+    </div>
+  );
+ }
   if (selectedProduct) {
     return (
       <CreditApplicationForm
@@ -37,6 +73,13 @@ export default function ProductCatalog() {
     <section>
       <h2>Кредитные продукты</h2>
       <p>Выберите подходящий вариант финансирования.</p>
+      <button
+        type="button"
+        className="catalog-navigation-button"
+        onClick={() => setShowApplications(true)}
+        >
+        Мои заявки 
+      </button>
 
       <div className="product-list">
         {products.map((product) => (

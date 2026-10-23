@@ -171,3 +171,99 @@ main p {
   background: #ef3124;
   color: white;
 }
+
+.application-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.application-card {
+  padding: 20px;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+}
+
+.application-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.application-card__header h3 {
+  margin: 0;
+}
+
+.application-status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #f1f1f1;
+  color: #555;
+  font-size: 13px;
+}
+
+.catalog-navigation-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  margin: 16px 0;
+  border: 1px solid #ef3124;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #ef3124;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.catalog-navigation-button:hover {
+  background-color: #ef3124;
+  color: #fff;
+}
+
+.catalog-navigation-button:focus-visible {
+  outline: 2px solid #ef3124;
+  outline-offset: 3px;
+}
+
+.application-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.application-edit-button,
+.application-delete-button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.application-edit-button {
+  border: 1px solid #ef3124;
+  background: #ef3124;
+  color: white;
+}
+
+.application-edit-button:hover {
+  background: #cf261c;
+}
+
+.application-delete-button {
+  border: 1px solid #d5d5d5;
+  background: white;
+  color: #333;
+}
+
+.application-delete-button:hover {
+  border-color: #ef3124;
+  color: #ef3124;
+}
