@@ -8,6 +8,8 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
+from app.synthetic import is_valid_inn, synthesize
+
 logger = logging.getLogger("mocks")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -36,6 +38,8 @@ async def lifespan(app: FastAPI):
     # Доступность живёт в памяти процесса: это мок для демо сценария 7,
     # а не боевое состояние. Перезапуск контейнера включает все источники.
     app.state.availability = {name: True for name in SERVICES}
+    # Неизвестный ИНН нужного формата получает детерминированную синтетику (сценарий 12).
+    app.state.synthetic = os.environ.get("MOCKS_SYNTHETIC_UNKNOWN_INN", "1") != "0"
     logger.info("loaded %d companies", len(app.state.companies))
     yield
 
@@ -53,6 +57,8 @@ def _lookup(request: Request, service: ServiceName, inn: str) -> dict:
         logger.warning("%s unavailable, inn=%s", service, inn)
         raise HTTPException(status_code=503, detail=f"{service} is temporarily unavailable")
     company = request.app.state.companies.get(inn)
+    if company is None and request.app.state.synthetic and is_valid_inn(inn):
+        company = synthesize(inn)
     if company is None:
         raise HTTPException(status_code=404, detail="company not found")
     return company
