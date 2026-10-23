@@ -1,0 +1,4514 @@
+[
+  {
+    "inn": "7700000001",
+    "name": "ООО «Северный ветер»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2019-03-15",
+    "region": "77",
+    "status": "active",
+    "director": "Смирнова Анна Викторовна",
+    "financials": {
+      "revenue_year": 24000000,
+      "expenses_year": 21000000,
+      "liabilities_total": 2000000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1500000
+    },
+    "demo": {
+      "scenarios": [
+        1,
+        7
+      ],
+      "title": "Сильная компания",
+      "expected": "автоодобрение; в сценарии 7 перед заявкой выключить БКИ",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 1500000,
+          "term_months": 12
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000002",
+    "name": "ООО «Пекарня на углу»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2020-06-01",
+    "region": "77",
+    "status": "active",
+    "director": "Орлов Дмитрий Сергеевич",
+    "financials": {
+      "revenue_year": 12000000,
+      "expenses_year": 9600000,
+      "liabilities_total": 5000000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1200000
+    },
+    "demo": {
+      "scenarios": [
+        2
+      ],
+      "title": "Пограничная: высокая долговая нагрузка при хорошем риске",
+      "expected": "другие условия: длиннее срок или меньше сумма",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 4000000,
+          "term_months": 6
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000003",
+    "name": "ИП Ковалёва Мария Игоревна",
+    "legal_form": "IP",
+    "okved": "96.02",
+    "registration_date": "2021-09-10",
+    "region": "50",
+    "status": "active",
+    "director": "Ковалёва Мария Игоревна",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": {
+      "scenarios": [
+        3
+      ],
+      "title": "Неполные данные",
+      "expected": "«Прозрачный бизнес» отвечает 404: запрос уточнения, после ответа клиента автоодобрение",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 800000,
+          "term_months": 12
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000004",
+    "name": "ООО «СтройМонтаж»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2018-02-20",
+    "region": "77",
+    "status": "active",
+    "director": "Белов Игорь Петрович",
+    "financials": {
+      "revenue_year": 30000000,
+      "expenses_year": 28500000,
+      "liabilities_total": 14000000,
+      "employees": 40,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 4,
+      "overdue_count": 4,
+      "max_overdue_days": 120,
+      "total_debt": 10000000
+    },
+    "demo": {
+      "scenarios": [
+        4
+      ],
+      "title": "Просрочка 120 дней и высокая нагрузка",
+      "expected": "отказ с понятной причиной",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 3000000,
+          "term_months": 12
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000005",
+    "name": "ООО «Агротех»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2017-04-05",
+    "region": "36",
+    "status": "active",
+    "director": "Никитин Сергей Олегович",
+    "financials": {
+      "revenue_year": 15000000,
+      "expenses_year": 14700000,
+      "liabilities_total": 6000000,
+      "employees": 18,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2400000
+    },
+    "demo": {
+      "scenarios": [
+        5
+      ],
+      "title": "Нестандартный случай: низкая рентабельность, три кредита",
+      "expected": "серая зона PD, ручная проверка и решение сотрудника",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 2000000,
+          "term_months": 12
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000006",
+    "name": "ООО «Вектор»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2016-11-11",
+    "region": "78",
+    "status": "liquidating",
+    "director": "Морозов Алексей Иванович",
+    "financials": {
+      "revenue_year": 36000000,
+      "expenses_year": 31000000,
+      "liabilities_total": 4000000,
+      "employees": 22,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1200000
+    },
+    "demo": {
+      "scenarios": [
+        6
+      ],
+      "title": "Компания в стадии ликвидации",
+      "expected": "отказ по статусу в ЕГРЮЛ",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 2000000,
+          "term_months": 12
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000007",
+    "name": "ООО «Кофейня Зерно»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2020-01-20",
+    "region": "77",
+    "status": "active",
+    "director": "Лебедева Ольга Андреевна",
+    "financials": {
+      "revenue_year": 18000000,
+      "expenses_year": 16000000,
+      "liabilities_total": 6000000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2500000
+    },
+    "demo": {
+      "scenarios": [
+        8
+      ],
+      "title": "Один скоринг, два продукта",
+      "expected": "оборотный: автоодобрение, оборудование: ручная проверка",
+      "suggested_applications": [
+        {
+          "product_id": "working_capital",
+          "amount": 2000000,
+          "term_months": 24
+        },
+        {
+          "product_id": "equipment",
+          "amount": 2000000,
+          "term_months": 24
+        }
+      ]
+    }
+  },
+  {
+    "inn": "7700000008",
+    "name": "ИП Захаров Павел Николаевич",
+    "legal_form": "IP",
+    "okved": "49.41",
+    "registration_date": "2026-02-01",
+    "region": "52",
+    "status": "active",
+    "director": "Захаров Павел Николаевич",
+    "financials": {
+      "revenue_year": 21000000,
+      "expenses_year": 18000000,
+      "liabilities_total": 3000000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": {
+      "scenarios": [
+        11
+      ],
+      "title": "Молодой бизнес: восемь месяцев",
+      "expected": "другие условия: вместо оборудования предлагается оборотный кредит",
+      "suggested_applications": [
+        {
+          "product_id": "equipment",
+          "amount": 2000000,
+          "term_months": 24
+        }
+      ]
+    }
+  },
+  {
+    "inn": "5437071205",
+    "name": "ООО «Меридиан Трейд»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2023-04-22",
+    "region": "54",
+    "status": "active",
+    "director": "Васильев В. И.",
+    "financials": {
+      "revenue_year": 16030000,
+      "expenses_year": 12950000,
+      "liabilities_total": 2090000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1460000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1673752499",
+    "name": "ООО «Юпитер Плюс»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2021-03-22",
+    "region": "16",
+    "status": "active",
+    "director": "Волков М. А.",
+    "financials": {
+      "revenue_year": 14950000,
+      "expenses_year": 14500000,
+      "liabilities_total": 5160000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 4,
+      "max_overdue_days": 45,
+      "total_debt": 3690000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6382520127",
+    "name": "ООО «Маяк Опт»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2018-09-20",
+    "region": "63",
+    "status": "active",
+    "director": "Морозов Д. С.",
+    "financials": {
+      "revenue_year": 29340000,
+      "expenses_year": 27240000,
+      "liabilities_total": 8870000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 45,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5229064776",
+    "name": "ООО «Каскад Трейд»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2022-11-20",
+    "region": "52",
+    "status": "active",
+    "director": "Смирнов Б. В.",
+    "financials": {
+      "revenue_year": 48480000,
+      "expenses_year": 45050000,
+      "liabilities_total": 20740000,
+      "employees": 14,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 10690000
+    },
+    "demo": null
+  },
+  {
+    "inn": "522575037631",
+    "name": "ИП Алексеев М. А.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2014-09-20",
+    "region": "52",
+    "status": "active",
+    "director": "Алексеев Е. П.",
+    "financials": {
+      "revenue_year": 6410000,
+      "expenses_year": 5470000,
+      "liabilities_total": 1430000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6605120605",
+    "name": "ООО «Орбита Сервис»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2021-04-21",
+    "region": "66",
+    "status": "active",
+    "director": "Соколов Г. Д.",
+    "financials": {
+      "revenue_year": 60340000,
+      "expenses_year": 52020000,
+      "liabilities_total": 4420000,
+      "employees": 22,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7463981549",
+    "name": "ООО «Импульс Групп»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2015-04-21",
+    "region": "74",
+    "status": "active",
+    "director": "Новиков В. И.",
+    "financials": {
+      "revenue_year": 7700000,
+      "expenses_year": 6190000,
+      "liabilities_total": 500000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6662945729",
+    "name": "ООО «Прогресс Опт»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2020-06-21",
+    "region": "66",
+    "status": "active",
+    "director": "Волков В. И.",
+    "financials": {
+      "revenue_year": 28690000,
+      "expenses_year": 25330000,
+      "liabilities_total": 4310000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5278446889",
+    "name": "ООО «Горизонт Плюс»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-07-21",
+    "region": "52",
+    "status": "active",
+    "director": "Кузнецов М. А.",
+    "financials": {
+      "revenue_year": 211290000,
+      "expenses_year": 194750000,
+      "liabilities_total": 75860000,
+      "employees": 94,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6365812924",
+    "name": "ООО «Альтаир Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2018-03-22",
+    "region": "63",
+    "status": "active",
+    "director": "Лебедев А. А.",
+    "financials": {
+      "revenue_year": 35350000,
+      "expenses_year": 30250000,
+      "liabilities_total": 3360000,
+      "employees": 16,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1870000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7738481493",
+    "name": "ООО «Титан Трейд»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2016-01-20",
+    "region": "77",
+    "status": "active",
+    "director": "Кузнецов Г. Д.",
+    "financials": {
+      "revenue_year": 96250000,
+      "expenses_year": 86650000,
+      "liabilities_total": 20390000,
+      "employees": 33,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 9300000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7735033761",
+    "name": "ООО «Меридиан Строй»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2022-08-21",
+    "region": "77",
+    "status": "active",
+    "director": "Петров Е. П.",
+    "financials": {
+      "revenue_year": 5630000,
+      "expenses_year": 4670000,
+      "liabilities_total": 560000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "235669828737",
+    "name": "ИП Соколов Д. С.",
+    "legal_form": "IP",
+    "okved": "10.71",
+    "registration_date": "2026-03-22",
+    "region": "23",
+    "status": "active",
+    "director": "Соколов В. И.",
+    "financials": {
+      "revenue_year": 11730000,
+      "expenses_year": 10990000,
+      "liabilities_total": 9370000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "785094504558",
+    "name": "ИП Лебедев А. А.",
+    "legal_form": "IP",
+    "okved": "62.01",
+    "registration_date": "2020-08-20",
+    "region": "78",
+    "status": "active",
+    "director": "Лебедев А. А.",
+    "financials": {
+      "revenue_year": 9380000,
+      "expenses_year": 7570000,
+      "liabilities_total": 510000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1622396677",
+    "name": "ООО «Юпитер Эко»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-09-20",
+    "region": "16",
+    "status": "liquidated",
+    "director": "Новиков О. В.",
+    "financials": {
+      "revenue_year": 82480000,
+      "expenses_year": 85780000,
+      "liabilities_total": 39750000,
+      "employees": 19,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 18020000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6615108226",
+    "name": "ООО «Каскад Эко»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2023-12-21",
+    "region": "66",
+    "status": "active",
+    "director": "Морозов И. И.",
+    "financials": {
+      "revenue_year": 30010000,
+      "expenses_year": 29700000,
+      "liabilities_total": 16390000,
+      "employees": 16,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 9320000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6300270408",
+    "name": "ООО «Фаворит Лого»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2019-10-21",
+    "region": "63",
+    "status": "active",
+    "director": "Иванов С. Л.",
+    "financials": {
+      "revenue_year": 7530000,
+      "expenses_year": 6620000,
+      "liabilities_total": 110000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5263112971",
+    "name": "ООО «Навигатор Продукт»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2012-07-21",
+    "region": "52",
+    "status": "active",
+    "director": "Попов Е. П.",
+    "financials": {
+      "revenue_year": 66050000,
+      "expenses_year": 55560000,
+      "liabilities_total": 12750000,
+      "employees": 33,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 4860000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7416215863",
+    "name": "ООО «Вега Сервис»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2025-06-21",
+    "region": "74",
+    "status": "active",
+    "director": "Соколов А. А.",
+    "financials": {
+      "revenue_year": 8950000,
+      "expenses_year": 8080000,
+      "liabilities_total": 3330000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2560000
+    },
+    "demo": null
+  },
+  {
+    "inn": "508075118554",
+    "name": "ИП Смирнов А. А.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2020-08-20",
+    "region": "50",
+    "status": "active",
+    "director": "Смирнов С. Л.",
+    "financials": {
+      "revenue_year": 4800000,
+      "expenses_year": 4620000,
+      "liabilities_total": 1200000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7407698339",
+    "name": "ООО «Сигма Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2025-08-21",
+    "region": "74",
+    "status": "active",
+    "director": "Михайлов Б. В.",
+    "financials": {
+      "revenue_year": 21600000,
+      "expenses_year": 17580000,
+      "liabilities_total": 740000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 4,
+      "max_overdue_days": 12,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5076080244",
+    "name": "ООО «Прогресс Эко»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2022-02-19",
+    "region": "50",
+    "status": "active",
+    "director": "Сидоров И. И.",
+    "financials": {
+      "revenue_year": 24240000,
+      "expenses_year": 21720000,
+      "liabilities_total": 6500000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 5040000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6316475008",
+    "name": "ООО «Юпитер Техно»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2021-03-22",
+    "region": "63",
+    "status": "active",
+    "director": "Петров И. И.",
+    "financials": {
+      "revenue_year": 36830000,
+      "expenses_year": 33070000,
+      "liabilities_total": 9400000,
+      "employees": 17,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 4880000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5293112581",
+    "name": "ООО «Северный Лого»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2018-05-22",
+    "region": "52",
+    "status": "active",
+    "director": "Волков К. Н.",
+    "financials": {
+      "revenue_year": 26660000,
+      "expenses_year": 23350000,
+      "liabilities_total": 3080000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2450000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7808767993",
+    "name": "ООО «Меридиан Лого»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2025-04-21",
+    "region": "78",
+    "status": "active",
+    "director": "Смирнов С. Л.",
+    "financials": {
+      "revenue_year": 13820000,
+      "expenses_year": 11700000,
+      "liabilities_total": 2190000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2347046102",
+    "name": "ООО «Эталон Трейд»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2019-06-21",
+    "region": "23",
+    "status": "active",
+    "director": "Сидоров М. А.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6666235639",
+    "name": "ООО «Маяк Сервис»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2021-01-20",
+    "region": "66",
+    "status": "active",
+    "director": "Морозов И. И.",
+    "financials": {
+      "revenue_year": 34100000,
+      "expenses_year": 30660000,
+      "liabilities_total": 15120000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 5170000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7465868935",
+    "name": "ООО «Янтарь Эко»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2017-02-19",
+    "region": "74",
+    "status": "active",
+    "director": "Петров А. А.",
+    "financials": {
+      "revenue_year": 86240000,
+      "expenses_year": 71430000,
+      "liabilities_total": 6810000,
+      "employees": 26,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6389300062",
+    "name": "ООО «Титан Сервис»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2020-09-20",
+    "region": "63",
+    "status": "active",
+    "director": "Сидоров И. И.",
+    "financials": {
+      "revenue_year": 30980000,
+      "expenses_year": 28220000,
+      "liabilities_total": 4810000,
+      "employees": 16,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1614475842",
+    "name": "ООО «Альтаир Эко»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2024-09-20",
+    "region": "16",
+    "status": "active",
+    "director": "Кузнецов В. И.",
+    "financials": {
+      "revenue_year": 69700000,
+      "expenses_year": 57530000,
+      "liabilities_total": 3800000,
+      "employees": 17,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5402234541",
+    "name": "ООО «Цитадель Лого»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2018-05-22",
+    "region": "54",
+    "status": "active",
+    "director": "Иванов Е. П.",
+    "financials": {
+      "revenue_year": 30540000,
+      "expenses_year": 29400000,
+      "liabilities_total": 16100000,
+      "employees": 14,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 5,
+      "max_overdue_days": 100,
+      "total_debt": 9010000
+    },
+    "demo": null
+  },
+  {
+    "inn": "2358110615",
+    "name": "ООО «Каскад Трейд»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2022-04-21",
+    "region": "23",
+    "status": "active",
+    "director": "Новиков Г. Д.",
+    "financials": {
+      "revenue_year": 122600000,
+      "expenses_year": 123620000,
+      "liabilities_total": 49770000,
+      "employees": 32,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 1,
+      "max_overdue_days": 25,
+      "total_debt": 18880000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7882402376",
+    "name": "ООО «Цитадель Плюс»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2019-08-21",
+    "region": "78",
+    "status": "active",
+    "director": "Морозов Б. В.",
+    "financials": {
+      "revenue_year": 21960000,
+      "expenses_year": 20020000,
+      "liabilities_total": 2670000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7752991680",
+    "name": "ООО «Северный Групп»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2018-02-19",
+    "region": "77",
+    "status": "active",
+    "director": "Морозов М. А.",
+    "financials": {
+      "revenue_year": 12680000,
+      "expenses_year": 12250000,
+      "liabilities_total": 2990000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1300000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5288639998",
+    "name": "ООО «Импульс Техно»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2019-07-22",
+    "region": "52",
+    "status": "active",
+    "director": "Васильев А. А.",
+    "financials": {
+      "revenue_year": 45620000,
+      "expenses_year": 43900000,
+      "liabilities_total": 26420000,
+      "employees": 18,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 6,
+      "max_overdue_days": 100,
+      "total_debt": 15470000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6666891328",
+    "name": "ООО «Сигма Техно»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2021-06-21",
+    "region": "66",
+    "status": "liquidating",
+    "director": "Смирнов Б. В.",
+    "financials": {
+      "revenue_year": 77620000,
+      "expenses_year": 70330000,
+      "liabilities_total": 16760000,
+      "employees": 30,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "6617031750",
+    "name": "ООО «Бриз Групп»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2022-01-20",
+    "region": "66",
+    "status": "active",
+    "director": "Соколов И. И.",
+    "financials": {
+      "revenue_year": 37240000,
+      "expenses_year": 30810000,
+      "liabilities_total": 5510000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 4230000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6305959970",
+    "name": "ООО «Горизонт Эко»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2017-07-21",
+    "region": "63",
+    "status": "active",
+    "director": "Морозов С. Л.",
+    "financials": {
+      "revenue_year": 27290000,
+      "expenses_year": 26970000,
+      "liabilities_total": 13620000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 1,
+      "max_overdue_days": 75,
+      "total_debt": 10860000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5020489462",
+    "name": "ООО «Рассвет Трейд»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2020-05-21",
+    "region": "50",
+    "status": "active",
+    "director": "Соколов М. А.",
+    "financials": {
+      "revenue_year": 19440000,
+      "expenses_year": 17420000,
+      "liabilities_total": 10710000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 4790000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5455824438",
+    "name": "ООО «Рассвет Строй»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2023-05-22",
+    "region": "54",
+    "status": "active",
+    "director": "Соколов Е. П.",
+    "financials": {
+      "revenue_year": 26120000,
+      "expenses_year": 24980000,
+      "liabilities_total": 8230000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "1631627255",
+    "name": "ООО «Вега Плюс»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2016-06-20",
+    "region": "16",
+    "status": "active",
+    "director": "Семёнов К. Н.",
+    "financials": {
+      "revenue_year": 36650000,
+      "expenses_year": 30980000,
+      "liabilities_total": 4990000,
+      "employees": 17,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2210000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6662009391",
+    "name": "ООО «Фаворит Трейд»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-07-21",
+    "region": "66",
+    "status": "active",
+    "director": "Лебедев Г. Д.",
+    "financials": {
+      "revenue_year": 25350000,
+      "expenses_year": 22270000,
+      "liabilities_total": 2280000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1400000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7400227220",
+    "name": "ООО «Холдинг Опт»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2013-12-20",
+    "region": "74",
+    "status": "active",
+    "director": "Соколов М. А.",
+    "financials": {
+      "revenue_year": 40870000,
+      "expenses_year": 33010000,
+      "liabilities_total": 6310000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 5010000
+    },
+    "demo": null
+  },
+  {
+    "inn": "789902074158",
+    "name": "ИП Петрова Д. С.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2022-06-21",
+    "region": "78",
+    "status": "active",
+    "director": "Петров В. И.",
+    "financials": {
+      "revenue_year": 4130000,
+      "expenses_year": 3700000,
+      "liabilities_total": 340000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5425288172",
+    "name": "ООО «Орбита Сервис»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2019-04-21",
+    "region": "54",
+    "status": "active",
+    "director": "Сидоров Д. С.",
+    "financials": {
+      "revenue_year": 13750000,
+      "expenses_year": 12360000,
+      "liabilities_total": 7390000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 4400000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5483478016",
+    "name": "ООО «Навигатор Плюс»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2021-08-21",
+    "region": "54",
+    "status": "active",
+    "director": "Фёдоров С. Л.",
+    "financials": {
+      "revenue_year": 25470000,
+      "expenses_year": 25170000,
+      "liabilities_total": 8770000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7882261547",
+    "name": "ООО «Меридиан Лого»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2023-06-21",
+    "region": "78",
+    "status": "active",
+    "director": "Михайлов Г. Д.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5498518392",
+    "name": "ООО «Горизонт Строй»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2018-01-20",
+    "region": "54",
+    "status": "active",
+    "director": "Алексеев О. В.",
+    "financials": {
+      "revenue_year": 101860000,
+      "expenses_year": 96500000,
+      "liabilities_total": 12510000,
+      "employees": 35,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 2,
+      "max_overdue_days": 12,
+      "total_debt": 6500000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7702078482",
+    "name": "ООО «Бриз Плюс»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2022-05-22",
+    "region": "77",
+    "status": "active",
+    "director": "Фёдоров Д. С.",
+    "financials": {
+      "revenue_year": 25820000,
+      "expenses_year": 25580000,
+      "liabilities_total": 19180000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2317465402",
+    "name": "ООО «Фаворит Трейд»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2017-06-21",
+    "region": "23",
+    "status": "active",
+    "director": "Семёнов В. И.",
+    "financials": {
+      "revenue_year": 4850000,
+      "expenses_year": 4490000,
+      "liabilities_total": 1890000,
+      "employees": 1,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2388593878",
+    "name": "ООО «Прогресс Лого»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2016-07-21",
+    "region": "23",
+    "status": "active",
+    "director": "Семёнов Е. П.",
+    "financials": {
+      "revenue_year": 8400000,
+      "expenses_year": 8090000,
+      "liabilities_total": 4050000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "162549922915",
+    "name": "ИП Петров О. В.",
+    "legal_form": "IP",
+    "okved": "43.21",
+    "registration_date": "2024-05-21",
+    "region": "16",
+    "status": "active",
+    "director": "Петров Г. Д.",
+    "financials": {
+      "revenue_year": 5790000,
+      "expenses_year": 5260000,
+      "liabilities_total": 2900000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7731813313",
+    "name": "ООО «Фаворит Лого»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2018-08-21",
+    "region": "77",
+    "status": "active",
+    "director": "Морозов К. Н.",
+    "financials": {
+      "revenue_year": 42530000,
+      "expenses_year": 38210000,
+      "liabilities_total": 5350000,
+      "employees": 18,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "741619359466",
+    "name": "ИП Новиков М. А.",
+    "legal_form": "IP",
+    "okved": "56.10",
+    "registration_date": "2014-08-21",
+    "region": "74",
+    "status": "active",
+    "director": "Новиков К. Н.",
+    "financials": {
+      "revenue_year": 15740000,
+      "expenses_year": 13090000,
+      "liabilities_total": 1000000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5444223116",
+    "name": "ООО «Импульс Плюс»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2020-09-20",
+    "region": "54",
+    "status": "liquidated",
+    "director": "Волков А. А.",
+    "financials": {
+      "revenue_year": 92570000,
+      "expenses_year": 78790000,
+      "liabilities_total": 5460000,
+      "employees": 38,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5224407028",
+    "name": "ООО «Бриз Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2022-12-21",
+    "region": "52",
+    "status": "active",
+    "director": "Морозов Т. Р.",
+    "financials": {
+      "revenue_year": 7930000,
+      "expenses_year": 7340000,
+      "liabilities_total": 4780000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 6,
+      "max_overdue_days": 25,
+      "total_debt": 1890000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7426734906",
+    "name": "ООО «Альтаир Продукт»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2016-03-21",
+    "region": "74",
+    "status": "active",
+    "director": "Васильев С. Л.",
+    "financials": {
+      "revenue_year": 16210000,
+      "expenses_year": 14130000,
+      "liabilities_total": 4110000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "7731796938",
+    "name": "ООО «Холдинг Эко»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-02-19",
+    "region": "77",
+    "status": "liquidated",
+    "director": "Фёдоров Е. П.",
+    "financials": {
+      "revenue_year": 16910000,
+      "expenses_year": 16370000,
+      "liabilities_total": 10470000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1647418323",
+    "name": "ООО «Импульс Эко»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-09-20",
+    "region": "16",
+    "status": "active",
+    "director": "Иванов М. А.",
+    "financials": {
+      "revenue_year": 27430000,
+      "expenses_year": 24410000,
+      "liabilities_total": 6960000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 2,
+      "max_overdue_days": 12,
+      "total_debt": 5270000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6364342093",
+    "name": "ООО «Рассвет Опт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2015-08-21",
+    "region": "63",
+    "status": "active",
+    "director": "Смирнов К. Н.",
+    "financials": {
+      "revenue_year": 43170000,
+      "expenses_year": 36750000,
+      "liabilities_total": 6020000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "662601366980",
+    "name": "ИП Михайлов В. И.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2024-06-21",
+    "region": "66",
+    "status": "active",
+    "director": "Михайлов Т. Р.",
+    "financials": {
+      "revenue_year": 8470000,
+      "expenses_year": 7510000,
+      "liabilities_total": 2220000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1490000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6600186357",
+    "name": "ООО «Маяк Опт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2022-12-21",
+    "region": "66",
+    "status": "active",
+    "director": "Васильев Д. С.",
+    "financials": {
+      "revenue_year": 11150000,
+      "expenses_year": 9910000,
+      "liabilities_total": 2810000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 2,
+      "max_overdue_days": 25,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7413272879",
+    "name": "ООО «Маяк Строй»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2017-04-21",
+    "region": "74",
+    "status": "active",
+    "director": "Васильев М. А.",
+    "financials": {
+      "revenue_year": 9690000,
+      "expenses_year": 7660000,
+      "liabilities_total": 390000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5206962082",
+    "name": "ООО «Гранит Техно»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2014-09-20",
+    "region": "52",
+    "status": "active",
+    "director": "Попов М. А.",
+    "financials": {
+      "revenue_year": 18330000,
+      "expenses_year": 18190000,
+      "liabilities_total": 3870000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5007764392",
+    "name": "ООО «Каскад Лого»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2018-07-21",
+    "region": "50",
+    "status": "active",
+    "director": "Смирнов А. А.",
+    "financials": {
+      "revenue_year": 11650000,
+      "expenses_year": 10340000,
+      "liabilities_total": 740000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "6606609258",
+    "name": "ООО «Фаворит Эко»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2021-03-22",
+    "region": "66",
+    "status": "active",
+    "director": "Кузнецов Е. П.",
+    "financials": {
+      "revenue_year": 15360000,
+      "expenses_year": 13210000,
+      "liabilities_total": 480000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5406952104",
+    "name": "ООО «Прогресс Трейд»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2015-08-21",
+    "region": "54",
+    "status": "active",
+    "director": "Михайлов А. А.",
+    "financials": {
+      "revenue_year": 5840000,
+      "expenses_year": 5650000,
+      "liabilities_total": 1150000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 5,
+      "max_overdue_days": 5,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2388604255",
+    "name": "ООО «Прогресс Лого»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2015-03-22",
+    "region": "23",
+    "status": "active",
+    "director": "Кузнецов В. И.",
+    "financials": {
+      "revenue_year": 23500000,
+      "expenses_year": 19580000,
+      "liabilities_total": 3590000,
+      "employees": 8,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2324825847",
+    "name": "ООО «Навигатор Эко»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2016-05-21",
+    "region": "23",
+    "status": "active",
+    "director": "Попов С. Л.",
+    "financials": {
+      "revenue_year": 20920000,
+      "expenses_year": 19980000,
+      "liabilities_total": 6210000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 2,
+      "max_overdue_days": 45,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1678241310",
+    "name": "ООО «Прогресс Сервис»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2023-04-22",
+    "region": "16",
+    "status": "active",
+    "director": "Михайлов В. И.",
+    "financials": {
+      "revenue_year": 19670000,
+      "expenses_year": 17180000,
+      "liabilities_total": 2090000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "789324624624",
+    "name": "ИП Волкова С. Л.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2015-03-22",
+    "region": "78",
+    "status": "active",
+    "director": "Волков Г. Д.",
+    "financials": {
+      "revenue_year": 16040000,
+      "expenses_year": 14830000,
+      "liabilities_total": 1230000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "549215252670",
+    "name": "ИП Сидоров О. В.",
+    "legal_form": "IP",
+    "okved": "46.90",
+    "registration_date": "2023-04-22",
+    "region": "54",
+    "status": "active",
+    "director": "Сидоров Б. В.",
+    "financials": {
+      "revenue_year": 2230000,
+      "expenses_year": 2070000,
+      "liabilities_total": 290000,
+      "employees": 1,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5425948278",
+    "name": "ООО «Урал Опт»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2016-12-20",
+    "region": "54",
+    "status": "active",
+    "director": "Кузнецов А. А.",
+    "financials": {
+      "revenue_year": 9110000,
+      "expenses_year": 9150000,
+      "liabilities_total": 3470000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6314988062",
+    "name": "ООО «Вега Трейд»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2018-01-20",
+    "region": "63",
+    "status": "active",
+    "director": "Фёдоров В. И.",
+    "financials": {
+      "revenue_year": 15440000,
+      "expenses_year": 14220000,
+      "liabilities_total": 7090000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7889577271",
+    "name": "ООО «Горизонт Плюс»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2020-08-20",
+    "region": "78",
+    "status": "active",
+    "director": "Морозов И. И.",
+    "financials": {
+      "revenue_year": 12570000,
+      "expenses_year": 11220000,
+      "liabilities_total": 4130000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 3,
+      "max_overdue_days": 5,
+      "total_debt": 1620000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5077703802",
+    "name": "ООО «Навигатор Строй»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2019-05-22",
+    "region": "50",
+    "status": "active",
+    "director": "Семёнов А. А.",
+    "financials": {
+      "revenue_year": 39190000,
+      "expenses_year": 34070000,
+      "liabilities_total": 4490000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1697790531",
+    "name": "ООО «Горизонт Трейд»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2016-10-20",
+    "region": "16",
+    "status": "active",
+    "director": "Семёнов К. Н.",
+    "financials": {
+      "revenue_year": 19120000,
+      "expenses_year": 15570000,
+      "liabilities_total": 420000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7864765548",
+    "name": "ООО «Фаворит Трейд»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2016-09-20",
+    "region": "78",
+    "status": "active",
+    "director": "Алексеев Т. Р.",
+    "financials": {
+      "revenue_year": 9250000,
+      "expenses_year": 8780000,
+      "liabilities_total": 1410000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6699057932",
+    "name": "ООО «Вега Сервис»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2014-10-21",
+    "region": "66",
+    "status": "active",
+    "director": "Петров И. И.",
+    "financials": {
+      "revenue_year": 70140000,
+      "expenses_year": 66820000,
+      "liabilities_total": 8140000,
+      "employees": 29,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 4,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2950000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7770222430",
+    "name": "ООО «Каскад Техно»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2022-09-20",
+    "region": "77",
+    "status": "active",
+    "director": "Петров В. И.",
+    "financials": {
+      "revenue_year": 61660000,
+      "expenses_year": 50600000,
+      "liabilities_total": 4640000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5485860077",
+    "name": "ООО «Гранит Опт»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2022-01-20",
+    "region": "54",
+    "status": "active",
+    "director": "Кузнецов М. А.",
+    "financials": {
+      "revenue_year": 23840000,
+      "expenses_year": 21460000,
+      "liabilities_total": 4290000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2480000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1605358382",
+    "name": "ООО «Эталон Сервис»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2020-11-20",
+    "region": "16",
+    "status": "active",
+    "director": "Фёдоров И. И.",
+    "financials": {
+      "revenue_year": 118060000,
+      "expenses_year": 103800000,
+      "liabilities_total": 14730000,
+      "employees": 48,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7433142644",
+    "name": "ООО «Титан Строй»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2026-05-22",
+    "region": "74",
+    "status": "active",
+    "director": "Алексеев К. Н.",
+    "financials": {
+      "revenue_year": 26780000,
+      "expenses_year": 26110000,
+      "liabilities_total": 15620000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "6682580673",
+    "name": "ООО «Орбита Лого»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2016-03-21",
+    "region": "66",
+    "status": "liquidating",
+    "director": "Кузнецов Б. В.",
+    "financials": {
+      "revenue_year": 17650000,
+      "expenses_year": 17090000,
+      "liabilities_total": 7750000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2430000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7448780289",
+    "name": "ООО «Рассвет Эко»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-11-20",
+    "region": "74",
+    "status": "active",
+    "director": "Васильев Г. Д.",
+    "financials": {
+      "revenue_year": 26360000,
+      "expenses_year": 22790000,
+      "liabilities_total": 4990000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5236553069",
+    "name": "ООО «Альтаир Плюс»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2018-12-21",
+    "region": "52",
+    "status": "active",
+    "director": "Васильев И. И.",
+    "financials": {
+      "revenue_year": 11170000,
+      "expenses_year": 9860000,
+      "liabilities_total": 1220000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5220968897",
+    "name": "ООО «Меридиан Техно»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2018-05-22",
+    "region": "52",
+    "status": "active",
+    "director": "Смирнов М. А.",
+    "financials": {
+      "revenue_year": 14990000,
+      "expenses_year": 13560000,
+      "liabilities_total": 3680000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "5229552354",
+    "name": "ООО «Фаворит Эко»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2021-05-21",
+    "region": "52",
+    "status": "active",
+    "director": "Новиков А. А.",
+    "financials": {
+      "revenue_year": 36830000,
+      "expenses_year": 37600000,
+      "liabilities_total": 24940000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 5,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7808489915",
+    "name": "ООО «Вега Лого»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2016-07-21",
+    "region": "78",
+    "status": "active",
+    "director": "Петров А. А.",
+    "financials": {
+      "revenue_year": 31550000,
+      "expenses_year": 26690000,
+      "liabilities_total": 4310000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2940000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6332395154",
+    "name": "ООО «Лотос Трейд»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2015-03-22",
+    "region": "63",
+    "status": "active",
+    "director": "Морозов М. А.",
+    "financials": {
+      "revenue_year": 14410000,
+      "expenses_year": 13160000,
+      "liabilities_total": 1880000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1010000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7483999281",
+    "name": "ООО «Сигма Опт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2018-03-22",
+    "region": "74",
+    "status": "active",
+    "director": "Соколов А. А.",
+    "financials": {
+      "revenue_year": 18280000,
+      "expenses_year": 16850000,
+      "liabilities_total": 1890000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1330000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7712460403",
+    "name": "ООО «Сигма Групп»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2023-02-20",
+    "region": "77",
+    "status": "active",
+    "director": "Фёдоров Д. С.",
+    "financials": {
+      "revenue_year": 44970000,
+      "expenses_year": 37800000,
+      "liabilities_total": 5100000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6395917547",
+    "name": "ООО «Альтаир Техно»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2022-09-20",
+    "region": "63",
+    "status": "active",
+    "director": "Попов Б. В.",
+    "financials": {
+      "revenue_year": 76450000,
+      "expenses_year": 70650000,
+      "liabilities_total": 18050000,
+      "employees": 19,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7821176814",
+    "name": "ООО «Гранит Лого»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2020-02-20",
+    "region": "78",
+    "status": "active",
+    "director": "Лебедев А. А.",
+    "financials": {
+      "revenue_year": 37840000,
+      "expenses_year": 38940000,
+      "liabilities_total": 12660000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 7390000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7857366979",
+    "name": "ООО «Сигма Лого»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2018-07-21",
+    "region": "78",
+    "status": "active",
+    "director": "Семёнов О. В.",
+    "financials": {
+      "revenue_year": 59240000,
+      "expenses_year": 49990000,
+      "liabilities_total": 7870000,
+      "employees": 25,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2362547217",
+    "name": "ООО «Прогресс Лого»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2016-06-20",
+    "region": "23",
+    "status": "liquidating",
+    "director": "Смирнов О. В.",
+    "financials": {
+      "revenue_year": 9820000,
+      "expenses_year": 9260000,
+      "liabilities_total": 4890000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 3690000
+    },
+    "demo": null
+  },
+  {
+    "inn": "2329558810",
+    "name": "ООО «Импульс Продукт»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2017-03-21",
+    "region": "23",
+    "status": "active",
+    "director": "Смирнов О. В.",
+    "financials": {
+      "revenue_year": 153710000,
+      "expenses_year": 131550000,
+      "liabilities_total": 30410000,
+      "employees": 42,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "509742989954",
+    "name": "ИП Волкова С. Л.",
+    "legal_form": "IP",
+    "okved": "43.21",
+    "registration_date": "2022-02-19",
+    "region": "50",
+    "status": "active",
+    "director": "Волков Т. Р.",
+    "financials": {
+      "revenue_year": 13170000,
+      "expenses_year": 12460000,
+      "liabilities_total": 6930000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2240000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6617062454",
+    "name": "ООО «Гранит Сервис»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2019-07-22",
+    "region": "66",
+    "status": "active",
+    "director": "Иванов К. Н.",
+    "financials": {
+      "revenue_year": 21040000,
+      "expenses_year": 17700000,
+      "liabilities_total": 1640000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7769565882",
+    "name": "ООО «Юпитер Техно»",
+    "legal_form": "OOO",
+    "okved": "25.62",
+    "registration_date": "2024-04-21",
+    "region": "77",
+    "status": "active",
+    "director": "Алексеев И. И.",
+    "financials": {
+      "revenue_year": 17430000,
+      "expenses_year": 14490000,
+      "liabilities_total": 2090000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 720000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5279415859",
+    "name": "ООО «Орбита Опт»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2015-10-21",
+    "region": "52",
+    "status": "active",
+    "director": "Кузнецов Б. В.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 3790000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5455384031",
+    "name": "ООО «Гранит Лого»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2016-09-20",
+    "region": "54",
+    "status": "active",
+    "director": "Смирнов О. В.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 700000
+    },
+    "demo": null
+  },
+  {
+    "inn": "2358275266",
+    "name": "ООО «Эталон Эко»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2023-06-21",
+    "region": "23",
+    "status": "active",
+    "director": "Иванов Т. Р.",
+    "financials": {
+      "revenue_year": 62420000,
+      "expenses_year": 56110000,
+      "liabilities_total": 36490000,
+      "employees": 24,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 19050000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1603754235",
+    "name": "ООО «Импульс Техно»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2021-09-20",
+    "region": "16",
+    "status": "active",
+    "director": "Васильев И. И.",
+    "financials": {
+      "revenue_year": 97780000,
+      "expenses_year": 92660000,
+      "liabilities_total": 18830000,
+      "employees": 35,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 5,
+      "max_overdue_days": 140,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5091251525",
+    "name": "ООО «Гранит Продукт»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2022-12-21",
+    "region": "50",
+    "status": "active",
+    "director": "Михайлов Д. С.",
+    "financials": {
+      "revenue_year": 74850000,
+      "expenses_year": 66460000,
+      "liabilities_total": 18620000,
+      "employees": 37,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "774085282421",
+    "name": "ИП Кузнецова М. А.",
+    "legal_form": "IP",
+    "okved": "01.11",
+    "registration_date": "2018-06-21",
+    "region": "77",
+    "status": "active",
+    "director": "Кузнецов М. А.",
+    "financials": {
+      "revenue_year": 26290000,
+      "expenses_year": 24050000,
+      "liabilities_total": 10050000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7476256431",
+    "name": "ООО «Эталон Сервис»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2019-09-21",
+    "region": "74",
+    "status": "active",
+    "director": "Сидоров Е. П.",
+    "financials": {
+      "revenue_year": 60280000,
+      "expenses_year": 53520000,
+      "liabilities_total": 5750000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7771586693",
+    "name": "ООО «Импульс Лого»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2021-03-22",
+    "region": "77",
+    "status": "active",
+    "director": "Попов О. В.",
+    "financials": {
+      "revenue_year": 22880000,
+      "expenses_year": 20210000,
+      "liabilities_total": 4140000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1630678985",
+    "name": "ООО «Навигатор Групп»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2019-02-20",
+    "region": "16",
+    "status": "liquidating",
+    "director": "Смирнов А. А.",
+    "financials": null,
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "5423432989",
+    "name": "ООО «Титан Опт»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2020-04-21",
+    "region": "54",
+    "status": "active",
+    "director": "Михайлов А. А.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2540000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5281992583",
+    "name": "ООО «Титан Трейд»",
+    "legal_form": "OOO",
+    "okved": "25.62",
+    "registration_date": "2016-10-20",
+    "region": "52",
+    "status": "active",
+    "director": "Алексеев О. В.",
+    "financials": {
+      "revenue_year": 30460000,
+      "expenses_year": 30850000,
+      "liabilities_total": 21550000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 2,
+      "max_overdue_days": 100,
+      "total_debt": 10710000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1658483190",
+    "name": "ООО «Холдинг Трейд»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2015-03-22",
+    "region": "16",
+    "status": "active",
+    "director": "Кузнецов В. И.",
+    "financials": {
+      "revenue_year": 11140000,
+      "expenses_year": 10290000,
+      "liabilities_total": 1540000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1690711607",
+    "name": "ООО «Северный Сервис»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2018-01-20",
+    "region": "16",
+    "status": "active",
+    "director": "Попов И. И.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6351509758",
+    "name": "ООО «Гранит Трейд»",
+    "legal_form": "OOO",
+    "okved": "25.62",
+    "registration_date": "2014-05-21",
+    "region": "63",
+    "status": "active",
+    "director": "Сидоров С. Л.",
+    "financials": {
+      "revenue_year": 16930000,
+      "expenses_year": 16000000,
+      "liabilities_total": 2030000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5006158445",
+    "name": "ООО «Вега Сервис»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2021-02-19",
+    "region": "50",
+    "status": "liquidating",
+    "director": "Лебедев К. Н.",
+    "financials": {
+      "revenue_year": 134670000,
+      "expenses_year": 119100000,
+      "liabilities_total": 22310000,
+      "employees": 64,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7409942588",
+    "name": "ООО «Северный Опт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2024-03-21",
+    "region": "74",
+    "status": "active",
+    "director": "Алексеев Г. Д.",
+    "financials": {
+      "revenue_year": 43200000,
+      "expenses_year": 39270000,
+      "liabilities_total": 7260000,
+      "employees": 12,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5250808355",
+    "name": "ООО «Каскад Сервис»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2020-02-20",
+    "region": "52",
+    "status": "active",
+    "director": "Михайлов М. А.",
+    "financials": {
+      "revenue_year": 11150000,
+      "expenses_year": 9390000,
+      "liabilities_total": 610000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5478194456",
+    "name": "ООО «Юпитер Групп»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2016-04-21",
+    "region": "54",
+    "status": "active",
+    "director": "Петров О. В.",
+    "financials": {
+      "revenue_year": 66300000,
+      "expenses_year": 64150000,
+      "liabilities_total": 31880000,
+      "employees": 35,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5093824413",
+    "name": "ООО «Урал Трейд»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2023-01-20",
+    "region": "50",
+    "status": "active",
+    "director": "Иванов Г. Д.",
+    "financials": {
+      "revenue_year": 12930000,
+      "expenses_year": 12550000,
+      "liabilities_total": 3480000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5444833711",
+    "name": "ООО «Орбита Групп»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2017-06-21",
+    "region": "54",
+    "status": "active",
+    "director": "Морозов С. Л.",
+    "financials": {
+      "revenue_year": 25060000,
+      "expenses_year": 22530000,
+      "liabilities_total": 9990000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 3400000
+    },
+    "demo": null
+  },
+  {
+    "inn": "2329467494",
+    "name": "ООО «Орбита Продукт»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2018-09-20",
+    "region": "23",
+    "status": "active",
+    "director": "Лебедев М. А.",
+    "financials": {
+      "revenue_year": 10930000,
+      "expenses_year": 9870000,
+      "liabilities_total": 2990000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1710000
+    },
+    "demo": null
+  },
+  {
+    "inn": "507689406503",
+    "name": "ИП Сидорова Т. Р.",
+    "legal_form": "IP",
+    "okved": "43.21",
+    "registration_date": "2022-05-22",
+    "region": "50",
+    "status": "liquidated",
+    "director": "Сидоров О. В.",
+    "financials": {
+      "revenue_year": 1500000,
+      "expenses_year": 1250000,
+      "liabilities_total": 220000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "776945403435",
+    "name": "ИП Новиков О. В.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2021-04-21",
+    "region": "77",
+    "status": "active",
+    "director": "Новиков Г. Д.",
+    "financials": {
+      "revenue_year": 10510000,
+      "expenses_year": 9270000,
+      "liabilities_total": 1370000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "164727720578",
+    "name": "ИП Васильев Б. В.",
+    "legal_form": "IP",
+    "okved": "47.11",
+    "registration_date": "2011-12-21",
+    "region": "16",
+    "status": "active",
+    "director": "Васильев Д. С.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5007474360",
+    "name": "ООО «Цитадель Эко»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2022-01-20",
+    "region": "50",
+    "status": "active",
+    "director": "Петров Г. Д.",
+    "financials": {
+      "revenue_year": 27710000,
+      "expenses_year": 27740000,
+      "liabilities_total": 16370000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 6,
+      "max_overdue_days": 25,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5479309619",
+    "name": "ООО «Северный Продукт»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2024-10-20",
+    "region": "54",
+    "status": "active",
+    "director": "Фёдоров С. Л.",
+    "financials": {
+      "revenue_year": 56630000,
+      "expenses_year": 54640000,
+      "liabilities_total": 24710000,
+      "employees": 19,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 3,
+      "max_overdue_days": 75,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5491761124",
+    "name": "ООО «Горизонт Опт»",
+    "legal_form": "OOO",
+    "okved": "96.02",
+    "registration_date": "2018-08-21",
+    "region": "54",
+    "status": "active",
+    "director": "Петров А. А.",
+    "financials": {
+      "revenue_year": 12060000,
+      "expenses_year": 12400000,
+      "liabilities_total": 5530000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2140000
+    },
+    "demo": null
+  },
+  {
+    "inn": "743628949108",
+    "name": "ИП Попов В. И.",
+    "legal_form": "IP",
+    "okved": "10.71",
+    "registration_date": "2022-12-21",
+    "region": "74",
+    "status": "active",
+    "director": "Попов Б. В.",
+    "financials": {
+      "revenue_year": 6830000,
+      "expenses_year": 6550000,
+      "liabilities_total": 1300000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 3,
+      "max_overdue_days": 75,
+      "total_debt": 750000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7448935012",
+    "name": "ООО «Каскад Лого»",
+    "legal_form": "OOO",
+    "okved": "25.62",
+    "registration_date": "2021-07-21",
+    "region": "74",
+    "status": "active",
+    "director": "Петров О. В.",
+    "financials": {
+      "revenue_year": 16860000,
+      "expenses_year": 17030000,
+      "liabilities_total": 6190000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 6,
+      "max_overdue_days": 140,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5468969583",
+    "name": "ООО «Фаворит Плюс»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2013-10-20",
+    "region": "54",
+    "status": "active",
+    "director": "Михайлов В. И.",
+    "financials": {
+      "revenue_year": 21370000,
+      "expenses_year": 18990000,
+      "liabilities_total": 4360000,
+      "employees": 6,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6350912453",
+    "name": "ООО «Орбита Сервис»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2017-09-20",
+    "region": "63",
+    "status": "liquidating",
+    "director": "Соколов А. А.",
+    "financials": {
+      "revenue_year": 117410000,
+      "expenses_year": 103270000,
+      "liabilities_total": 10520000,
+      "employees": 60,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 7390000
+    },
+    "demo": null
+  },
+  {
+    "inn": "544403527737",
+    "name": "ИП Попов С. Л.",
+    "legal_form": "IP",
+    "okved": "25.62",
+    "registration_date": "2022-11-20",
+    "region": "54",
+    "status": "active",
+    "director": "Попов В. И.",
+    "financials": {
+      "revenue_year": 8250000,
+      "expenses_year": 7910000,
+      "liabilities_total": 5650000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 3560000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7408117684",
+    "name": "ООО «Навигатор Сервис»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2018-05-22",
+    "region": "74",
+    "status": "active",
+    "director": "Смирнов Е. П.",
+    "financials": {
+      "revenue_year": 15770000,
+      "expenses_year": 14000000,
+      "liabilities_total": 2420000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 25,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5011866830",
+    "name": "ООО «Холдинг Сервис»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2015-09-20",
+    "region": "50",
+    "status": "active",
+    "director": "Кузнецов О. В.",
+    "financials": {
+      "revenue_year": 10050000,
+      "expenses_year": 8320000,
+      "liabilities_total": 2280000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5276589384",
+    "name": "ООО «Юпитер Трейд»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2025-01-20",
+    "region": "52",
+    "status": "active",
+    "director": "Михайлов Д. С.",
+    "financials": {
+      "revenue_year": 10190000,
+      "expenses_year": 9230000,
+      "liabilities_total": 2020000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 910000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7847934404",
+    "name": "ООО «Цитадель Лого»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2024-02-20",
+    "region": "78",
+    "status": "active",
+    "director": "Попов Д. С.",
+    "financials": {
+      "revenue_year": 27630000,
+      "expenses_year": 25340000,
+      "liabilities_total": 4220000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1860000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6337880072",
+    "name": "ООО «Северный Групп»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2024-07-21",
+    "region": "63",
+    "status": "active",
+    "director": "Волков Б. В.",
+    "financials": {
+      "revenue_year": 10110000,
+      "expenses_year": 9620000,
+      "liabilities_total": 3670000,
+      "employees": 3,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2333208436",
+    "name": "ООО «Цитадель Строй»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2024-03-21",
+    "region": "23",
+    "status": "active",
+    "director": "Новиков М. А.",
+    "financials": {
+      "revenue_year": 51630000,
+      "expenses_year": 47930000,
+      "liabilities_total": 13150000,
+      "employees": 27,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 6,
+      "max_overdue_days": 12,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5249214366",
+    "name": "ООО «Юпитер Групп»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2021-06-21",
+    "region": "52",
+    "status": "active",
+    "director": "Морозов Г. Д.",
+    "financials": {
+      "revenue_year": 5240000,
+      "expenses_year": 4920000,
+      "liabilities_total": 1880000,
+      "employees": 2,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1230000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5295431136",
+    "name": "ООО «Холдинг Групп»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2019-06-21",
+    "region": "52",
+    "status": "active",
+    "director": "Васильев Е. П.",
+    "financials": {
+      "revenue_year": 33790000,
+      "expenses_year": 32260000,
+      "liabilities_total": 11550000,
+      "employees": 16,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7801932648",
+    "name": "ООО «Навигатор Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2017-07-21",
+    "region": "78",
+    "status": "active",
+    "director": "Новиков В. И.",
+    "financials": {
+      "revenue_year": 33460000,
+      "expenses_year": 30030000,
+      "liabilities_total": 12210000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 45,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5010531634",
+    "name": "ООО «Меридиан Опт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2015-06-21",
+    "region": "50",
+    "status": "active",
+    "director": "Морозов В. И.",
+    "financials": {
+      "revenue_year": 25070000,
+      "expenses_year": 23970000,
+      "liabilities_total": 15040000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 5,
+      "max_overdue_days": 45,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2303426001",
+    "name": "ООО «Орбита Плюс»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2021-02-19",
+    "region": "23",
+    "status": "active",
+    "director": "Петров Б. В.",
+    "financials": {
+      "revenue_year": 35340000,
+      "expenses_year": 30160000,
+      "liabilities_total": 8770000,
+      "employees": 16,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 5910000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7741451638",
+    "name": "ООО «Меридиан Групп»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2023-09-21",
+    "region": "77",
+    "status": "active",
+    "director": "Фёдоров Т. Р.",
+    "financials": {
+      "revenue_year": 61890000,
+      "expenses_year": 53920000,
+      "liabilities_total": 1290000,
+      "employees": 21,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1661208939",
+    "name": "ООО «Вега Опт»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2026-03-22",
+    "region": "16",
+    "status": "active",
+    "director": "Михайлов Б. В.",
+    "financials": {
+      "revenue_year": 37280000,
+      "expenses_year": 35380000,
+      "liabilities_total": 7020000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 2,
+      "max_overdue_days": 140,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "529688721117",
+    "name": "ИП Морозова Е. П.",
+    "legal_form": "IP",
+    "okved": "49.41",
+    "registration_date": "2015-02-19",
+    "region": "52",
+    "status": "active",
+    "director": "Морозов О. В.",
+    "financials": {
+      "revenue_year": 7040000,
+      "expenses_year": 5930000,
+      "liabilities_total": 620000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7457525634",
+    "name": "ООО «Цитадель Плюс»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2025-05-22",
+    "region": "74",
+    "status": "active",
+    "director": "Новиков Д. С.",
+    "financials": {
+      "revenue_year": 35610000,
+      "expenses_year": 33840000,
+      "liabilities_total": 6870000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 3250000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1606680917",
+    "name": "ООО «Прогресс Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2019-11-20",
+    "region": "16",
+    "status": "active",
+    "director": "Михайлов М. А.",
+    "financials": {
+      "revenue_year": 78860000,
+      "expenses_year": 69600000,
+      "liabilities_total": 24730000,
+      "employees": 23,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 17520000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5053894431",
+    "name": "ООО «Титан Эко»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2021-01-20",
+    "region": "50",
+    "status": "active",
+    "director": "Алексеев М. А.",
+    "financials": {
+      "revenue_year": 121880000,
+      "expenses_year": 109590000,
+      "liabilities_total": 31860000,
+      "employees": 30,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 5,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7866425287",
+    "name": "ООО «Янтарь Лого»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2024-09-20",
+    "region": "78",
+    "status": "active",
+    "director": "Алексеев С. Л.",
+    "financials": {
+      "revenue_year": 27770000,
+      "expenses_year": 24390000,
+      "liabilities_total": 4370000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2510000
+    },
+    "demo": null
+  },
+  {
+    "inn": "741476459787",
+    "name": "ИП Васильев М. А.",
+    "legal_form": "IP",
+    "okved": "68.20",
+    "registration_date": "2024-06-21",
+    "region": "74",
+    "status": "active",
+    "director": "Васильев В. И.",
+    "financials": {
+      "revenue_year": 6840000,
+      "expenses_year": 5840000,
+      "liabilities_total": 2160000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 4,
+      "max_overdue_days": 25,
+      "total_debt": 820000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7720995555",
+    "name": "ООО «Цитадель Строй»",
+    "legal_form": "OOO",
+    "okved": "41.20",
+    "registration_date": "2020-07-21",
+    "region": "77",
+    "status": "active",
+    "director": "Алексеев Т. Р.",
+    "financials": {
+      "revenue_year": 494650000,
+      "expenses_year": 435720000,
+      "liabilities_total": 35040000,
+      "employees": 140,
+      "tax_arrears": false
+    },
+    "credit_history": null,
+    "demo": null
+  },
+  {
+    "inn": "5414326711",
+    "name": "ООО «Бриз Опт»",
+    "legal_form": "OOO",
+    "okved": "25.62",
+    "registration_date": "2015-05-22",
+    "region": "54",
+    "status": "active",
+    "director": "Иванов С. Л.",
+    "financials": {
+      "revenue_year": 38750000,
+      "expenses_year": 37070000,
+      "liabilities_total": 13440000,
+      "employees": 11,
+      "tax_arrears": true
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "503678477994",
+    "name": "ИП Смирнов В. И.",
+    "legal_form": "IP",
+    "okved": "96.02",
+    "registration_date": "2017-11-20",
+    "region": "50",
+    "status": "active",
+    "director": "Смирнов В. И.",
+    "financials": {
+      "revenue_year": 9750000,
+      "expenses_year": 8250000,
+      "liabilities_total": 1610000,
+      "employees": 2,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5266776724",
+    "name": "ООО «Бриз Лого»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2024-05-21",
+    "region": "52",
+    "status": "active",
+    "director": "Новиков В. И.",
+    "financials": {
+      "revenue_year": 11940000,
+      "expenses_year": 11110000,
+      "liabilities_total": 2980000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 2370000
+    },
+    "demo": null
+  },
+  {
+    "inn": "660965255067",
+    "name": "ИП Иванов М. А.",
+    "legal_form": "IP",
+    "okved": "43.21",
+    "registration_date": "2018-06-21",
+    "region": "66",
+    "status": "active",
+    "director": "Иванов Е. П.",
+    "financials": {
+      "revenue_year": 4220000,
+      "expenses_year": 3790000,
+      "liabilities_total": 1760000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 680000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5068941245",
+    "name": "ООО «Импульс Техно»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2013-04-21",
+    "region": "50",
+    "status": "active",
+    "director": "Морозов А. А.",
+    "financials": {
+      "revenue_year": 19550000,
+      "expenses_year": 17030000,
+      "liabilities_total": 3940000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "1636834316",
+    "name": "ООО «Маяк Лого»",
+    "legal_form": "OOO",
+    "okved": "49.41",
+    "registration_date": "2022-12-21",
+    "region": "16",
+    "status": "active",
+    "director": "Лебедев Г. Д.",
+    "financials": {
+      "revenue_year": 9700000,
+      "expenses_year": 9200000,
+      "liabilities_total": 4660000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 5,
+      "max_overdue_days": 25,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5075003663",
+    "name": "ООО «Урал Сервис»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2024-07-21",
+    "region": "50",
+    "status": "active",
+    "director": "Алексеев Д. С.",
+    "financials": {
+      "revenue_year": 17060000,
+      "expenses_year": 16470000,
+      "liabilities_total": 7700000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7462752301",
+    "name": "ООО «Прогресс Продукт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2020-12-20",
+    "region": "74",
+    "status": "active",
+    "director": "Попов М. А.",
+    "financials": {
+      "revenue_year": 19120000,
+      "expenses_year": 16280000,
+      "liabilities_total": 3220000,
+      "employees": 10,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "2302953510",
+    "name": "ООО «Цитадель Строй»",
+    "legal_form": "OOO",
+    "okved": "47.11",
+    "registration_date": "2017-02-19",
+    "region": "23",
+    "status": "active",
+    "director": "Сидоров Е. П.",
+    "financials": {
+      "revenue_year": 33510000,
+      "expenses_year": 30340000,
+      "liabilities_total": 8520000,
+      "employees": 10,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "521612198972",
+    "name": "ИП Соколов К. Н.",
+    "legal_form": "IP",
+    "okved": "41.20",
+    "registration_date": "2020-07-21",
+    "region": "52",
+    "status": "active",
+    "director": "Соколов Г. Д.",
+    "financials": {
+      "revenue_year": 2880000,
+      "expenses_year": 2710000,
+      "liabilities_total": 1080000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 2,
+      "max_overdue_days": 75,
+      "total_debt": 380000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6641792441",
+    "name": "ООО «Вега Плюс»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2018-03-22",
+    "region": "66",
+    "status": "active",
+    "director": "Кузнецов А. А.",
+    "financials": {
+      "revenue_year": 16340000,
+      "expenses_year": 14940000,
+      "liabilities_total": 7950000,
+      "employees": 8,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 5180000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7822868288",
+    "name": "ООО «Цитадель Техно»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2018-05-22",
+    "region": "78",
+    "status": "active",
+    "director": "Смирнов О. В.",
+    "financials": {
+      "revenue_year": 22870000,
+      "expenses_year": 19710000,
+      "liabilities_total": 2820000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1660000
+    },
+    "demo": null
+  },
+  {
+    "inn": "1695991297",
+    "name": "ООО «Эталон Опт»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2025-04-21",
+    "region": "16",
+    "status": "active",
+    "director": "Иванов Т. Р.",
+    "financials": {
+      "revenue_year": 24800000,
+      "expenses_year": 21490000,
+      "liabilities_total": 3300000,
+      "employees": 11,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6622674765",
+    "name": "ООО «Рассвет Трейд»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2025-06-21",
+    "region": "66",
+    "status": "liquidated",
+    "director": "Соколов Б. В.",
+    "financials": {
+      "revenue_year": 18540000,
+      "expenses_year": 16330000,
+      "liabilities_total": 1750000,
+      "employees": 7,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "631996233673",
+    "name": "ИП Кузнецов С. Л.",
+    "legal_form": "IP",
+    "okved": "10.71",
+    "registration_date": "2014-10-21",
+    "region": "63",
+    "status": "active",
+    "director": "Кузнецов Г. Д.",
+    "financials": {
+      "revenue_year": 8610000,
+      "expenses_year": 8210000,
+      "liabilities_total": 2380000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 3,
+      "max_overdue_days": 25,
+      "total_debt": 1040000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5264853334",
+    "name": "ООО «Импульс Опт»",
+    "legal_form": "OOO",
+    "okved": "62.01",
+    "registration_date": "2014-10-21",
+    "region": "52",
+    "status": "active",
+    "director": "Лебедев В. И.",
+    "financials": {
+      "revenue_year": 18030000,
+      "expenses_year": 14720000,
+      "liabilities_total": 1510000,
+      "employees": 5,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 930000
+    },
+    "demo": null
+  },
+  {
+    "inn": "5262147899",
+    "name": "ООО «Маяк Продукт»",
+    "legal_form": "OOO",
+    "okved": "68.20",
+    "registration_date": "2017-03-21",
+    "region": "52",
+    "status": "active",
+    "director": "Морозов Т. Р.",
+    "financials": null,
+    "credit_history": {
+      "active_loans": 2,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1510000
+    },
+    "demo": null
+  },
+  {
+    "inn": "6654843768",
+    "name": "ООО «Цитадель Эко»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2019-11-20",
+    "region": "66",
+    "status": "active",
+    "director": "Сидоров А. А.",
+    "financials": {
+      "revenue_year": 46860000,
+      "expenses_year": 45060000,
+      "liabilities_total": 21620000,
+      "employees": 23,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 15460000
+    },
+    "demo": null
+  },
+  {
+    "inn": "747557075751",
+    "name": "ИП Сидоров М. А.",
+    "legal_form": "IP",
+    "okved": "41.20",
+    "registration_date": "2020-04-21",
+    "region": "74",
+    "status": "active",
+    "director": "Сидоров О. В.",
+    "financials": {
+      "revenue_year": 16810000,
+      "expenses_year": 15390000,
+      "liabilities_total": 2780000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 1,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 1070000
+    },
+    "demo": null
+  },
+  {
+    "inn": "787105108961",
+    "name": "ИП Семёнов Е. П.",
+    "legal_form": "IP",
+    "okved": "96.02",
+    "registration_date": "2020-05-21",
+    "region": "78",
+    "status": "active",
+    "director": "Семёнов В. И.",
+    "financials": {
+      "revenue_year": 8000000,
+      "expenses_year": 6430000,
+      "liabilities_total": 920000,
+      "employees": 4,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 3,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 540000
+    },
+    "demo": null
+  },
+  {
+    "inn": "7700119838",
+    "name": "ООО «Урал Эко»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2022-07-22",
+    "region": "77",
+    "status": "active",
+    "director": "Михайлов И. И.",
+    "financials": {
+      "revenue_year": 4680000,
+      "expenses_year": 4210000,
+      "liabilities_total": 800000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5457971651",
+    "name": "ООО «Орбита Опт»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2019-08-21",
+    "region": "54",
+    "status": "active",
+    "director": "Попов М. А.",
+    "financials": {
+      "revenue_year": 26360000,
+      "expenses_year": 25780000,
+      "liabilities_total": 11710000,
+      "employees": 13,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5209373915",
+    "name": "ООО «Фаворит Продукт»",
+    "legal_form": "OOO",
+    "okved": "46.90",
+    "registration_date": "2023-05-22",
+    "region": "52",
+    "status": "active",
+    "director": "Михайлов А. А.",
+    "financials": {
+      "revenue_year": 77720000,
+      "expenses_year": 64210000,
+      "liabilities_total": 11460000,
+      "employees": 19,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5097297620",
+    "name": "ООО «Орбита Строй»",
+    "legal_form": "OOO",
+    "okved": "01.11",
+    "registration_date": "2018-11-20",
+    "region": "50",
+    "status": "active",
+    "director": "Волков А. А.",
+    "financials": {
+      "revenue_year": 11470000,
+      "expenses_year": 10120000,
+      "liabilities_total": 4650000,
+      "employees": 3,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "770738763242",
+    "name": "ИП Петрова М. А.",
+    "legal_form": "IP",
+    "okved": "56.10",
+    "registration_date": "2020-12-20",
+    "region": "77",
+    "status": "active",
+    "director": "Петров Д. С.",
+    "financials": {
+      "revenue_year": 1810000,
+      "expenses_year": 1610000,
+      "liabilities_total": 760000,
+      "employees": 1,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 100,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "5010910316",
+    "name": "ООО «Меридиан Продукт»",
+    "legal_form": "OOO",
+    "okved": "56.10",
+    "registration_date": "2017-02-19",
+    "region": "50",
+    "status": "active",
+    "director": "Волков Т. Р.",
+    "financials": {
+      "revenue_year": 22200000,
+      "expenses_year": 17540000,
+      "liabilities_total": 950000,
+      "employees": 9,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "7783518330",
+    "name": "ООО «Северный Продукт»",
+    "legal_form": "OOO",
+    "okved": "43.21",
+    "registration_date": "2017-10-20",
+    "region": "77",
+    "status": "active",
+    "director": "Морозов И. И.",
+    "financials": {
+      "revenue_year": 39170000,
+      "expenses_year": 34810000,
+      "liabilities_total": 8750000,
+      "employees": 20,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 1,
+      "max_overdue_days": 140,
+      "total_debt": 0
+    },
+    "demo": null
+  },
+  {
+    "inn": "6349173029",
+    "name": "ООО «Меридиан Опт»",
+    "legal_form": "OOO",
+    "okved": "10.71",
+    "registration_date": "2024-02-20",
+    "region": "63",
+    "status": "active",
+    "director": "Соколов Г. Д.",
+    "financials": {
+      "revenue_year": 45040000,
+      "expenses_year": 41660000,
+      "liabilities_total": 6210000,
+      "employees": 15,
+      "tax_arrears": false
+    },
+    "credit_history": {
+      "active_loans": 0,
+      "overdue_count": 0,
+      "max_overdue_days": 0,
+      "total_debt": 0
+    },
+    "demo": null
+  }
+]

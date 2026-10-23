@@ -17,6 +17,10 @@ services:
       timeout: 3s
       retries: 10
 
+  mocks:
+    build:
+      context: ./mocks
+
   backend:
     build:
       context: ./backend
