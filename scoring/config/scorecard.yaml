@@ -1,0 +1,100 @@
+# Балльная карта скоринга малого бизнеса.
+#
+# Как считается оценка:
+#   points_total = base_points + сумма баллов по факторам
+#   score (вероятность дефолта) = clamp(1 / (1 + exp(slope * (points_total - pivot))), min_pd, max_pd)
+#
+# Чем больше баллов, тем надёжнее заёмщик. Положительные баллы фактора уменьшают риск,
+# отрицательные увеличивают. Фактор с нулём баллов в объяснение не попадает.
+#
+# Каждый фактор берёт один входной признак и сопоставляет значению интервал:
+# интервалы идут по возрастанию, "upto" это верхняя граница включительно,
+# последний интервал с "upto: null" ловит всё остальное.
+# В "comment" доступен плейсхолдер {value} с числом признака.
+#
+# Веса заданы экспертно: реальных меток "вернул или не вернул" нет (см. README).
+
+model_version: scorecard-0.1.0
+
+base_points: 400
+
+pd:
+  pivot: 275
+  slope: 0.0075
+  min_pd: 0.01
+  max_pd: 0.99
+
+# score строго ниже low_max: low, ниже medium_max: medium, иначе high
+risk_classes:
+  low_max: 0.10
+  medium_max: 0.25
+
+factors:
+  credit_history:
+    feature: max_overdue_days
+    bins:
+      - { upto: 0, points: 120, comment: "просрочек в кредитной истории нет" }
+      - { upto: 29, points: 30, comment: "были короткие просрочки, максимум {value:.0f} дн." }
+      - { upto: 89, points: -60, comment: "была просрочка до {value:.0f} дн." }
+      - { upto: null, points: -200, comment: "была серьёзная просрочка {value:.0f} дн." }
+
+  overdue_frequency:
+    feature: overdue_count
+    bins:
+      - { upto: 0, points: 30, comment: "просрочек не было" }
+      - { upto: 2, points: -25, comment: "просрочек: {value:.0f}" }
+      - { upto: null, points: -70, comment: "частые просрочки: {value:.0f}" }
+
+  debt_load:
+    feature: debt_load
+    bins:
+      - { upto: 0.10, points: 60, comment: "обязательства малы, около {value:.0%} выручки" }
+      - { upto: 0.30, points: 20, comment: "обязательства умеренные, около {value:.0%} выручки" }
+      - { upto: 0.60, points: -40, comment: "обязательства заметны, около {value:.0%} выручки" }
+      - { upto: null, points: -110, comment: "высокая долговая нагрузка, обязательства около {value:.0%} выручки" }
+
+  profit_margin:
+    feature: profit_margin
+    bins:
+      - { upto: 0.0, points: -200, comment: "расходы не меньше выручки, прибыли нет" }
+      - { upto: 0.05, points: -40, comment: "низкая рентабельность, {value:.0%}" }
+      - { upto: 0.12, points: 20, comment: "рентабельность в норме, {value:.0%}" }
+      - { upto: null, points: 70, comment: "высокая рентабельность, {value:.0%}" }
+
+  company_age:
+    feature: age_months
+    bins:
+      - { upto: 11, points: -70, comment: "компании меньше года, {value:.0f} мес." }
+      - { upto: 23, points: -30, comment: "компании меньше двух лет, {value:.0f} мес." }
+      - { upto: 59, points: 20, comment: "компания работает {value:.0f} мес." }
+      - { upto: null, points: 50, comment: "давно на рынке, {value:.0f} мес." }
+
+  revenue_size:
+    feature: revenue_year
+    bins:
+      - { upto: 6000000, points: -40, comment: "небольшая годовая выручка" }
+      - { upto: 20000000, points: 0, comment: "средняя годовая выручка" }
+      - { upto: 60000000, points: 30, comment: "заметная годовая выручка" }
+      - { upto: null, points: 50, comment: "крупная годовая выручка" }
+
+  loan_to_revenue:
+    feature: loan_to_revenue
+    bins:
+      - { upto: 0.10, points: 40, comment: "запрошенная сумма мала относительно выручки, {value:.0%}" }
+      - { upto: 0.25, points: 0, comment: "запрошенная сумма соразмерна выручке, {value:.0%}" }
+      - { upto: 0.50, points: -50, comment: "запрошенная сумма велика относительно выручки, {value:.0%}" }
+      - { upto: null, points: -120, comment: "запрошенная сумма очень велика относительно выручки, {value:.0%}" }
+
+  active_loans:
+    feature: active_loans
+    bins:
+      - { upto: 1, points: 10, comment: "действующих кредитов немного: {value:.0f}" }
+      - { upto: 3, points: -20, comment: "действующих кредитов: {value:.0f}" }
+      - { upto: null, points: -60, comment: "много действующих кредитов: {value:.0f}" }
+
+  term:
+    feature: term_months
+    bins:
+      - { upto: 12, points: 10, comment: "короткий срок, {value:.0f} мес." }
+      - { upto: 36, points: 0, comment: "средний срок, {value:.0f} мес." }
+      - { upto: null, points: -30, comment: "длинный срок, {value:.0f} мес." }
