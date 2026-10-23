@@ -1,3 +1,13 @@
+export type ApplicationStatus =
+  | "draft"
+  | "submitted"
+  | "review"
+  | "clarification"
+  | "approved"
+  | "rejected"
+  | "offer"
+  | "accepted"
+  | "declined";
 
 export type CreditApplication = {
   id: string;
@@ -7,6 +17,10 @@ export type CreditApplication = {
   purpose: string;
   companyName: string;
   inn: string;
-  status: "draft";
+  status: ApplicationStatus;
   createdAt: string;
+  submittedAt?: string;
+  clarificationRequest?: string;
+  clarificationReply?: string;
+  offerDetails?: string;
 };

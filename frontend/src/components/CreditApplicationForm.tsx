@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { CreditApplication } from "../types/application";
-import { saveApplication } from "../utils/applicationStorage";
-import { updateApplication } from "../utils/applicationStorage";
+import { saveApplication, updateApplication } from "../utils/applicationStorage";
 
 type CreditApplicationFormProps = {
   productName: string;
@@ -60,6 +59,10 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
   };
 
   try {
+    if (application && application.status !== "draft") {
+      window.alert("Редактировать можно только черновик.");
+      return;
+    }
     if (application) {
       updateApplication(updatedData);
     } else {
@@ -172,7 +175,7 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
           <button type="button" onClick={onClose}>
             Отмена
           </button>
-          <button type="submit">Проверить черновик</button>
+          <button type="submit">Сохранить черновик</button>
         </div>
       </form>
     </section>

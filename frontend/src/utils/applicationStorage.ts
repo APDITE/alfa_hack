@@ -6,17 +6,36 @@ const STORAGE_KEY = "credit-applications-demo";
 export function getApplications(): CreditApplication[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) as CreditApplication[] : [];
+    if (!data) return [];
+
+    const parsed: unknown = JSON.parse(data);
+
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is CreditApplication =>
+          typeof item === "object" &&
+          item !== null &&
+          typeof item.id === "string" &&
+          typeof item.status === "string"
+        )
+      : [];
   } catch {
     return [];
   }
 }
 
-export function saveApplication(application: CreditApplication): void {
-  const applications = getApplications();
-  applications.push(application);
+function writeApplications(
+  applications: CreditApplication[]
+): void {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(applications)
+  );
+}
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+export function saveApplication(
+  application: CreditApplication
+): void {
+  writeApplications([...getApplications(), application]);
 }
 
 export function updateApplication(
@@ -24,21 +43,25 @@ export function updateApplication(
 ): void {
   const applications = getApplications();
 
-  const updated = applications.map((application) =>
-    application.id === updatedApplication.id
-      ? updatedApplication
-      : application
-  );
+  if (
+    !applications.some(
+      (item) => item.id === updatedApplication.id
+    )
+  ) {
+    throw new Error("Заявка не найдена");
+  }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  writeApplications(
+    applications.map((item) =>
+      item.id === updatedApplication.id
+        ? updatedApplication
+        : item
+    )
+  );
 }
 
 export function deleteApplication(id: string): void {
-  const applications = getApplications();
-
-  const filtered = applications.filter(
-    (application) => application.id !== id
+  writeApplications(
+    getApplications().filter((item) => item.id !== id)
   );
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 }
