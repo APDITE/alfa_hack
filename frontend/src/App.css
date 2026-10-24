@@ -447,6 +447,20 @@ main {
   margin-top: 8px;
 }
 
+.stack {
+  display: grid;
+  gap: 10px;
+}
+
+.company-found {
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--success-bg);
+  font-size: 14px;
+}
+
 .demo-accounts {
   margin-top: 20px;
 }

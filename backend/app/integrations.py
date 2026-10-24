@@ -5,9 +5,10 @@ only on the `Integrations` protocol, so tests and a local fallback can swap the 
 """
 
 import logging
-from typing import Any, Protocol
+from typing import Annotated, Any, Protocol
 
 import httpx
+from fastapi import Depends, Request
 
 log = logging.getLogger(__name__)
 
@@ -81,3 +82,11 @@ class HttpIntegrations:
         if result is None:
             raise ExternalUnavailableError("scoring", "HTTP 404")
         return result
+
+
+def get_integrations(request: Request) -> Integrations:
+    integrations: Integrations = request.app.state.integrations
+    return integrations
+
+
+IntegrationsDep = Annotated[Integrations, Depends(get_integrations)]

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 
 import { api, errorText } from "../api/client";
 import type { AuthUser } from "../api/types";
+import RegistrationForm from "./RegistrationForm";
 
 type Props = {
   onLogin: (user: AuthUser, token: string) => void;
@@ -25,6 +26,7 @@ export default function LoginForm({ onLogin }: Props) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [registering, setRegistering] = useState(false);
 
   async function signIn(loginValue: string, passwordValue: string) {
     setError("");
@@ -63,6 +65,7 @@ export default function LoginForm({ onLogin }: Props) {
                   className="demo-account"
                   disabled={loading}
                   onClick={() => {
+                    setRegistering(false);
                     setLogin(account.login);
                     setPassword(account.login);
                     void signIn(account.login, account.login);
@@ -78,35 +81,42 @@ export default function LoginForm({ onLogin }: Props) {
         </div>
       </div>
 
-      <form className="login-form card" onSubmit={handleSubmit}>
-        <h3>Вход в систему</h3>
-        <label htmlFor="auth-login">Логин</label>
-        <input
-          id="auth-login"
-          type="text"
-          autoComplete="username"
-          required
-          value={login}
-          onChange={(event) => setLogin(event.target.value)}
-        />
-        <label htmlFor="auth-password">Пароль</label>
-        <input
-          id="auth-password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-        {error && (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
-        )}
-        <button type="submit" className="button button--primary" disabled={loading}>
-          {loading ? "Входим…" : "Войти"}
-        </button>
-      </form>
+      {registering ? (
+        <RegistrationForm onRegistered={onLogin} onCancel={() => setRegistering(false)} />
+      ) : (
+        <form className="login-form card" onSubmit={handleSubmit}>
+          <h3>Вход в систему</h3>
+          <label htmlFor="auth-login">Логин</label>
+          <input
+            id="auth-login"
+            type="text"
+            autoComplete="username"
+            required
+            value={login}
+            onChange={(event) => setLogin(event.target.value)}
+          />
+          <label htmlFor="auth-password">Пароль</label>
+          <input
+            id="auth-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          {error && (
+            <p className="form-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" className="button button--primary" disabled={loading}>
+            {loading ? "Входим…" : "Войти"}
+          </button>
+          <button type="button" className="link-button" onClick={() => setRegistering(true)}>
+            Нет учётной записи? Зарегистрируйте компанию по ИНН
+          </button>
+        </form>
+      )}
     </section>
   );
 }

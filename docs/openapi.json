@@ -96,6 +96,91 @@
         ]
       }
     },
+    "/api/registration/company/{inn}": {
+      "get": {
+        "tags": [
+          "registration"
+        ],
+        "summary": "Find Company",
+        "description": "Find the company in the registry before registering (registry data is public).\n\n409 if the company already has an account, so the client is sent to sign in at once.",
+        "operationId": "find_company_api_registration_company__inn__get",
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registration": {
+      "post": {
+        "tags": [
+          "registration"
+        ],
+        "summary": "Register",
+        "description": "Register a client by INN and sign them in. One account per company in the prototype.",
+        "operationId": "register_api_registration_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/products": {
       "get": {
         "tags": [
@@ -1966,6 +2051,49 @@
           "reason"
         ],
         "title": "RecommendResponse"
+      },
+      "RegistrationRequest": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "pattern": "^\\d{10}(\\d{2})?$",
+            "title": "Inn",
+            "examples": [
+              "7712345678"
+            ]
+          },
+          "full_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Full Name",
+            "examples": [
+              "Иван Петров"
+            ]
+          },
+          "login": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "title": "Login"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 8,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "full_name",
+          "login",
+          "password"
+        ],
+        "title": "RegistrationRequest",
+        "description": "New client by INN: the company card comes from the registry (ЕГРЮЛ/ЕГРИП)."
       },
       "RiskClass": {
         "type": "string",

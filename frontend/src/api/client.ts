@@ -18,6 +18,7 @@ import type {
   Product,
   PurposeCategory,
   Recommendation,
+  RegistrationInput,
 } from "./types";
 
 const TOKEN_KEY = "alfa-hack-access-token";
@@ -69,6 +70,12 @@ const KNOWN_ERRORS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^Only clients can do this$/, () => "Действие доступно только клиенту."],
   [/^Only bank employees can do this$/, () => "Действие доступно только сотруднику банка."],
   [/^Invalid login or password$/, () => "Неверный логин или пароль."],
+  [/^Company is already registered$/, () =>
+    "Эта компания уже зарегистрирована — войдите под её учётной записью."],
+  [/^Login is already taken$/, () => "Этот логин уже занят, выберите другой."],
+  [/^Company not found in the registry$/, () => "Компания с таким ИНН не найдена в ЕГРЮЛ/ЕГРИП."],
+  [/^Registry is temporarily unavailable$/, () => "Реестр временно недоступен, попробуйте через минуту."],
+  [/^INN must be 10 or 12 digits$/, () => "ИНН — 10 цифр для ООО или 12 для ИП."],
   [/^Not authenticated$/, () => "Сессия истекла, войдите снова."],
 ];
 
@@ -81,6 +88,10 @@ const FIELD_NAMES: Record<string, string> = {
   liabilities_total: "долги",
   comment: "комментарий",
   rate: "ставка",
+  inn: "ИНН",
+  login: "логин",
+  password: "пароль",
+  full_name: "имя",
 };
 
 function translate(message: string): string {
@@ -145,6 +156,10 @@ export const api = {
   login: (login: string, password: string) =>
     request<LoginResponse>("/api/auth/login", { method: "POST", body: json({ login, password }) }),
   me: () => request<AuthUser>("/api/auth/me"),
+  registryCompany: (inn: string) =>
+    request<Company>(`/api/registration/company/${encodeURIComponent(inn)}`),
+  register: (input: RegistrationInput) =>
+    request<LoginResponse>("/api/registration", { method: "POST", body: json(input) }),
 
   products: () => request<Product[]>("/api/products"),
   recommend: (purpose_category: PurposeCategory) =>

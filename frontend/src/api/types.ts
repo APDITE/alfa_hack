@@ -242,3 +242,10 @@ export type OpsSummary = {
   manual_review: number;
   alerts: { level: "warning" | "critical"; text: string }[];
 };
+
+export type RegistrationInput = {
+  inn: string;
+  full_name: string;
+  login: string;
+  password: string;
+};
