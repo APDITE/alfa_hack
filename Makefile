@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help env up down reset logs db docs test
+.PHONY: help env up down reset logs db monitoring docs test
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-8s %s\n", $$1, $$2}'
@@ -21,6 +21,9 @@ logs: ## Follow backend and worker logs
 
 db: ## Only Postgres, published on localhost:5432 (backend outside Docker)
 	docker compose -f docker-compose.yml -f compose.dev.yml up db
+
+monitoring: env ## Same as up, plus Prometheus with alert rules on http://localhost:9090
+	docker compose -f docker-compose.yml -f compose.monitoring.yml up --build
 
 docs: ## Regenerate docs/state-diagram.md, docs/data-model.md and docs/openapi.json
 	cd backend && uv run python -m app.docgen

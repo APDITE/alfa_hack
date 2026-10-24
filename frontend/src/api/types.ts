@@ -231,3 +231,14 @@ export type LifecycleMeta = {
 export type ExternalService = "egrul" | "transparent_business" | "bki";
 
 export type Availability = Record<ExternalService, boolean>;
+
+export type OpsSummary = {
+  status: "ok" | "warning" | "critical";
+  ready_jobs: number;
+  oldest_ready_seconds: number;
+  stuck_applications: number;
+  waiting_external: number;
+  failed_jobs_24h: number;
+  manual_review: number;
+  alerts: { level: "warning" | "critical"; text: string }[];
+};

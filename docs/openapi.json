@@ -791,6 +791,33 @@
           }
         }
       }
+    },
+    "/api/ops/summary": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Summary",
+        "description": "Pipeline health for employees: queue, stuck applications, external services, errors.",
+        "operationId": "summary_api_ops_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1704,6 +1731,90 @@
           "comment"
         ],
         "title": "ManualDecisionRequest"
+      },
+      "OpsAlert": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "warning",
+              "critical"
+            ],
+            "title": "Level"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "text"
+        ],
+        "title": "OpsAlert"
+      },
+      "OpsSummary": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Status"
+          },
+          "ready_jobs": {
+            "type": "integer",
+            "title": "Ready Jobs",
+            "description": "Jobs ready to run now"
+          },
+          "oldest_ready_seconds": {
+            "type": "number",
+            "title": "Oldest Ready Seconds",
+            "description": "How long the oldest ready job waits"
+          },
+          "stuck_applications": {
+            "type": "integer",
+            "title": "Stuck Applications",
+            "description": "Automatic status, no progress for 5+ minutes"
+          },
+          "waiting_external": {
+            "type": "integer",
+            "title": "Waiting External",
+            "description": "Retrying an unavailable external service"
+          },
+          "failed_jobs_24h": {
+            "type": "integer",
+            "title": "Failed Jobs 24H",
+            "description": "Stages that failed with an unexpected error"
+          },
+          "manual_review": {
+            "type": "integer",
+            "title": "Manual Review"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/OpsAlert"
+            },
+            "type": "array",
+            "title": "Alerts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "ready_jobs",
+          "oldest_ready_seconds",
+          "stuck_applications",
+          "waiting_external",
+          "failed_jobs_24h",
+          "manual_review",
+          "alerts"
+        ],
+        "title": "OpsSummary",
+        "description": "Pipeline health for the bank workplace; thresholds match monitoring/alerts.yml."
       },
       "ProductId": {
         "type": "string",

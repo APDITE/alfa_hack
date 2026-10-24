@@ -1,0 +1,48 @@
+# Alert rules for the credit pipeline. The same thresholds drive the pipeline health
+# widget in the bank workplace (backend/app/ops.py).
+groups:
+  - name: credit-pipeline
+    rules:
+      - alert: PipelineQueueStalled
+        expr: credit_pipeline_oldest_ready_job_age_seconds > 60
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Очередь конвейера не разбирается"
+          description: "Готовая задача ждёт {{ $value | humanizeDuration }} — проверьте, что воркер запущен."
+
+      - alert: ApplicationsStuck
+        expr: credit_applications_stuck > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Заявки без движения в автоматическом статусе"
+          description: "{{ $value }} заявок дольше 5 минут не меняют статус."
+
+      - alert: ExternalServiceUnavailable
+        expr: credit_applications_waiting_external > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Заявки ждут недоступный внешний сервис"
+          description: "{{ $value }} заявок повторяют запросы к ЕГРЮЛ, «Прозрачному бизнесу» или БКИ."
+
+      - alert: PipelineStageErrors
+        expr: delta(credit_pipeline_jobs{state="failed"}[15m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Этапы конвейера падают с технической ошибкой"
+          description: "Заявки переданы сотрудникам; причина — в last_error задач pipeline_jobs."
+
+      - alert: ManualReviewBacklog
+        expr: credit_applications{status="manual_review"} > 20
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Растёт очередь ручной проверки"
+          description: "{{ $value }} заявок ждут решения сотрудника."

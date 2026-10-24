@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from app.config import Settings
 from app.db import make_engine, make_session_factory
 from app.products import load_products
-from app.routes import applications, auth, catalog, feed, health, meta
+from app.routes import applications, auth, catalog, feed, health, meta, ops
 
 _DEV_SECRET_PREFIX = "dev-only"
 
@@ -47,6 +47,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.session_factory = make_session_factory(engine)
     app.state.products = load_products(Path(settings.products_path))
 
-    for module in (health, auth, catalog, applications, feed, meta):
+    for module in (health, auth, catalog, applications, feed, meta, ops):
         app.include_router(module.router, prefix="/api")
+    # Prometheus scrapes the backend directly; nginx does not proxy /metrics.
+    app.include_router(ops.metrics_router)
     return app

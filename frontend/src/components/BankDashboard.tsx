@@ -7,6 +7,7 @@ import { usePolling } from "../utils/hooks";
 import { IN_PROGRESS, PRODUCT_NAMES, RISK_LABELS } from "../utils/labels";
 import BankApplication from "./BankApplication";
 import DemoPanel from "./DemoPanel";
+import PipelineHealth from "./PipelineHealth";
 import StatusBadge from "./StatusBadge";
 
 type Queue = {
@@ -106,6 +107,8 @@ export default function BankDashboard() {
         </div>
         <DemoPanel />
       </div>
+
+      <PipelineHealth />
 
       <div className="queues" role="tablist" aria-label="Очереди заявок">
         {QUEUES.map((item) => {

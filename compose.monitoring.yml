@@ -1,0 +1,12 @@
+# Optional: the stack plus Prometheus with the alert rules on http://localhost:9090
+#   make monitoring  (docker compose -f docker-compose.yml -f compose.monitoring.yml up --build)
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend

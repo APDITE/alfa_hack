@@ -14,6 +14,7 @@ import type {
   LifecycleMeta,
   LoginResponse,
   ManualDecision,
+  OpsSummary,
   Product,
   PurposeCategory,
   Recommendation,
@@ -180,6 +181,8 @@ export const api = {
 
   feed: () => request<Feed>("/api/feed"),
   markFeedRead: () => request<void>("/api/feed/read", { method: "POST" }),
+
+  opsSummary: () => request<OpsSummary>("/api/ops/summary"),
 
   // Demo only: availability switches of the external-service mocks (scenario 7).
   availability: () => request<Availability>("/mock/admin/availability"),
