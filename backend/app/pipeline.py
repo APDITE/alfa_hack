@@ -6,6 +6,7 @@ next job. External services that do not answer are retried with backoff (scenari
 """
 
 import logging
+import uuid
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
@@ -35,12 +36,14 @@ from app.models import (
     ScoreRecord,
 )
 from app.products import ProductConfig
-from app.statuses import Actor, ApplicationStatus
+from app.statuses import STATUS_LABELS, Actor, ApplicationStatus, can_transition
 
 log = logging.getLogger("app.pipeline")
 
 S = ApplicationStatus
 MAX_ATTEMPTS = 10
+# An unexpected error (a bug, bad data) is retried a few times, then an employee takes over.
+MAX_CRASH_ATTEMPTS = 3
 _BACKOFF_SECONDS = (5, 15, 45)
 _RETRY_EVERY_SECONDS = 60
 
@@ -100,13 +103,46 @@ def run_once(factory: sessionmaker[Session], ctx: PipelineContext, now: datetime
             session.commit()
         except Exception as exc:
             session.rollback()
-            log.exception("application=%s stage=%s job failed", application_id, stage)
-            failed = session.get(PipelineJob, job_id)
-            if failed is not None:
-                failed.status = JobStatus.FAILED
-                failed.last_error = repr(exc)[:2000]
-                session.commit()
+            log.exception("application=%s stage=%s job crashed", application_id, stage)
+            try:
+                handle_crash(session, job_id, exc, now)
+            except Exception:
+                session.rollback()
+                log.exception("application=%s stage=%s crash not recorded", application_id, stage)
         return True
+
+
+def handle_crash(session: Session, job_id: uuid.UUID, exc: Exception, now: datetime) -> None:
+    """Unexpected error in a stage: retry with backoff, then hand the application to an
+    employee, so it never hangs in an automatic status (the attempt of the crashed run
+    was rolled back with the rest of its transaction)."""
+    job = session.get(PipelineJob, job_id)
+    if job is None:
+        return
+    job.attempt += 1
+    job.last_error = repr(exc)[:2000]
+    if job.attempt < MAX_CRASH_ATTEMPTS:
+        job.status = JobStatus.PENDING
+        job.run_after = now + backoff(job.attempt)
+        session.commit()
+        return
+
+    job.status = JobStatus.FAILED
+    application = session.get(Application, job.application_id)
+    if (
+        application is not None
+        and application.status is job.stage
+        and can_transition(application.status, S.MANUAL_REVIEW)
+    ):
+        reason = (
+            f"Техническая ошибка на этапе «{STATUS_LABELS[job.stage]}» после "
+            f"{job.attempt} попыток, заявку проверит сотрудник"
+        )
+        transition(session, application, S.MANUAL_REVIEW, Actor.SYSTEM, comment=reason)
+        log.error(
+            "application=%s stage=%s handed to an employee after crashes", application.id, job.stage
+        )
+    session.commit()
 
 
 def run_until_idle(

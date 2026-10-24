@@ -27,13 +27,16 @@ stateDiagram-v2
     draft --> submitted : клиент
     draft --> withdrawn : клиент
     submitted --> data_check : система
+    submitted --> manual_review : система
     data_check --> clarification_required : система
     data_check --> enrichment : система
+    data_check --> manual_review : система
     clarification_required --> data_check : клиент
     clarification_required --> withdrawn : клиент
     enrichment --> manual_review : система
     enrichment --> scoring : система
     scoring --> credit_decision : система
+    scoring --> manual_review : система
     credit_decision --> approved : система
     credit_decision --> clarification_required : система
     credit_decision --> counter_offer : система
@@ -57,11 +60,11 @@ stateDiagram-v2
 | Статус | Подпись | Этап для клиента | Чей ход | Следующие статусы | Что видит клиент |
 | --- | --- | --- | --- | --- | --- |
 | `draft` | Черновик | Заполняете заявку | клиент | `submitted`, `withdrawn` | Заполните сумму, срок и цель и отправьте заявку. Черновик сохраняется сам. |
-| `submitted` | Отправлена | Проверяем заявку | система | `data_check` | Заявка принята. Мы проверим данные — от вас ничего не требуется. |
-| `data_check` | Проверка данных | Проверяем заявку | система | `clarification_required`, `enrichment` | Проверяем, что все данные заполнены. От вас ничего не требуется. |
+| `submitted` | Отправлена | Проверяем заявку | система | `data_check`, `manual_review` | Заявка принята. Мы проверим данные — от вас ничего не требуется. |
+| `data_check` | Проверка данных | Проверяем заявку | система | `clarification_required`, `enrichment`, `manual_review` | Проверяем, что все данные заполнены. От вас ничего не требуется. |
 | `clarification_required` | Нужны уточнения | Нужно ваше действие | клиент | `data_check`, `withdrawn` | Нам не хватает данных. Ответьте на вопрос ниже — после этого проверка продолжится. |
 | `enrichment` | Обогащение данных | Проверяем заявку | система | `manual_review`, `scoring` | Сверяем данные о компании с государственными реестрами и кредитной историей. |
-| `scoring` | Скоринг | Проверяем заявку | система | `credit_decision` | Оцениваем финансовое положение компании. |
+| `scoring` | Скоринг | Проверяем заявку | система | `credit_decision`, `manual_review` | Оцениваем финансовое положение компании. |
 | `credit_decision` | Кредитное решение | Проверяем заявку | система | `approved`, `clarification_required`, `counter_offer`, `manual_review`, `rejected` | Готовим решение по заявке. |
 | `manual_review` | Ручная проверка | Проверяем заявку | сотрудник | `approved`, `clarification_required`, `counter_offer`, `rejected` | Заявку смотрит кредитный специалист. Обычно это занимает до одного дня. |
 | `approved` | Одобрена | Решение готово | клиент | `signing`, `withdrawn` | Банк готов выдать кредит на запрошенных условиях. Примите или отклоните их. |
