@@ -1,0 +1,198 @@
+### Коллекция запросов к API бэкенда: сквозной сценарий клиента и сотрудника.
+### Формат VS Code REST Client (именованные запросы # @name и ссылки на ответы).
+### В JetBrains HTTP Client вставьте access_token вручную в переменные ниже.
+### Стек: make up, затем запросы выполняются по порядку сверху вниз.
+
+@base = http://localhost:8080/api
+
+### Проверка живости
+GET {{base}}/health
+
+### Статусы, переходы и подписи — прямо из модели процесса
+GET {{base}}/meta/lifecycle
+
+### Каталог продуктов (без авторизации)
+GET {{base}}/products
+
+### Подбор продукта по цели: «на что нужны деньги»
+POST {{base}}/products/recommend
+Content-Type: application/json
+
+{"purpose_category": "inventory"}
+
+
+### ==== Сценарий 1: автоодобрение → подписание → выдача (client1) ====
+
+# @name client1
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"login": "client1", "password": "client1"}
+
+###
+@client1Token = {{client1.response.body.access_token}}
+
+### Реквизиты компании подставляются из реестра
+GET {{base}}/companies/lookup/7700000001
+Authorization: Bearer {{client1Token}}
+
+### Черновик заявки
+# @name draft1
+POST {{base}}/applications
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "product_id": "working_capital",
+  "purpose_category": "inventory",
+  "amount": 1500000,
+  "term_months": 12,
+  "purpose": "Закупка товара к новогоднему сезону"
+}
+
+###
+@app1 = {{draft1.response.body.id}}
+
+### Отправка в банк. Повтор с тем же ключом вернёт ту же заявку (сценарий 9)
+POST {{base}}/applications/{{app1}}/submit
+Authorization: Bearer {{client1Token}}
+Idempotency-Key: demo-submit-{{app1}}
+
+### Карточка через 1–2 с: approved, decision.terms, next_step, history
+GET {{base}}/applications/{{app1}}
+Authorization: Bearer {{client1Token}}
+
+### Принять условия → signing
+POST {{base}}/applications/{{app1}}/accept
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{"accept": true}
+
+### Подписать (симуляция) → issued
+POST {{base}}/applications/{{app1}}/sign
+Authorization: Bearer {{client1Token}}
+
+### Уведомления: события по заявке, новые сверху
+GET {{base}}/feed
+Authorization: Bearer {{client1Token}}
+
+### Отметить уведомления прочитанными
+POST {{base}}/feed/read
+Authorization: Bearer {{client1Token}}
+
+
+### ==== Сценарий 3: запрос уточнения и ответ клиента (client3) ====
+
+# @name client3
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"login": "client3", "password": "client3"}
+
+###
+@client3Token = {{client3.response.body.access_token}}
+
+# @name draft3
+POST {{base}}/applications
+Authorization: Bearer {{client3Token}}
+Content-Type: application/json
+
+{"product_id": "working_capital", "amount": 800000, "term_months": 12, "purpose": "Материалы"}
+
+###
+@app3 = {{draft3.response.body.id}}
+
+POST {{base}}/applications/{{app3}}/submit
+Authorization: Bearer {{client3Token}}
+Idempotency-Key: demo-submit-{{app3}}
+
+### Через 1–2 с: clarification_required, clarification.requested_fields
+GET {{base}}/applications/{{app3}}
+Authorization: Bearer {{client3Token}}
+
+### Ответ: недостающие показатели → заявка снова идёт по конвейеру и одобряется
+PUT {{base}}/applications/{{app3}}
+Authorization: Bearer {{client3Token}}
+Content-Type: application/json
+
+{
+  "revenue_year": 9000000,
+  "expenses_year": 7200000,
+  "liabilities_total": 600000,
+  "clarification_answer": "Цифры из книги учёта доходов за 12 месяцев"
+}
+
+### Сценарий 10: чужая заявка — 403
+GET {{base}}/applications/{{app3}}
+Authorization: Bearer {{client1Token}}
+
+
+### ==== Сценарий 5: ручная проверка и решение сотрудника (client5 + analyst) ====
+
+# @name client5
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"login": "client5", "password": "client5"}
+
+###
+@client5Token = {{client5.response.body.access_token}}
+
+# @name draft5
+POST {{base}}/applications
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"product_id": "working_capital", "amount": 2000000, "term_months": 12, "purpose": "Сезонные работы"}
+
+###
+@app5 = {{draft5.response.body.id}}
+
+POST {{base}}/applications/{{app5}}/submit
+Authorization: Bearer {{client5Token}}
+Idempotency-Key: demo-submit-{{app5}}
+
+###
+# @name analyst
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{"login": "analyst", "password": "analyst"}
+
+###
+@analystToken = {{analyst.response.body.access_token}}
+
+### Очередь сотрудника: заявки на ручной проверке
+GET {{base}}/applications?status=manual_review
+Authorization: Bearer {{analystToken}}
+
+### Карточка для сотрудника: проверки, скоринг с факторами, история
+GET {{base}}/applications/{{app5}}
+Authorization: Bearer {{analystToken}}
+
+### Решение: другие условия (approved | counter_offer | clarification | rejected)
+POST {{base}}/applications/{{app5}}/decision
+Authorization: Bearer {{analystToken}}
+Content-Type: application/json
+
+{
+  "outcome": "counter_offer",
+  "comment": "Сезонная выручка: снижаем сумму и растягиваем срок",
+  "terms": {"product_id": "working_capital", "amount": 1500000, "term_months": 18}
+}
+
+
+### ==== Сценарий 7: сбой внешнего источника (демо-переключатель через nginx) ====
+
+POST http://localhost:8080/mock/admin/availability
+Content-Type: application/json
+
+{"service": "bki", "available": false}
+
+### Подайте заявку client1 (как в сценарии 1): заявка ждёт, waiting_external = true.
+### Затем включите источник — заявка продолжится сама.
+POST http://localhost:8080/mock/admin/availability
+Content-Type: application/json
+
+{"service": "bki", "available": true}
