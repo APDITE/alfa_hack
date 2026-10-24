@@ -1,22 +1,24 @@
 import { useState, type FormEvent } from "react";
 
-export type AuthUser = {
-  id: string;
-  login: string;
-  full_name: string;
-  role: "client" | "employee";
-  company_inn: string | null;
-};
-
-type LoginResponse = {
-  access_token: string;
-  token_type: string;
-  user: AuthUser;
-};
+import { api, errorText } from "../api/client";
+import type { AuthUser } from "../api/types";
 
 type Props = {
   onLogin: (user: AuthUser, token: string) => void;
 };
+
+// Synthetic test accounts from backend/config/demo_companies.yaml (password = login).
+const DEMO_ACCOUNTS: { login: string; company: string; scenario: string }[] = [
+  { login: "client1", company: "ООО «Северный ветер»", scenario: "автоодобрение" },
+  { login: "client2", company: "ООО «Пекарня на углу»", scenario: "другие условия" },
+  { login: "client3", company: "ИП Ковалёва", scenario: "банк запросит данные" },
+  { login: "client4", company: "ООО «СтройМонтаж»", scenario: "отказ: просрочка" },
+  { login: "client5", company: "ООО «Агротех»", scenario: "ручная проверка" },
+  { login: "client6", company: "ООО «Вектор»", scenario: "отказ: ликвидация" },
+  { login: "client7", company: "ООО «Кофейня Зерно»", scenario: "два продукта" },
+  { login: "client8", company: "ИП Захаров", scenario: "молодой бизнес" },
+  { login: "analyst", company: "Сотрудник банка", scenario: "ручная проверка заявок" },
+];
 
 export default function LoginForm({ onLogin }: Props) {
   const [login, setLogin] = useState("");
@@ -24,56 +26,59 @@ export default function LoginForm({ onLogin }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function signIn(loginValue: string, passwordValue: string) {
     setError("");
     setLoading(true);
-
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ login, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          response.status === 401
-            ? "Неверный логин или пароль"
-            : `Ошибка сервера (${response.status})`
-        );
-      }
-
-      const data: LoginResponse = await response.json();
-      if (
-        !data.access_token ||
-        !data.user ||
-        (data.user.role !== "client" && data.user.role !== "employee")
-      ) {
-        throw new Error("Сервер вернул некорректный ответ");
-      }
-
+      const data = await api.login(loginValue, passwordValue);
       onLogin(data.user, data.access_token);
-    } catch (err) {
-      setError(
-        err instanceof TypeError
-          ? "Не удалось связаться с backend. Проверьте, что сервер запущен."
-          : err instanceof Error
-            ? err.message
-            : "Ошибка входа"
-      );
+    } catch (caught) {
+      setError(errorText(caught));
     } finally {
       setLoading(false);
     }
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void signIn(login.trim(), password);
+  }
+
   return (
     <section className="login-page">
       <div className="login-intro">
-        <h2>Добро пожаловать!</h2>
-        <p>Управляйте кредитными заявками в едином кабинете.</p>
+        <h2>Кредит для бизнеса — в одном кабинете</h2>
+        <p>
+          Подберите продукт под задачу, подайте заявку и следите за решением. Банк проверит
+          данные компании сам: реквизиты, выручку и кредитную историю.
+        </p>
+        <div className="demo-accounts">
+          <h3>Демо-доступ</h3>
+          <p className="muted">Нажмите на учётную запись, чтобы войти. Пароль совпадает с логином.</p>
+          <ul>
+            {DEMO_ACCOUNTS.map((account) => (
+              <li key={account.login}>
+                <button
+                  type="button"
+                  className="demo-account"
+                  disabled={loading}
+                  onClick={() => {
+                    setLogin(account.login);
+                    setPassword(account.login);
+                    void signIn(account.login, account.login);
+                  }}
+                >
+                  <span className="demo-account__login">{account.login}</span>
+                  <span className="demo-account__company">{account.company}</span>
+                  <span className="demo-account__scenario">{account.scenario}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      <form className="login-form" onSubmit={handleSubmit}>
+
+      <form className="login-form card" onSubmit={handleSubmit}>
         <h3>Вход в систему</h3>
         <label htmlFor="auth-login">Логин</label>
         <input
@@ -93,9 +98,13 @@ export default function LoginForm({ onLogin }: Props) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
         />
-        {error && <p className="login-error" role="alert">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Выполняется вход…" : "Войти"}
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+        <button type="submit" className="button button--primary" disabled={loading}>
+          {loading ? "Входим…" : "Войти"}
         </button>
       </form>
     </section>
