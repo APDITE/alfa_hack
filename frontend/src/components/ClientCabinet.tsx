@@ -8,6 +8,7 @@ import type {
   AuthUser,
   Company,
   Feed as FeedData,
+  Preapproval,
   Product,
   PurposeCategory,
 } from "../api/types";
@@ -17,7 +18,7 @@ import { IN_PROGRESS, PRODUCT_NAMES } from "../utils/labels";
 import CreditApplicationForm from "./CreditApplicationForm";
 import Feed from "./Feed";
 import MyApplications from "./MyApplications";
-import ProductCatalog from "./ProductCatalog";
+import ProductCatalog, { type Preset } from "./ProductCatalog";
 
 type Tab = "applications" | "products" | "feed";
 
@@ -25,6 +26,8 @@ type FormState = {
   product: Product;
   purpose: PurposeCategory | null;
   draft?: ApplicationDetail;
+  /** Amount and term of a pre-approved offer. */
+  preset?: Preset;
 };
 
 type Toast = { id: number; text: string };
@@ -53,6 +56,7 @@ export default function ClientCabinet({ user }: { user: AuthUser }) {
   const [details, setDetails] = useState<Record<string, ApplicationDetail>>({});
   const [products, setProducts] = useState<Product[]>([]);
   const [company, setCompany] = useState<Company | null>(null);
+  const [preapproval, setPreapproval] = useState<Preapproval | null>(null);
   const [form, setForm] = useState<FormState | null>(null);
   const [feed, setFeed] = useState<FeedData | null>(null);
   const [feedError, setFeedError] = useState("");
@@ -122,6 +126,11 @@ export default function ClientCabinet({ user }: { user: AuthUser }) {
     api
       .products()
       .then(setProducts)
+      .catch(() => undefined);
+    // Without a pre-approval (sources down, no data) the catalog simply has no offer block.
+    api
+      .preapproved()
+      .then(setPreapproval)
       .catch(() => undefined);
     if (user.company_inn) {
       api
@@ -247,6 +256,7 @@ export default function ClientCabinet({ user }: { user: AuthUser }) {
             purpose={form.purpose}
             company={company}
             draft={form.draft}
+            preset={form.preset}
             onCancel={() => setForm(null)}
             onDone={(detail, submitted) => {
               setForm(null);
@@ -269,7 +279,10 @@ export default function ClientCabinet({ user }: { user: AuthUser }) {
             onNew={() => switchTab("products")}
           />
         ) : tab === "products" ? (
-          <ProductCatalog onApply={(product, purpose) => setForm({ product, purpose })} />
+          <ProductCatalog
+            offers={preapproval?.offers ?? []}
+            onApply={(product, purpose, preset) => setForm({ product, purpose, preset })}
+          />
         ) : (
           <Feed feed={feed} error={feedError} onOpenApplication={openApplication} />
         )}

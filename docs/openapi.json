@@ -296,6 +296,33 @@
         }
       }
     },
+    "/api/offers/preapproved": {
+      "get": {
+        "tags": [
+          "offers"
+        ],
+        "summary": "Preapproved Offers",
+        "description": "What the bank would approve automatically right now, per product (clients only).\n\nThe same sources and credit rules as the pipeline; nothing is stored. An application\nwith these terms gets the same decision while the company's data does not change.",
+        "operationId": "preapproved_offers_api_offers_preapproved_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreapprovalResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/applications": {
       "post": {
         "tags": [
@@ -1142,6 +1169,17 @@
               }
             ]
           },
+          "schedule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentSchedule"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Payment schedule for the offered or signed terms"
+          },
           "clarification": {
             "anyOf": [
               {
@@ -1901,6 +1939,63 @@
         "title": "OpsSummary",
         "description": "Pipeline health for the bank workplace; thresholds match monitoring/alerts.yml."
       },
+      "PaymentSchedule": {
+        "properties": {
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/SchedulePayment"
+            },
+            "type": "array",
+            "title": "Payments"
+          },
+          "total_paid": {
+            "type": "integer",
+            "title": "Total Paid"
+          },
+          "overpayment": {
+            "type": "integer",
+            "title": "Overpayment",
+            "description": "Interest over the whole term, rubles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payments",
+          "total_paid",
+          "overpayment"
+        ],
+        "title": "PaymentSchedule",
+        "description": "Monthly annuity payments for `decision.terms`; the last one absorbs the rounding."
+      },
+      "PreapprovalResponse": {
+        "properties": {
+          "offers": {
+            "items": {
+              "$ref": "#/components/schemas/LoanTerms"
+            },
+            "type": "array",
+            "title": "Offers",
+            "description": "Per product: the largest amount the rules approve automatically now"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "Why there is no offer, for the client"
+          }
+        },
+        "type": "object",
+        "required": [
+          "offers"
+        ],
+        "title": "PreapprovalResponse"
+      },
       "ProductId": {
         "type": "string",
         "enum": [
@@ -2103,6 +2198,41 @@
           "high"
         ],
         "title": "RiskClass"
+      },
+      "SchedulePayment": {
+        "properties": {
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "payment": {
+            "type": "integer",
+            "title": "Payment",
+            "description": "Rubles"
+          },
+          "principal": {
+            "type": "integer",
+            "title": "Principal"
+          },
+          "interest": {
+            "type": "integer",
+            "title": "Interest"
+          },
+          "balance": {
+            "type": "integer",
+            "title": "Balance",
+            "description": "Debt left after this payment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "payment",
+          "principal",
+          "interest",
+          "balance"
+        ],
+        "title": "SchedulePayment"
       },
       "ScoreFactor": {
         "properties": {

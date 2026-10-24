@@ -18,6 +18,8 @@ type Props = {
   company: Company | null;
   /** Edit an existing draft instead of creating a new one. */
   draft?: ApplicationDetail;
+  /** Amount and term to start from, e.g. a pre-approved offer. */
+  preset?: { amount: number; term_months: number };
   onCancel: () => void;
   onDone: (application: ApplicationDetail, submitted: boolean) => void;
 };
@@ -29,14 +31,17 @@ export default function CreditApplicationForm({
   purpose,
   company,
   draft,
+  preset,
   onCancel,
   onDone,
 }: Props) {
   const [category, setCategory] = useState<PurposeCategory>(
     draft?.purpose_category ?? purpose ?? product.purposes[0],
   );
-  const [amountText, setAmountText] = useState(draft?.amount ? groupDigits(String(draft.amount)) : "");
-  const [termText, setTermText] = useState(draft?.term_months ? String(draft.term_months) : "");
+  const startAmount = draft?.amount ?? preset?.amount;
+  const startTerm = draft?.term_months ?? preset?.term_months;
+  const [amountText, setAmountText] = useState(startAmount ? groupDigits(String(startAmount)) : "");
+  const [termText, setTermText] = useState(startTerm ? String(startTerm) : "");
   const [purposeText, setPurposeText] = useState(draft?.purpose ?? "");
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState("");

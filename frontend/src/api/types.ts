@@ -173,7 +173,31 @@ export type ApplicationDetail = ApplicationSummary & {
   checks: CheckResult[];
   score: Score | null;
   decision: Decision | null;
+  /** Payment schedule for the offered or signed terms. */
+  schedule: PaymentSchedule | null;
   clarification: Clarification | null;
+};
+
+export type SchedulePayment = {
+  number: number;
+  payment: number;
+  principal: number;
+  interest: number;
+  /** Debt left after this payment. */
+  balance: number;
+};
+
+export type PaymentSchedule = {
+  payments: SchedulePayment[];
+  total_paid: number;
+  /** Interest over the whole term. */
+  overpayment: number;
+};
+
+/** What the bank would approve automatically right now, per product. */
+export type Preapproval = {
+  offers: LoanTerms[];
+  reason: string | null;
 };
 
 export type DraftInput = {
