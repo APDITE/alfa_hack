@@ -389,3 +389,51 @@ def test_months_between(start: str, end: str, months: int) -> None:
     from datetime import date
 
     assert months_between(date.fromisoformat(start), date.fromisoformat(end)) == months
+
+
+# --- Unexpected errors ----------------------------------------------------------------------
+
+
+def crash_scoring(fake: FakeIntegrations, times: int) -> None:
+    """Make the fake scoring raise a non-network error `times` times, then answer."""
+    original = fake.score
+    left = {"n": times}
+
+    def score(payload: JSON) -> JSON:
+        if left["n"] > 0:
+            left["n"] -= 1
+            raise RuntimeError("bug in the scoring adapter")
+        return original(payload)
+
+    fake.score = score  # type: ignore[method-assign]
+
+
+def test_unexpected_error_is_retried(
+    client: TestClient, login_as: LoginAs, run: Callable[..., int], fake: FakeIntegrations
+) -> None:
+    crash_scoring(fake, times=1)
+    app_id, headers = apply(client, login_as, "client1", "working_capital", 1_500_000, 12)
+    run()
+    assert card(client, app_id, headers)["status"] == "scoring"
+    run(datetime.now(UTC) + timedelta(minutes=2))
+    assert card(client, app_id, headers)["status"] == "approved"
+
+
+def test_repeated_errors_hand_the_application_to_an_employee(
+    app: FastAPI,
+    client: TestClient,
+    login_as: LoginAs,
+    run: Callable[..., int],
+    fake: FakeIntegrations,
+) -> None:
+    crash_scoring(fake, times=100)
+    app_id, headers = apply(client, login_as, "client1", "working_capital", 1_500_000, 12)
+    for minutes in range(0, 10):
+        run(datetime.now(UTC) + timedelta(minutes=minutes))
+    body = card(client, app_id, headers)
+    assert body["status"] == "manual_review"
+    assert statuses(body)[-2:] == ["scoring", "manual_review"]
+    assert "Техническая ошибка" in body["history"][-1]["comment"]
+    with app.state.session_factory() as session:
+        jobs = session.scalars(select(PipelineJob).where(PipelineJob.stage == "scoring")).all()
+        assert [(j.status, j.attempt) for j in jobs] == [(JobStatus.FAILED, 3)]

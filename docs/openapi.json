@@ -1,0 +1,2372 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Smart Credit Cabinet API",
+    "description": "Кредитный конвейер для МСБ: кабинет клиента и рабочее место банка.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "description": "Sign in. Test accounts: `client1`…`client8`, `analyst`; password equals login.",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "description": "The signed-in user.",
+        "operationId": "me_api_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "catalog"
+        ],
+        "summary": "List Products",
+        "operationId": "list_products_api_products_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Products Api Products Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/recommend": {
+      "post": {
+        "tags": [
+          "catalog"
+        ],
+        "summary": "Recommend Product",
+        "description": "Pick a product by the answer to \"what do you need the money for?\".",
+        "operationId": "recommend_product_api_products_recommend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecommendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/lookup/{inn}": {
+      "get": {
+        "tags": [
+          "catalog"
+        ],
+        "summary": "Lookup Company",
+        "description": "Prefill company data by INN (signed-in users). Demo companies: 7700000001 … 7700000008.",
+        "operationId": "lookup_company_api_companies_lookup__inn__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Inn"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Create Application",
+        "description": "Create a draft for the signed-in client's company.",
+        "operationId": "create_application_api_applications_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "List Applications",
+        "description": "Client: own company's applications. Employee: the queue (everything except drafts).",
+        "operationId": "list_applications_api_applications_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ApplicationStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "client_stage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ClientStage"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Stage"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationSummary"
+                  },
+                  "title": "Response List Applications Api Applications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}": {
+      "put": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Update Application",
+        "description": "Edit a draft, or answer a clarification request (the application goes back to review).",
+        "operationId": "update_application_api_applications__application_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Get Application",
+        "description": "Full card. Checks and scoring are shown to employees only.",
+        "operationId": "get_application_api_applications__application_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/submit": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Submit Application",
+        "description": "Send the draft to the bank. Repeating the call with the same key is safe.",
+        "operationId": "submit_application_api_applications__application_id__submit_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/decision": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Manual Decision",
+        "description": "Employee decision on an application in manual review.",
+        "operationId": "manual_decision_api_applications__application_id__decision_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualDecisionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/accept": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Accept Offer",
+        "description": "Client accepts the offer (goes to signing) or declines it (withdrawn).",
+        "operationId": "accept_offer_api_applications__application_id__accept_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptOfferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/withdraw": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Withdraw Application",
+        "description": "Client withdraws the application wherever it is their turn.",
+        "operationId": "withdraw_application_api_applications__application_id__withdraw_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/sign": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Sign Documents",
+        "description": "Simulated signing and disbursement.",
+        "operationId": "sign_documents_api_applications__application_id__sign_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/feed": {
+      "get": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "Get Feed",
+        "description": "Client notifications: events of the client's applications, newest first.",
+        "operationId": "get_feed_api_feed_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/feed/read": {
+      "post": {
+        "tags": [
+          "feed"
+        ],
+        "summary": "Mark Read",
+        "description": "Mark all notifications of the client as read.",
+        "operationId": "mark_read_api_feed_read_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/meta/lifecycle": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Lifecycle",
+        "description": "Statuses, labels and transitions straight from the domain model, for the frontend.",
+        "operationId": "lifecycle_api_meta_lifecycle_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LifecycleMeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ops/summary": {
+      "get": {
+        "tags": [
+          "ops"
+        ],
+        "summary": "Summary",
+        "description": "Pipeline health for employees: queue, stuck applications, external services, errors.",
+        "operationId": "summary_api_ops_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpsSummary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcceptOfferRequest": {
+        "properties": {
+          "accept": {
+            "type": "boolean",
+            "title": "Accept"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accept"
+        ],
+        "title": "AcceptOfferRequest"
+      },
+      "Actor": {
+        "type": "string",
+        "enum": [
+          "client",
+          "system",
+          "employee"
+        ],
+        "title": "Actor"
+      },
+      "ApplicationAction": {
+        "type": "string",
+        "enum": [
+          "edit",
+          "submit",
+          "answer_clarification",
+          "accept",
+          "decline",
+          "sign",
+          "withdraw",
+          "decide"
+        ],
+        "title": "ApplicationAction",
+        "description": "What the current user may do with the application right now."
+      },
+      "ApplicationDetail": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "status_label": {
+            "type": "string",
+            "title": "Status Label"
+          },
+          "client_stage": {
+            "$ref": "#/components/schemas/ClientStage"
+          },
+          "stage_label": {
+            "type": "string",
+            "title": "Stage Label"
+          },
+          "product_id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "company_inn": {
+            "type": "string",
+            "title": "Company Inn"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "risk_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RiskClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "purpose_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PurposeCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "revenue_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Year",
+            "description": "Entered by the client, rubles"
+          },
+          "expenses_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expenses Year"
+          },
+          "liabilities_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Liabilities Total"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "available_actions": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationAction"
+            },
+            "type": "array",
+            "title": "Available Actions",
+            "description": "Buttons to show to the current user"
+          },
+          "next_step": {
+            "type": "string",
+            "title": "Next Step",
+            "description": "What happens next, for the client"
+          },
+          "waiting_external": {
+            "type": "boolean",
+            "title": "Waiting External",
+            "description": "An external source is unavailable, retrying"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyResponse"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/StatusHistoryItem"
+            },
+            "type": "array",
+            "title": "History"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckResult"
+            },
+            "type": "array",
+            "title": "Checks",
+            "description": "Empty for clients"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Null for clients"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "clarification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClarificationView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "status_label",
+          "client_stage",
+          "stage_label",
+          "product_id",
+          "amount",
+          "term_months",
+          "company_inn",
+          "company_name",
+          "created_at",
+          "updated_at",
+          "purpose_category",
+          "purpose",
+          "next_step",
+          "waiting_external",
+          "company",
+          "history",
+          "checks"
+        ],
+        "title": "ApplicationDetail"
+      },
+      "ApplicationStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "submitted",
+          "data_check",
+          "clarification_required",
+          "enrichment",
+          "scoring",
+          "credit_decision",
+          "manual_review",
+          "approved",
+          "counter_offer",
+          "rejected",
+          "signing",
+          "issued",
+          "withdrawn"
+        ],
+        "title": "ApplicationStatus"
+      },
+      "ApplicationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "status_label": {
+            "type": "string",
+            "title": "Status Label"
+          },
+          "client_stage": {
+            "$ref": "#/components/schemas/ClientStage"
+          },
+          "stage_label": {
+            "type": "string",
+            "title": "Stage Label"
+          },
+          "product_id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "company_inn": {
+            "type": "string",
+            "title": "Company Inn"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "risk_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RiskClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "status_label",
+          "client_stage",
+          "stage_label",
+          "product_id",
+          "amount",
+          "term_months",
+          "company_inn",
+          "company_name",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ApplicationSummary"
+      },
+      "CheckOutcome": {
+        "type": "string",
+        "enum": [
+          "passed",
+          "failed",
+          "pending",
+          "unavailable"
+        ],
+        "title": "CheckOutcome"
+      },
+      "CheckResult": {
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/CheckType"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/CheckOutcome"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "attempt": {
+            "type": "integer",
+            "title": "Attempt",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "outcome",
+          "summary"
+        ],
+        "title": "CheckResult"
+      },
+      "CheckType": {
+        "type": "string",
+        "enum": [
+          "completeness",
+          "egrul",
+          "transparent_business",
+          "bki"
+        ],
+        "title": "CheckType"
+      },
+      "ClarificationView": {
+        "properties": {
+          "requested_fields": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requested Fields"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested_fields",
+          "message"
+        ],
+        "title": "ClarificationView"
+      },
+      "ClientStage": {
+        "type": "string",
+        "enum": [
+          "filling",
+          "in_review",
+          "action_required",
+          "decision_ready",
+          "signing",
+          "completed"
+        ],
+        "title": "ClientStage",
+        "description": "Simplified stages shown to the client instead of internal statuses."
+      },
+      "CompanyResponse": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "legal_form": {
+            "$ref": "#/components/schemas/LegalForm"
+          },
+          "okved": {
+            "type": "string",
+            "title": "Okved"
+          },
+          "registration_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Registration Date"
+          },
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "director": {
+            "type": "string",
+            "title": "Director"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "name",
+          "legal_form",
+          "okved",
+          "registration_date",
+          "region",
+          "director"
+        ],
+        "title": "CompanyResponse"
+      },
+      "CreateApplicationRequest": {
+        "properties": {
+          "product_id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "purpose_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PurposeCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Rubles"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id"
+        ],
+        "title": "CreateApplicationRequest"
+      },
+      "DecisionOutcome": {
+        "type": "string",
+        "enum": [
+          "approved",
+          "counter_offer",
+          "clarification",
+          "rejected"
+        ],
+        "title": "DecisionOutcome"
+      },
+      "DecisionView": {
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/DecisionOutcome"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LoanTerms"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Shown to the client in plain language"
+          },
+          "rule": {
+            "type": "string",
+            "title": "Rule",
+            "description": "Which credit rule fired; shown to the employee"
+          },
+          "decided_by": {
+            "$ref": "#/components/schemas/Actor"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decided At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "reason",
+          "rule",
+          "decided_by",
+          "decided_at"
+        ],
+        "title": "DecisionView"
+      },
+      "FactorImpact": {
+        "type": "string",
+        "enum": [
+          "increases_risk",
+          "decreases_risk"
+        ],
+        "title": "FactorImpact"
+      },
+      "FeedItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FeedItemType"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "application_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read": {
+            "type": "boolean",
+            "title": "Read"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "title",
+          "text",
+          "created_at",
+          "read"
+        ],
+        "title": "FeedItem"
+      },
+      "FeedItemType": {
+        "type": "string",
+        "enum": [
+          "event"
+        ],
+        "title": "FeedItemType"
+      },
+      "FeedResponse": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/FeedItem"
+            },
+            "type": "array",
+            "title": "Events",
+            "description": "Events of the client's applications, newest first"
+          },
+          "unread_events": {
+            "type": "integer",
+            "title": "Unread Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events",
+          "unread_events"
+        ],
+        "title": "FeedResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse"
+      },
+      "LegalForm": {
+        "type": "string",
+        "enum": [
+          "OOO",
+          "IP"
+        ],
+        "title": "LegalForm"
+      },
+      "LifecycleMeta": {
+        "properties": {
+          "statuses": {
+            "items": {
+              "$ref": "#/components/schemas/StatusMeta"
+            },
+            "type": "array",
+            "title": "Statuses"
+          },
+          "stages": {
+            "items": {
+              "$ref": "#/components/schemas/StageMeta"
+            },
+            "type": "array",
+            "title": "Stages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statuses",
+          "stages"
+        ],
+        "title": "LifecycleMeta"
+      },
+      "LoanTerms": {
+        "properties": {
+          "product_id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "term_months": {
+            "type": "integer",
+            "title": "Term Months"
+          },
+          "rate": {
+            "type": "number",
+            "title": "Rate",
+            "description": "Annual rate, percent"
+          },
+          "monthly_payment": {
+            "type": "integer",
+            "title": "Monthly Payment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "amount",
+          "term_months",
+          "rate",
+          "monthly_payment"
+        ],
+        "title": "LoanTerms"
+      },
+      "LoginRequest": {
+        "properties": {
+          "login": {
+            "type": "string",
+            "title": "Login",
+            "examples": [
+              "client1"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "title": "Password",
+            "examples": [
+              "client1"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "login",
+          "password"
+        ],
+        "title": "LoginRequest"
+      },
+      "LoginResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserResponse"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "user"
+        ],
+        "title": "LoginResponse"
+      },
+      "ManualDecisionRequest": {
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/DecisionOutcome"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Comment"
+          },
+          "terms": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposedTerms"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required for counter_offer"
+          },
+          "requested_fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested Fields",
+            "description": "For clarification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "comment"
+        ],
+        "title": "ManualDecisionRequest"
+      },
+      "OpsAlert": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "warning",
+              "critical"
+            ],
+            "title": "Level"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "text"
+        ],
+        "title": "OpsAlert"
+      },
+      "OpsSummary": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "warning",
+              "critical"
+            ],
+            "title": "Status"
+          },
+          "ready_jobs": {
+            "type": "integer",
+            "title": "Ready Jobs",
+            "description": "Jobs ready to run now"
+          },
+          "oldest_ready_seconds": {
+            "type": "number",
+            "title": "Oldest Ready Seconds",
+            "description": "How long the oldest ready job waits"
+          },
+          "stuck_applications": {
+            "type": "integer",
+            "title": "Stuck Applications",
+            "description": "Automatic status, no progress for 5+ minutes"
+          },
+          "waiting_external": {
+            "type": "integer",
+            "title": "Waiting External",
+            "description": "Retrying an unavailable external service"
+          },
+          "failed_jobs_24h": {
+            "type": "integer",
+            "title": "Failed Jobs 24H",
+            "description": "Stages that failed with an unexpected error"
+          },
+          "manual_review": {
+            "type": "integer",
+            "title": "Manual Review"
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/OpsAlert"
+            },
+            "type": "array",
+            "title": "Alerts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "ready_jobs",
+          "oldest_ready_seconds",
+          "stuck_applications",
+          "waiting_external",
+          "failed_jobs_24h",
+          "manual_review",
+          "alerts"
+        ],
+        "title": "OpsSummary",
+        "description": "Pipeline health for the bank workplace; thresholds match monitoring/alerts.yml."
+      },
+      "ProductId": {
+        "type": "string",
+        "enum": [
+          "working_capital",
+          "equipment"
+        ],
+        "title": "ProductId"
+      },
+      "ProductResponse": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Plain-language description for the client"
+          },
+          "purposes": {
+            "items": {
+              "$ref": "#/components/schemas/PurposeCategory"
+            },
+            "type": "array",
+            "title": "Purposes"
+          },
+          "min_amount": {
+            "type": "integer",
+            "title": "Min Amount",
+            "description": "Rubles"
+          },
+          "max_amount": {
+            "type": "integer",
+            "title": "Max Amount",
+            "description": "Rubles"
+          },
+          "min_term_months": {
+            "type": "integer",
+            "title": "Min Term Months"
+          },
+          "max_term_months": {
+            "type": "integer",
+            "title": "Max Term Months"
+          },
+          "base_rate": {
+            "type": "number",
+            "title": "Base Rate",
+            "description": "Annual rate, percent"
+          },
+          "min_business_age_months": {
+            "type": "integer",
+            "title": "Min Business Age Months"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "purposes",
+          "min_amount",
+          "max_amount",
+          "min_term_months",
+          "max_term_months",
+          "base_rate",
+          "min_business_age_months"
+        ],
+        "title": "ProductResponse"
+      },
+      "ProposedTerms": {
+        "properties": {
+          "product_id": {
+            "$ref": "#/components/schemas/ProductId"
+          },
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "description": "Rubles"
+          },
+          "term_months": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Term Months"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Annual rate, percent; product rate if omitted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "amount",
+          "term_months"
+        ],
+        "title": "ProposedTerms",
+        "description": "Terms offered by the employee; the monthly payment is calculated by the bank."
+      },
+      "PurposeCategory": {
+        "type": "string",
+        "enum": [
+          "inventory",
+          "cash_gap",
+          "equipment",
+          "other"
+        ],
+        "title": "PurposeCategory"
+      },
+      "RecommendRequest": {
+        "properties": {
+          "purpose_category": {
+            "$ref": "#/components/schemas/PurposeCategory"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purpose_category"
+        ],
+        "title": "RecommendRequest"
+      },
+      "RecommendResponse": {
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductResponse"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Why this product fits, in plain language"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product",
+          "reason"
+        ],
+        "title": "RecommendResponse"
+      },
+      "RiskClass": {
+        "type": "string",
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "RiskClass"
+      },
+      "ScoreFactor": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "impact": {
+            "$ref": "#/components/schemas/FactorImpact"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "points",
+          "impact",
+          "comment"
+        ],
+        "title": "ScoreFactor"
+      },
+      "ScoreView": {
+        "properties": {
+          "score": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "description": "Probability of default"
+          },
+          "risk_class": {
+            "$ref": "#/components/schemas/RiskClass"
+          },
+          "points_total": {
+            "type": "integer",
+            "title": "Points Total"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreFactor"
+            },
+            "type": "array",
+            "title": "Factors"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "risk_class",
+          "points_total",
+          "factors",
+          "model_version"
+        ],
+        "title": "ScoreView"
+      },
+      "StageMeta": {
+        "properties": {
+          "stage": {
+            "$ref": "#/components/schemas/ClientStage"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stage",
+          "label"
+        ],
+        "title": "StageMeta"
+      },
+      "StatusHistoryItem": {
+        "properties": {
+          "from_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApplicationStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/Actor"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_status",
+          "to_status",
+          "actor",
+          "at"
+        ],
+        "title": "StatusHistoryItem"
+      },
+      "StatusMeta": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "client_stage": {
+            "$ref": "#/components/schemas/ClientStage"
+          },
+          "turn_owner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Actor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "allowed_next": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationStatus"
+            },
+            "type": "array",
+            "title": "Allowed Next"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "label",
+          "client_stage",
+          "turn_owner",
+          "allowed_next"
+        ],
+        "title": "StatusMeta"
+      },
+      "UpdateApplicationRequest": {
+        "properties": {
+          "product_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "purpose_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PurposeCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "revenue_year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Year",
+            "description": "Rubles, last 12 months"
+          },
+          "expenses_year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expenses Year"
+          },
+          "liabilities_total": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Liabilities Total"
+          },
+          "clarification_answer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarification Answer"
+          }
+        },
+        "type": "object",
+        "title": "UpdateApplicationRequest",
+        "description": "Edit a draft or answer a clarification request. Only sent fields are changed."
+      },
+      "UserResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "login": {
+            "type": "string",
+            "title": "Login"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "company_inn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Inn",
+            "description": "Only for clients"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "login",
+          "full_name",
+          "role"
+        ],
+        "title": "UserResponse"
+      },
+      "UserRole": {
+        "type": "string",
+        "enum": [
+          "client",
+          "employee"
+        ],
+        "title": "UserRole"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WithdrawRequest": {
+        "properties": {
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "title": "WithdrawRequest"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "description": "Token from POST /api/auth/login",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

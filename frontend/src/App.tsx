@@ -1,89 +1,92 @@
 import { useEffect, useState } from "react";
-import "./App.css";
-import ProductCatalog from "./components/ProductCatalog";
-import BankDashboard from "./components/BankDashboard";
-import LoginForm, { type AuthUser } from "./components/LoginForm";
 
-const TOKEN_KEY = "alfa-hack-access-token";
+import "./App.css";
+import { api, setUnauthorizedHandler, tokenStore } from "./api/client";
+import type { AuthUser } from "./api/types";
+import BankDashboard from "./components/BankDashboard";
+import ClientCabinet from "./components/ClientCabinet";
+import LoginForm from "./components/LoginForm";
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    if (!token) {
+    setUnauthorizedHandler(() => {
+      tokenStore.clear();
+      setUser(null);
+      setSessionExpired(true);
+    });
+    return () => setUnauthorizedHandler(null);
+  }, []);
+
+  useEffect(() => {
+    if (!tokenStore.get()) {
       setCheckingSession(false);
       return;
     }
-
-    const controller = new AbortController();
-    fetch("/api/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("Session invalid");
-        return (await response.json()) as AuthUser;
-      })
-      .then((account) => {
-        if (account.role !== "client" && account.role !== "employee") {
-          throw new Error("Invalid role");
-        }
-        setUser(account);
-      })
-      .catch((error: unknown) => {
-        if (controller.signal.aborted) return;
-        // If the server is temporarily unavailable, require a fresh sign-in.
-        sessionStorage.removeItem(TOKEN_KEY);
-        setUser(null);
-        if (error instanceof Error) console.warn("Session check failed:", error.message);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setCheckingSession(false);
-      });
-
-    return () => controller.abort();
+    api
+      .me()
+      .then(setUser)
+      .catch(() => tokenStore.clear())
+      .finally(() => setCheckingSession(false));
   }, []);
 
   function handleLogin(account: AuthUser, token: string) {
-    sessionStorage.setItem(TOKEN_KEY, token);
+    tokenStore.set(token);
+    setSessionExpired(false);
     setUser(account);
   }
 
   function handleLogout() {
-    sessionStorage.removeItem(TOKEN_KEY);
+    tokenStore.clear();
     setUser(null);
   }
 
   return (
-    <div>
-      <header>
-        <h1>Умный кредитный кабинет</h1>
-        <p>Альфа-Банк — учебный прототип</p>
+    <div className="app">
+      <header className="topbar">
+        <div className="topbar__brand">
+          <span className="topbar__logo" aria-hidden="true">
+            ₽
+          </span>
+          <div>
+            <h1>Умный кредитный кабинет</h1>
+            <p>Прототип кредитного конвейера для малого бизнеса</p>
+          </div>
+        </div>
+        {user && (
+          <div className="topbar__user">
+            <span>
+              {user.full_name}
+              <span className="muted"> · {user.role === "employee" ? "сотрудник банка" : "предприниматель"}</span>
+            </span>
+            <button type="button" className="button button--ghost" onClick={handleLogout}>
+              Выйти
+            </button>
+          </div>
+        )}
       </header>
 
-      {user && (
-        <nav className="auth-navigation">
-          <span>
-            {user.full_name} · {user.role === "employee" ? "Сотрудник банка" : "Предприниматель"}
-          </span>
-          <button type="button" onClick={handleLogout}>Выйти</button>
-        </nav>
-      )}
-
       <main>
+        {sessionExpired && !user && (
+          <p className="notice" role="status">
+            Сессия истекла — войдите снова.
+          </p>
+        )}
         {checkingSession ? (
-          <p role="status">Проверяем авторизацию…</p>
+          <p className="muted" role="status">
+            Проверяем вход…
+          </p>
         ) : !user ? (
           <LoginForm onLogin={handleLogin} />
         ) : user.role === "client" ? (
-          <ProductCatalog />
+          <ClientCabinet key={user.id} user={user} />
         ) : (
-          <BankDashboard />
+          <BankDashboard key={user.id} />
         )}
       </main>
     </div>
   );
 }
-

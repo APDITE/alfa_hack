@@ -43,14 +43,16 @@ class ClientStage(StrEnum):
 
 S = ApplicationStatus
 
+# From every automatic stage the system may hand the application to an employee
+# (MANUAL_REVIEW): an external source stayed unavailable after all retries, or the
+# stage kept failing with an unexpected error.
 TRANSITIONS: dict[ApplicationStatus, frozenset[ApplicationStatus]] = {
     S.DRAFT: frozenset({S.SUBMITTED, S.WITHDRAWN}),
-    S.SUBMITTED: frozenset({S.DATA_CHECK}),
-    S.DATA_CHECK: frozenset({S.ENRICHMENT, S.CLARIFICATION_REQUIRED}),
+    S.SUBMITTED: frozenset({S.DATA_CHECK, S.MANUAL_REVIEW}),
+    S.DATA_CHECK: frozenset({S.ENRICHMENT, S.CLARIFICATION_REQUIRED, S.MANUAL_REVIEW}),
     S.CLARIFICATION_REQUIRED: frozenset({S.DATA_CHECK, S.WITHDRAWN}),
-    # MANUAL_REVIEW: an external source stayed unavailable after all retries.
     S.ENRICHMENT: frozenset({S.SCORING, S.MANUAL_REVIEW}),
-    S.SCORING: frozenset({S.CREDIT_DECISION}),
+    S.SCORING: frozenset({S.CREDIT_DECISION, S.MANUAL_REVIEW}),
     S.CREDIT_DECISION: frozenset(
         {S.APPROVED, S.COUNTER_OFFER, S.REJECTED, S.CLARIFICATION_REQUIRED, S.MANUAL_REVIEW}
     ),

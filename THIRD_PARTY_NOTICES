@@ -20,6 +20,7 @@
 | «Прозрачный бизнес» ФНС | сервис `mocks`, `GET /mock/transparent-business/{inn}`, синтетические данные |
 | Бюро кредитных историй | сервис `mocks`, `GET /mock/bki/{inn}`, синтетические данные |
 | Подписание документов и выдача денег | симуляция в бэкенде, реальных операций нет |
+| Сбои внешних источников | переключатель доступности в `mocks` (`/mock/admin/availability`), в демо — через nginx и панель сотрудника |
 
 Доступ к системам Альфа-Банка и государственным сервисам не используется.
 
@@ -46,10 +47,9 @@ PyJWT (MIT), bcrypt (Apache-2.0), httpx (BSD-3-Clause), PyYAML (MIT).
 
 ## Фронтенд (`frontend/`)
 
-Прямые зависимости времени выполнения на момент записи: React и React DOM (MIT).
-Сборка: Vite (MIT), TypeScript (Apache-2.0), @vitejs/plugin-react (MIT).
-Точные версии: `frontend/package-lock.json`. Пакеты, добавленные позже, дописывает
-автор фронтенда.
+Прямые зависимости времени выполнения: React и React DOM (MIT); других пакетов нет,
+запросы к API — встроенный `fetch`. Сборка: Vite (MIT), TypeScript (Apache-2.0),
+@vitejs/plugin-react (MIT). Точные версии: `frontend/package-lock.json`.
 
 ## Образы Docker
 
@@ -61,3 +61,4 @@ PyJWT (MIT), bcrypt (Apache-2.0), httpx (BSD-3-Clause), PyYAML (MIT).
 | `node:22-alpine` | MIT | frontend (сборка) |
 | `postgres:16-alpine` | PostgreSQL License | база данных |
 | `nginx:1.27-alpine` | BSD-2-Clause | прокси |
+| `prom/prometheus:v2.53.0` | Apache-2.0 | мониторинг, только `make monitoring` (необязательно) |

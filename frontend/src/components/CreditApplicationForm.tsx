@@ -1,189 +1,206 @@
+import { useRef, useState, type FormEvent } from "react";
 
-import { useState, type FormEvent } from "react";
-import type { CreditApplication } from "../types/application";
+import { api, errorText } from "../api/client";
+import type { ApplicationDetail, Company, Product, PurposeCategory } from "../api/types";
 import {
-  createApplication,
-  updateApplication,
-  type ProductId,
-} from "../api/applications";
+  annuityPayment,
+  groupDigits,
+  money,
+  newIdempotencyKey,
+  parseInteger,
+  percent,
+} from "../utils/format";
+import { PURPOSE_LABELS } from "../utils/labels";
 
-type CreditApplicationFormProps = {
-  productId: ProductId;
-  productName: string;
-  onClose: () => void;
-  application?: CreditApplication;
+type Props = {
+  product: Product;
+  purpose: PurposeCategory | null;
+  company: Company | null;
+  /** Edit an existing draft instead of creating a new one. */
+  draft?: ApplicationDetail;
+  onCancel: () => void;
+  onDone: (application: ApplicationDetail, submitted: boolean) => void;
 };
 
+type Errors = Partial<Record<"amount" | "term" | "purpose", string>>;
+
 export default function CreditApplicationForm({
-  productId,
-  productName,
-  onClose,
-  application,
-}: CreditApplicationFormProps) {
-  const [amount, setAmount] = useState(
-    application?.amount.toString() ?? ""
+  product,
+  purpose,
+  company,
+  draft,
+  onCancel,
+  onDone,
+}: Props) {
+  const [category, setCategory] = useState<PurposeCategory>(
+    draft?.purpose_category ?? purpose ?? product.purposes[0],
   );
-  const [term, setTerm] = useState(
-    application?.term.toString() ?? ""
-  );
-  const [purpose, setPurpose] = useState(
-    application?.purpose ?? ""
-  );
+  const [amountText, setAmountText] = useState(draft?.amount ? groupDigits(String(draft.amount)) : "");
+  const [termText, setTermText] = useState(draft?.term_months ? String(draft.term_months) : "");
+  const [purposeText, setPurposeText] = useState(draft?.purpose ?? "");
+  const [errors, setErrors] = useState<Errors>({});
+  const [formError, setFormError] = useState("");
+  const [busy, setBusy] = useState<"draft" | "submit" | null>(null);
+  // The draft id survives a failed submit, so a retry does not create a second draft.
+  const savedId = useRef<string | null>(draft?.id ?? null);
+  // One key per form: a repeated click or a retry after a network error is not a new submit.
+  const submitKey = useRef(newIdempotencyKey());
 
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState("");
+  const amount = parseInteger(amountText);
+  const term = parseInteger(termText);
+  const amountOk = amount !== null && amount >= product.min_amount && amount <= product.max_amount;
+  const termOk = term !== null && term >= product.min_term_months && term <= product.max_term_months;
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
+  function validate(strict: boolean): Errors {
+    const found: Errors = {};
+    if (amountText && amount === null) found.amount = "Введите сумму цифрами.";
+    else if (strict && !amountOk)
+      found.amount = `Сумма от ${money(product.min_amount)} до ${money(product.max_amount)}.`;
+    if (termText && term === null) found.term = "Введите срок целым числом месяцев.";
+    else if (strict && !termOk)
+      found.term = `Срок от ${product.min_term_months} до ${product.max_term_months} мес.`;
+    if (strict && purposeText.trim().length < 3) found.purpose = "Коротко опишите, на что пойдут деньги.";
+    return found;
+  }
 
-    const amountValue = Number(amount);
-    const termValue = Number(term);
+  async function save(submit: boolean) {
+    const found = validate(submit);
+    setErrors(found);
+    setFormError("");
+    if (Object.keys(found).length > 0) return;
 
-    if (
-      !Number.isSafeInteger(amountValue) ||
-      amountValue <= 0 ||
-      !Number.isSafeInteger(termValue) ||
-      termValue <= 0
-    ) {
-      setError("Введите корректную сумму и срок кредита.");
-      return;
-    }
-
-    if (!purpose.trim()) {
-      setError("Укажите цель кредитования.");
-      return;
-    }
-
-    if (purpose.trim().length > 500) {
-      setError("Цель кредитования не должна превышать 500 символов.");
-      return;
-    }
-
-    setSaving(true);
-
+    setBusy(submit ? "submit" : "draft");
+    const input = {
+      product_id: product.id,
+      purpose_category: category,
+      amount: amount ?? undefined,
+      term_months: term ?? undefined,
+      purpose: purposeText.trim() || undefined,
+    };
     try {
-      const data = {
-        product_id: productId,
-        purpose_category: productId === "equipment"
-          ? ("equipment" as const)
-          : ("other" as const),
-        amount: amountValue,
-        term_months: termValue,
-        purpose: purpose.trim(),
-      };
-
-      if (application) {
-        if (application.status !== "draft") {
-          throw new Error("Редактировать можно только черновик.");
-        }
-
-        await updateApplication(application.id, data);
-      } else {
-        await createApplication(data);
-      }
-
-      setSaved(true);
-    } catch (caughtError) {
-      setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Не удалось сохранить черновик."
-      );
+      let saved = savedId.current
+        ? await api.updateDraft(savedId.current, input)
+        : await api.createDraft(input);
+      savedId.current = saved.id;
+      if (submit) saved = await api.submit(saved.id, submitKey.current);
+      onDone(saved, submit);
+    } catch (caught) {
+      setFormError(errorText(caught));
     } finally {
-      setSaving(false);
+      setBusy(null);
     }
   }
 
-  if (saved) {
-    return (
-      <section className="application-form">
-        <h2>Черновик заявки сохранён</h2>
-        <p>
-          Черновик успешно сохранён на сервере банка.
-          Заявка пока не отправлена на рассмотрение.
-        </p>
-        <button type="button" onClick={onClose}>
-          Вернуться к кредитным продуктам
-        </button>
-      </section>
-    );
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void save(true);
   }
 
   return (
-    <section className="application-form">
-      <h2>Оформление кредитной заявки</h2>
-      <p>Продукт: {productName}</p>
+    <section className="card application-form">
+      <button type="button" className="link-button" onClick={onCancel}>
+        ← Назад
+      </button>
+      <h2>{draft ? "Черновик заявки" : "Новая заявка"}</h2>
+      <p className="muted">
+        {product.name}: {money(product.min_amount)} – {money(product.max_amount)}, срок{" "}
+        {product.min_term_months}–{product.max_term_months} мес., ставка от {percent(product.base_rate)}.
+      </p>
 
-      <form onSubmit={handleSubmit}>
+      {company && (
+        <div className="prefill">
+          <strong>{company.name}</strong>
+          <span>
+            ИНН {company.inn} · ОКВЭД {company.okved} · руководитель {company.director}
+          </span>
+          <span className="muted">Данные компании подставлены из реестра, вводить их не нужно.</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate>
         <label>
-          Сумма кредита, ₽
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]+"
-            title="Введите сумму кредита"
-            required
-            value={amount}
-            onChange={(event) => {
-              const value = event.target.value;
-              if (/^\d*$/.test(value)) {
-                setAmount(value);
-              }
-            }}
-            placeholder="Например, 1000000"
-          />
+          Цель кредита
+          <select value={category} onChange={(e) => setCategory(e.target.value as PurposeCategory)}>
+            {product.purposes.map((value) => (
+              <option key={value} value={value}>
+                {PURPOSE_LABELS[value]}
+              </option>
+            ))}
+          </select>
         </label>
 
-        <label>
-          Срок кредита, месяцев
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]+"
-            title="Введите срок целым положительным числом"
-            required
-            value={term}
-            onChange={(event) => {
-              const value = event.target.value;
-              if (/^\d*$/.test(value)) {
-                setTerm(value);
-              }
-            }}
-            placeholder="Например, 12"
-          />
-        </label>
+        <div className="form-row">
+          <label>
+            Сумма, ₽
+            <input
+              inputMode="numeric"
+              autoComplete="off"
+              value={amountText}
+              placeholder={groupDigits(String(product.min_amount))}
+              aria-invalid={Boolean(errors.amount)}
+              onChange={(e) => setAmountText(groupDigits(e.target.value))}
+            />
+            <small className={errors.amount ? "field-error" : "hint"}>
+              {errors.amount ?? `от ${money(product.min_amount)} до ${money(product.max_amount)}`}
+            </small>
+          </label>
+
+          <label>
+            Срок, мес.
+            <input
+              inputMode="numeric"
+              autoComplete="off"
+              value={termText}
+              placeholder={String(product.min_term_months)}
+              aria-invalid={Boolean(errors.term)}
+              onChange={(e) => setTermText(e.target.value.replace(/\D/g, ""))}
+            />
+            <small className={errors.term ? "field-error" : "hint"}>
+              {errors.term ?? `от ${product.min_term_months} до ${product.max_term_months} мес.`}
+            </small>
+          </label>
+        </div>
 
         <label>
-          Цель кредитования
+          Что планируете сделать с деньгами
           <textarea
-            required
             maxLength={500}
-            value={purpose}
-            onChange={(event) => setPurpose(event.target.value)}
-            placeholder="На что планируете потратить кредит?"
+            value={purposeText}
+            placeholder="Например: закупка товара к новогоднему сезону"
+            aria-invalid={Boolean(errors.purpose)}
+            onChange={(e) => setPurposeText(e.target.value)}
           />
+          {errors.purpose && <small className="field-error">{errors.purpose}</small>}
         </label>
 
-        <p>
-          Данные компании будут определены автоматически
-          по вашей учётной записи.
-        </p>
+        {amountOk && termOk && amount !== null && term !== null && (
+          <div className="estimate" role="status">
+            Ориентировочный платёж:{" "}
+            <strong>{money(annuityPayment(amount, product.base_rate, term))} в месяц</strong> по ставке
+            от {percent(product.base_rate)}. Точные условия банк назовёт после проверки.
+          </div>
+        )}
 
-        {error && (
-          <p role="alert" style={{ color: "#c62828" }}>
-            {error}
+        {formError && (
+          <p className="form-error" role="alert">
+            {formError}
           </p>
         )}
 
-        <div className="application-actions">
-          <button type="button" onClick={onClose} disabled={saving}>
-            Отмена
+        <div className="actions">
+          <button type="submit" className="button button--primary" disabled={busy !== null}>
+            {busy === "submit" ? "Отправляем…" : "Отправить в банк"}
           </button>
-
-          <button type="submit" disabled={saving}>
-            {saving ? "Сохранение..." : "Сохранить черновик"}
+          <button
+            type="button"
+            className="button button--secondary"
+            disabled={busy !== null}
+            onClick={() => void save(false)}
+          >
+            {busy === "draft" ? "Сохраняем…" : "Сохранить черновик"}
+          </button>
+          <button type="button" className="button button--ghost" onClick={onCancel} disabled={busy !== null}>
+            Отмена
           </button>
         </div>
       </form>

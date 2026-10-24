@@ -2,6 +2,7 @@
 
 from datetime import date, datetime
 from enum import StrEnum
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -282,7 +283,6 @@ class WithdrawRequest(BaseModel):
 
 class FeedItemType(StrEnum):
     EVENT = "event"
-    NEWS = "news"
 
 
 class FeedItem(BaseModel):
@@ -293,6 +293,32 @@ class FeedItem(BaseModel):
     application_id: UUID | None = None
     created_at: datetime
     read: bool
+
+
+class FeedResponse(BaseModel):
+    events: list[FeedItem] = Field(description="Events of the client's applications, newest first")
+    unread_events: int
+
+
+# --- Operations ---------------------------------------------------------------
+
+
+class OpsAlert(BaseModel):
+    level: Literal["warning", "critical"]
+    text: str
+
+
+class OpsSummary(BaseModel):
+    """Pipeline health for the bank workplace; thresholds match monitoring/alerts.yml."""
+
+    status: Literal["ok", "warning", "critical"]
+    ready_jobs: int = Field(description="Jobs ready to run now")
+    oldest_ready_seconds: float = Field(description="How long the oldest ready job waits")
+    stuck_applications: int = Field(description="Automatic status, no progress for 5+ minutes")
+    waiting_external: int = Field(description="Retrying an unavailable external service")
+    failed_jobs_24h: int = Field(description="Stages that failed with an unexpected error")
+    manual_review: int
+    alerts: list[OpsAlert]
 
 
 # --- Meta -------------------------------------------------------------------

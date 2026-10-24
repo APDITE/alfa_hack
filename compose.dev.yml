@@ -1,0 +1,6 @@
+# Local development only: publish Postgres to the host to run the backend without Docker.
+#   docker compose -f docker-compose.yml -f compose.dev.yml up db
+services:
+  db:
+    ports:
+      - "5432:5432"

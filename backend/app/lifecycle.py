@@ -1,13 +1,15 @@
 """The only place where an application's status changes.
 
-Every change is validated against the state diagram, written to the history and,
-when the next move belongs to the system, queued for the pipeline worker.
+Every change is validated against the state diagram, written to the history, announced
+in the client's feed when it matters to them and, when the next move belongs to the
+system, queued for the pipeline worker.
 """
 
 import uuid
 
 from sqlalchemy.orm import Session
 
+from app.feed import record_event
 from app.models import Application, JobStatus, PipelineJob, StatusHistory
 from app.statuses import TURN_OWNER, Actor, ApplicationStatus, ensure_transition
 
@@ -51,6 +53,7 @@ def transition(
             comment=comment,
         )
     )
+    record_event(session, application, target)
     if TURN_OWNER[target] is Actor.SYSTEM:
         session.add(
             PipelineJob(application_id=application.id, stage=target, status=JobStatus.PENDING)
