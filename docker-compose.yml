@@ -32,6 +32,9 @@ services:
       APP_ENV: development
       DOCS_ENABLED: "true"
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-app}
+      # Registration looks the company up in the registry mock (scenario 12).
+      MOCKS_URL: http://mocks:8000
+      SCORING_URL: http://scoring:8000
     volumes:
       - ./backend/app:/app/app
       - ./backend/config:/app/config
