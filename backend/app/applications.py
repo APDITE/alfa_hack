@@ -23,6 +23,7 @@ from app.models import (
     ScoreRecord,
 )
 from app.products import ProductConfig
+from app.schedule import annuity_schedule
 from app.schemas import (
     AcceptOfferRequest,
     ApplicationAction,
@@ -39,9 +40,11 @@ from app.schemas import (
     LegalForm,
     LoanTerms,
     ManualDecisionRequest,
+    PaymentSchedule,
     ProductId,
     PurposeCategory,
     RiskClass,
+    SchedulePayment,
     ScoreFactor,
     ScoreView,
     StatusHistoryItem,
@@ -466,6 +469,19 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
             decided_at=decision.created_at,
         )
 
+    schedule = None
+    terms = decision_view.terms if decision_view is not None else None
+    if terms is not None:
+        payments = annuity_schedule(
+            terms.amount, terms.rate, terms.term_months, terms.monthly_payment
+        )
+        total_paid = sum(p.payment for p in payments)
+        schedule = PaymentSchedule(
+            payments=[SchedulePayment.model_validate(p, from_attributes=True) for p in payments],
+            total_paid=total_paid,
+            overpayment=total_paid - terms.amount,
+        )
+
     clarification = _latest(session, Clarification, application.id)
     clarification_view = None
     if clarification is not None:
@@ -512,5 +528,6 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
         checks=checks,
         score=score_view,
         decision=decision_view,
+        schedule=schedule,
         clarification=clarification_view,
     )

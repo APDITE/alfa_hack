@@ -36,6 +36,10 @@ Content-Type: application/json
 GET {{base}}/companies/lookup/7700000001
 Authorization: Bearer {{client1Token}}
 
+### Предодобренные условия: сколько правила одобрят автоматически по каждому продукту
+GET {{base}}/offers/preapproved
+Authorization: Bearer {{client1Token}}
+
 ### Черновик заявки
 # @name draft1
 POST {{base}}/applications

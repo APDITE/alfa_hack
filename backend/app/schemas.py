@@ -206,6 +206,22 @@ class DecisionView(BaseModel):
     decided_at: datetime
 
 
+class SchedulePayment(BaseModel):
+    number: int
+    payment: int = Field(description="Rubles")
+    principal: int
+    interest: int
+    balance: int = Field(description="Debt left after this payment")
+
+
+class PaymentSchedule(BaseModel):
+    """Monthly annuity payments for `decision.terms`; the last one absorbs the rounding."""
+
+    payments: list[SchedulePayment]
+    total_paid: int
+    overpayment: int = Field(description="Interest over the whole term, rubles")
+
+
 class ClarificationView(BaseModel):
     requested_fields: list[str]
     message: str
@@ -258,6 +274,9 @@ class ApplicationDetail(ApplicationSummary):
     checks: list[CheckResult] = Field(description="Empty for clients")
     score: ScoreView | None = Field(default=None, description="Null for clients")
     decision: DecisionView | None = None
+    schedule: PaymentSchedule | None = Field(
+        default=None, description="Payment schedule for the offered or signed terms"
+    )
     clarification: ClarificationView | None = None
 
 
@@ -285,6 +304,16 @@ class AcceptOfferRequest(BaseModel):
 
 class WithdrawRequest(BaseModel):
     reason: str | None = Field(default=None, max_length=500)
+
+
+# --- Pre-approved offers ---------------------------------------------------------
+
+
+class PreapprovalResponse(BaseModel):
+    offers: list[LoanTerms] = Field(
+        description="Per product: the largest amount the rules approve automatically now"
+    )
+    reason: str | None = Field(default=None, description="Why there is no offer, for the client")
 
 
 # --- Feed -------------------------------------------------------------------

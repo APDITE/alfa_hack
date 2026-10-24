@@ -7,6 +7,7 @@ next job. External services that do not answer are retried with backoff (scenari
 
 import logging
 import uuid
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
@@ -54,6 +55,8 @@ _FIELD_NAMES = {
     "amount": "сумма кредита",
     "term_months": "срок кредита",
 }
+
+_FINANCIAL_FIELDS = ("revenue_year", "expenses_year", "liabilities_total")
 
 _OUTCOME_STATUS = {
     DecisionOutcome.APPROVED: S.APPROVED,
@@ -309,29 +312,17 @@ def _enrichment(session: Session, application: Application, ctx: PipelineContext
 
 def _scoring(session: Session, application: Application, ctx: PipelineContext) -> None:
     facts = company_facts(session, application)
-    if facts.registry_status is RegistryStatus.ACTIVE and not _missing_financials(facts):
-        bki = _payload(session, application, "bki") or {}
+    if facts.registry_status is RegistryStatus.ACTIVE and not missing_financials(facts):
         result = ctx.integrations.score(
-            {
-                "application": {
-                    "product_id": application.product_id,
-                    "amount": application.amount,
-                    "term_months": application.term_months,
-                },
-                "company": {
-                    "inn": application.company_inn,
-                    "okved": application.company.okved,
-                    "age_months": facts.business_age_months,
-                    "revenue_year": facts.revenue_year,
-                    "expenses_year": facts.expenses_year,
-                    "liabilities_total": facts.liabilities_total,
-                },
-                "credit_history": {
-                    "active_loans": int(bki.get("active_loans", 0)),
-                    "overdue_count": int(bki.get("overdue_count", 0)),
-                    "max_overdue_days": int(bki.get("max_overdue_days", 0)),
-                },
-            }
+            scoring_payload(
+                application.product_id,
+                application.amount,
+                application.term_months,
+                application.company_inn,
+                application.company.okved,
+                facts,
+                _payload(session, application, "bki"),
+            )
         )
         session.add(
             ScoreRecord(
@@ -356,7 +347,7 @@ def _credit_decision(session: Session, application: Application, ctx: PipelineCo
         .order_by(ScoreRecord.created_at.desc())
         .limit(1)
     )
-    needs_score = facts.registry_status is RegistryStatus.ACTIVE and not _missing_financials(facts)
+    needs_score = facts.registry_status is RegistryStatus.ACTIVE and not missing_financials(facts)
     if score is None and needs_score:
         decision = Decision(
             DecisionOutcome.MANUAL_REVIEW,
@@ -419,23 +410,35 @@ def apply_decision(session: Session, application: Application, decision: Decisio
 
 
 def company_facts(session: Session, application: Application) -> CompanyFacts:
-    egrul = _payload(session, application, "egrul")
-    financials = _payload(session, application, "transparent_business")
+    return facts_from_sources(
+        _payload(session, application, "egrul"),
+        _payload(session, application, "transparent_business"),
+        application.company.registration_date,
+        {name: getattr(application, name) for name in _FINANCIAL_FIELDS},
+    )
+
+
+def facts_from_sources(
+    egrul: JSON | None,
+    financials: JSON | None,
+    registered_fallback: date,
+    entered: Mapping[str, int | None] | None = None,
+) -> CompanyFacts:
+    """Facts for the credit rules: the registry, then «Прозрачный бизнес», then what the
+    client entered in answer to a clarification. Pre-approval uses the same function."""
     if egrul is None:
         registry_status = RegistryStatus.NOT_FOUND
-        registered = application.company.registration_date
+        registered = registered_fallback
     else:
         registry_status = RegistryStatus(str(egrul.get("status", "active")))
         raw_date = egrul.get("registration_date")
-        registered = (
-            date.fromisoformat(str(raw_date)) if raw_date else application.company.registration_date
-        )
+        registered = date.fromisoformat(str(raw_date)) if raw_date else registered_fallback
+    client_values = entered or {}
 
     def value(name: str) -> int | None:
         if financials is not None and financials.get(name) is not None:
             return int(financials[name])
-        client_value: int | None = getattr(application, name)
-        return client_value
+        return client_values.get(name)
 
     return CompanyFacts(
         registry_status=registry_status,
@@ -446,7 +449,36 @@ def company_facts(session: Session, application: Application) -> CompanyFacts:
     )
 
 
-def _missing_financials(facts: CompanyFacts) -> bool:
+def scoring_payload(
+    product_id: str,
+    amount: int | None,
+    term_months: int | None,
+    inn: str,
+    okved: str,
+    facts: CompanyFacts,
+    bki: JSON | None,
+) -> JSON:
+    """Request to the scoring service; the pipeline and pre-approval send the same one."""
+    history = bki or {}
+    return {
+        "application": {"product_id": product_id, "amount": amount, "term_months": term_months},
+        "company": {
+            "inn": inn,
+            "okved": okved,
+            "age_months": facts.business_age_months,
+            "revenue_year": facts.revenue_year,
+            "expenses_year": facts.expenses_year,
+            "liabilities_total": facts.liabilities_total,
+        },
+        "credit_history": {
+            "active_loans": int(history.get("active_loans", 0)),
+            "overdue_count": int(history.get("overdue_count", 0)),
+            "max_overdue_days": int(history.get("max_overdue_days", 0)),
+        },
+    }
+
+
+def missing_financials(facts: CompanyFacts) -> bool:
     return None in (facts.revenue_year, facts.expenses_year, facts.liabilities_total)
 
 

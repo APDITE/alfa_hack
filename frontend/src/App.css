@@ -1141,6 +1141,8 @@ fieldset.fields legend {
 
 .panel {
   display: grid;
+  /* One column that never grows past the card: wide content (the schedule) scrolls inside. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   margin-top: 20px;
   padding: 20px;
@@ -1750,6 +1752,174 @@ fieldset.fields legend {
 .health__alerts {
   margin: 4px 0 0;
   padding-left: 18px;
+}
+
+/* --- Pre-approved offers ------------------------------------------------------------ */
+
+.preapproved {
+  display: grid;
+  gap: 16px;
+  margin: 4px 0 24px;
+  padding: 24px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.preapproved__head {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.preapproved__head h3,
+.preapproved__head p {
+  margin: 0;
+}
+
+.preapproved__head p {
+  max-width: 720px;
+}
+
+.preapproved__list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preapproved__offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.preapproved__terms {
+  display: grid;
+  gap: 2px;
+}
+
+.preapproved__product {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.preapproved__amount {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* --- Payment schedule ---------------------------------------------------------------- */
+
+.schedule {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+
+.schedule__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-height: 44px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.schedule__summary::-webkit-details-marker {
+  display: none;
+}
+
+/* A chevron instead of the browser marker: right when closed, down when open. */
+.schedule__summary::before {
+  content: "";
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  margin-right: 2px;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+.schedule[open] > .schedule__summary::before {
+  transform: rotate(45deg);
+}
+
+.schedule__title {
+  font-weight: 700;
+}
+
+.schedule__meta {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.schedule__scroll {
+  max-height: 320px;
+  overflow: auto;
+  border-top: 1px solid var(--border);
+}
+
+.schedule__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.schedule__table th,
+.schedule__table td {
+  padding: 8px 16px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.schedule__table th:first-child,
+.schedule__table td:first-child {
+  text-align: left;
+}
+
+.schedule__table tbody td:first-child {
+  color: var(--muted);
+}
+
+.schedule__table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.schedule__table tbody tr + tr td {
+  border-top: 1px solid var(--border);
+}
+
+.schedule__table tfoot th,
+.schedule__table tfoot td {
+  position: sticky;
+  bottom: 0;
+  border-top: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-weight: 700;
+}
+
+.schedule__note {
+  margin: 0;
+  padding: 10px 16px 14px;
 }
 
 /* --- Responsive ---------------------------------------------------------------- */

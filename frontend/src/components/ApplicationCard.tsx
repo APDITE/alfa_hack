@@ -13,6 +13,7 @@ import {
   percent,
 } from "../utils/format";
 import { FIELD_LABELS, IN_PROGRESS, PRODUCT_NAMES, PURPOSE_LABELS } from "../utils/labels";
+import PaymentScheduleView from "./PaymentScheduleView";
 import StatusBadge from "./StatusBadge";
 import Timeline from "./Timeline";
 
@@ -339,6 +340,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
           ) : (
             <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
           )}
+          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
           <div className="actions">
             <button
               type="button"
@@ -370,6 +372,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         <div className="panel panel--accent">
           <h4>Подписание документов</h4>
           {terms && <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />}
+          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} open />}
           <label className="checkbox">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
             Я ознакомился с условиями кредитного договора и графиком платежей
@@ -400,6 +403,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         <div className="panel panel--success">
           <h4>Кредит выдан</h4>
           <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
+          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
         </div>
       )}
 

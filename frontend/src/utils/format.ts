@@ -10,6 +10,16 @@ export function months(value: number | null | undefined): string {
   return value === null || value === undefined ? "—" : `${value} мес.`;
 }
 
+/** Russian plural: plural(1, ["платёж", "платежа", "платежей"]) -> "платёж". */
+export function plural(count: number, forms: [string, string, string]): string {
+  const tens = count % 100;
+  const units = count % 10;
+  if (tens >= 11 && tens <= 14) return forms[2];
+  if (units === 1) return forms[0];
+  if (units >= 2 && units <= 4) return forms[1];
+  return forms[2];
+}
+
 export function percent(value: number): string {
   return `${value.toLocaleString("ru-RU", { maximumFractionDigits: 2 })}%`;
 }

@@ -15,6 +15,7 @@ import type {
   LoginResponse,
   ManualDecision,
   OpsSummary,
+  Preapproval,
   Product,
   PurposeCategory,
   Recommendation,
@@ -168,6 +169,7 @@ export const api = {
       body: json({ purpose_category }),
     }),
   company: (inn: string) => request<Company>(`/api/companies/lookup/${encodeURIComponent(inn)}`),
+  preapproved: () => request<Preapproval>("/api/offers/preapproved"),
   lifecycle: () => request<LifecycleMeta>("/api/meta/lifecycle"),
 
   applications: () => request<ApplicationSummary[]>("/api/applications"),

@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
 
 import { api, errorText } from "../api/client";
-import type { Product, PurposeCategory, Recommendation } from "../api/types";
+import type { LoanTerms, Product, PurposeCategory, Recommendation } from "../api/types";
 import { money, percent } from "../utils/format";
 import { PURPOSE_LABELS } from "../utils/labels";
+import PreapprovedOffers from "./PreapprovedOffers";
+
+export type Preset = { amount: number; term_months: number };
 
 type Props = {
-  onApply: (product: Product, purpose: PurposeCategory | null) => void;
+  /** Pre-approved offers of the bank, shown above the catalog. */
+  offers: LoanTerms[];
+  onApply: (product: Product, purpose: PurposeCategory | null, preset?: Preset) => void;
 };
 
 const PURPOSES: PurposeCategory[] = ["inventory", "cash_gap", "equipment", "other"];
 
-export default function ProductCatalog({ onApply }: Props) {
+export default function ProductCatalog({ offers, onApply }: Props) {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [purpose, setPurpose] = useState<PurposeCategory | null>(null);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
@@ -37,9 +42,16 @@ export default function ProductCatalog({ onApply }: Props) {
 
   const recommendedId = recommendation?.product.id;
 
+  function applyOffer(offer: LoanTerms) {
+    const product = products?.find((p) => p.id === offer.product_id);
+    if (product) onApply(product, null, { amount: offer.amount, term_months: offer.term_months });
+  }
+
   return (
     <section className="card">
       <h2>Кредитные продукты</h2>
+
+      <PreapprovedOffers offers={products ? offers : []} onApply={applyOffer} />
 
       <div className="advisor">
         <h3>На что нужны деньги?</h3>
