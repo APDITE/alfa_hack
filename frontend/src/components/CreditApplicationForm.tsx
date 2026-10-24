@@ -1,92 +1,111 @@
+
 import { useState, type FormEvent } from "react";
 import type { CreditApplication } from "../types/application";
-import { saveApplication, updateApplication } from "../utils/applicationStorage";
+import {
+  createApplication,
+  updateApplication,
+  type ProductId,
+} from "../api/applications";
 
 type CreditApplicationFormProps = {
+  productId: ProductId;
   productName: string;
   onClose: () => void;
   application?: CreditApplication;
 };
 
 export default function CreditApplicationForm({
+  productId,
   productName,
   onClose,
   application,
 }: CreditApplicationFormProps) {
-  
-    const [amount, setAmount] = useState(
+  const [amount, setAmount] = useState(
     application?.amount.toString() ?? ""
-    );
-    const [term, setTerm] = useState(
+  );
+  const [term, setTerm] = useState(
     application?.term.toString() ?? ""
-    );
-    const [purpose, setPurpose] = useState(
+  );
+  const [purpose, setPurpose] = useState(
     application?.purpose ?? ""
-    );
-    const [companyName, setCompanyName] = useState(
-    application?.companyName ?? ""
-    );
-    const [inn, setInn] = useState(
-    application?.inn ?? ""
-    );
-    const [saved, setSaved] = useState(false);
+  );
 
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
-  
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
 
-function handleSubmit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  if (
-  !Number.isSafeInteger(Number(amount)) ||
-  Number(amount) <= 0 ||
-  !Number.isSafeInteger(Number(term)) ||
-  Number(term) <= 0
+    const amountValue = Number(amount);
+    const termValue = Number(term);
+
+    if (
+      !Number.isSafeInteger(amountValue) ||
+      amountValue <= 0 ||
+      !Number.isSafeInteger(termValue) ||
+      termValue <= 0
     ) {
-    alert("Введите корректную сумму и срок кредита.");
-    return;
-    }
-
-  const updatedData: CreditApplication = {
-    id: application?.id ?? crypto.randomUUID(),
-    productName,
-    amount: Number(amount),
-    term: Number(term),
-    purpose,
-    companyName,
-    inn,
-    status: "draft",
-    createdAt: application?.createdAt ?? new Date().toISOString(),
-  };
-
-  try {
-    if (application && application.status !== "draft") {
-      window.alert("Редактировать можно только черновик.");
+      setError("Введите корректную сумму и срок кредита.");
       return;
     }
-    if (application) {
-      updateApplication(updatedData);
-    } else {
-      saveApplication(updatedData);
+
+    if (!purpose.trim()) {
+      setError("Укажите цель кредитования.");
+      return;
     }
 
-    setSaved(true);
-  } catch {
-    alert("Не удалось сохранить черновик.");
+    if (purpose.trim().length > 500) {
+      setError("Цель кредитования не должна превышать 500 символов.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const data = {
+        product_id: productId,
+        purpose_category: productId === "equipment"
+          ? ("equipment" as const)
+          : ("other" as const),
+        amount: amountValue,
+        term_months: termValue,
+        purpose: purpose.trim(),
+      };
+
+      if (application) {
+        if (application.status !== "draft") {
+          throw new Error("Редактировать можно только черновик.");
+        }
+
+        await updateApplication(application.id, data);
+      } else {
+        await createApplication(data);
+      }
+
+      setSaved(true);
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Не удалось сохранить черновик."
+      );
+    } finally {
+      setSaving(false);
+    }
   }
-}
-
-
 
   if (saved) {
     return (
       <section className="application-form">
-        <h2>Черновик заявки заполнен</h2>
+        <h2>Черновик заявки сохранён</h2>
         <p>
-            Черновик заявки сохранён в этом браузере.
-            Заявка не отправлена в банк.
+          Черновик успешно сохранён на сервере банка.
+          Заявка пока не отправлена на рассмотрение.
         </p>
         <button type="button" onClick={onClose}>
-          Вернуться к продуктам
+          Вернуться к кредитным продуктам
         </button>
       </section>
     );
@@ -104,14 +123,14 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
             type="text"
             inputMode="numeric"
             pattern="[0-9]+"
-            title="Введите сумму"
+            title="Введите сумму кредита"
             required
             value={amount}
             onChange={(event) => {
-                const value = event.target.value;
-                if (/^\d*$/.test(value)) {
+              const value = event.target.value;
+              if (/^\d*$/.test(value)) {
                 setAmount(value);
-                }
+              }
             }}
             placeholder="Например, 1000000"
           />
@@ -127,10 +146,10 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
             required
             value={term}
             onChange={(event) => {
-                const value = event.target.value;
-                if (/^\d*$/.test(value)) {
+              const value = event.target.value;
+              if (/^\d*$/.test(value)) {
                 setTerm(value);
-                }
+              }
             }}
             placeholder="Например, 12"
           />
@@ -140,42 +159,32 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
           Цель кредитования
           <textarea
             required
+            maxLength={500}
             value={purpose}
             onChange={(event) => setPurpose(event.target.value)}
             placeholder="На что планируете потратить кредит?"
           />
         </label>
 
-        <label>
-          Название компании
-          <input
-            type="text"
-            required
-            value={companyName}
-            onChange={(event) => setCompanyName(event.target.value)}
-            placeholder="ООО Пример"
-          />
-        </label>
+        <p>
+          Данные компании будут определены автоматически
+          по вашей учётной записи.
+        </p>
 
-        <label>
-          ИНН компании
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]{10}|[0-9]{12}"
-            title="ИНН должен содержать 10 или 12 цифр"
-            required
-            value={inn}
-            onChange={(event) => setInn(event.target.value)}
-            placeholder="10 или 12 цифр"
-          />
-        </label>
+        {error && (
+          <p role="alert" style={{ color: "#c62828" }}>
+            {error}
+          </p>
+        )}
 
         <div className="application-actions">
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={onClose} disabled={saving}>
             Отмена
           </button>
-          <button type="submit">Сохранить черновик</button>
+
+          <button type="submit" disabled={saving}>
+            {saving ? "Сохранение..." : "Сохранить черновик"}
+          </button>
         </div>
       </form>
     </section>

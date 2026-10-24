@@ -409,3 +409,33 @@ main p {
   .login-page { grid-template-columns: 1fr; gap: 20px; margin: 20px auto; }
   .login-form { padding: 20px; }
 }
+
+.application-action-button {
+  padding: 12px 20px;
+  border: 1px solid #ef3124;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #ef3124;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.application-action-button:hover:not(:disabled) {
+  background-color: #ef3124;
+  color: #ffffff;
+}
+
+.application-action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.application-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
