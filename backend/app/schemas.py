@@ -23,6 +23,15 @@ class LoginRequest(BaseModel):
     password: str = Field(examples=["client1"])
 
 
+class RegistrationRequest(BaseModel):
+    """New client by INN: the company card comes from the registry (ЕГРЮЛ/ЕГРИП)."""
+
+    inn: str = Field(pattern=r"^\d{10}(\d{2})?$", examples=["7712345678"])
+    full_name: str = Field(min_length=2, max_length=200, examples=["Иван Петров"])
+    login: str = Field(min_length=3, max_length=64, pattern=r"^[A-Za-z0-9_.-]+$")
+    password: str = Field(min_length=8, max_length=128)
+
+
 class UserResponse(BaseModel):
     id: UUID
     login: str

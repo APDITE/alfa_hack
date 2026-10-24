@@ -1,0 +1,41 @@
+# Production-like run for a demo stand: static frontend build, no dev servers, no source
+# mounts, backend as a non-root user, containers restart on failure.
+#   make up-prod      (generates JWT_SECRET when it is not set; HTTP_PORT=80 for a server)
+#   or: JWT_SECRET=<32+ random characters> docker compose -f docker-compose.yml -f compose.prod.yml up --build -d
+services:
+  db:
+    restart: unless-stopped
+
+  mocks:
+    restart: unless-stopped
+
+  scoring:
+    restart: unless-stopped
+
+  backend:
+    build:
+      target: prod
+    volumes: !reset []
+    environment:
+      APP_ENV: production
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET to 32+ random characters (make up-prod does it)}
+    restart: unless-stopped
+
+  worker:
+    build:
+      target: prod
+    volumes: !reset []
+    restart: unless-stopped
+
+  frontend:
+    build:
+      target: prod
+    volumes: !reset []
+    restart: unless-stopped
+
+  nginx:
+    volumes: !override
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+    ports: !override
+      - "${HTTP_PORT:-8080}:80"
+    restart: unless-stopped

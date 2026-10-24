@@ -6,6 +6,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    // The dev server sits behind nginx: accept any Host, so access by a domain name or
+    // through a tunnel works (Vite 6 blocks unknown hosts by default).
+    allowedHosts: true,
     // Needed for file watching inside Docker on macOS/Windows
     watch: { usePolling: true },
     // Used only when running `npm run dev` without Nginx

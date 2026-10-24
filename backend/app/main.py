@@ -6,8 +6,9 @@ from fastapi import FastAPI
 
 from app.config import Settings
 from app.db import make_engine, make_session_factory
+from app.integrations import HttpIntegrations
 from app.products import load_products
-from app.routes import applications, auth, catalog, feed, health, meta, ops
+from app.routes import applications, auth, catalog, feed, health, meta, ops, registration
 
 _DEV_SECRET_PREFIX = "dev-only"
 
@@ -27,10 +28,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
     check_settings(settings)
     engine = make_engine(settings.database_url)
+    integrations = HttpIntegrations(
+        settings.mocks_url, settings.scoring_url, settings.http_timeout_seconds
+    )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         yield
+        integrations.close()
         engine.dispose()
 
     app = FastAPI(
@@ -46,8 +51,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = engine
     app.state.session_factory = make_session_factory(engine)
     app.state.products = load_products(Path(settings.products_path))
+    # Registration looks companies up in the registry (the mock in the demo stack).
+    app.state.integrations = integrations
 
-    for module in (health, auth, catalog, applications, feed, meta, ops):
+    for module in (health, auth, registration, catalog, applications, feed, meta, ops):
         app.include_router(module.router, prefix="/api")
     # Prometheus scrapes the backend directly; nginx does not proxy /metrics.
     app.include_router(ops.metrics_router)

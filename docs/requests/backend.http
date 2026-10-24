@@ -196,3 +196,46 @@ POST http://localhost:8080/mock/admin/availability
 Content-Type: application/json
 
 {"service": "bki", "available": true}
+
+
+### ==== Сценарий 12: своя компания — регистрация по ИНН ====
+### Реестр синтетический: на любой ИНН из 10 или 12 цифр мок вернёт компанию.
+### Для повторного прогона поменяйте ИНН и логин: одна учётная запись на компанию.
+
+### Шаг 1: карточка компании из ЕГРЮЛ/ЕГРИП (без входа). 409 — компания уже зарегистрирована
+GET {{base}}/registration/company/7712345678
+
+### Шаг 2: учётная запись и сразу вход — в ответе access_token, как у /auth/login
+# @name newClient
+POST {{base}}/registration
+Content-Type: application/json
+
+{"inn": "7712345678", "full_name": "Иван Петров", "login": "ivan.petrov", "password": "secret-123"}
+
+###
+@newToken = {{newClient.response.body.access_token}}
+
+# @name draft12
+POST {{base}}/applications
+Authorization: Bearer {{newToken}}
+Content-Type: application/json
+
+{"product_id": "working_capital", "amount": 1000000, "term_months": 12, "purpose": "Закупка товара"}
+
+###
+@app12 = {{draft12.response.body.id}}
+
+POST {{base}}/applications/{{app12}}/submit
+Authorization: Bearer {{newToken}}
+Idempotency-Key: demo-submit-{{app12}}
+
+### Через пару секунд: clarification_required — в «Прозрачном бизнесе» нет данных о новой компании
+GET {{base}}/applications/{{app12}}
+Authorization: Bearer {{newToken}}
+
+### Ответ клиента. Хорошие цифры — одобрение; высокая нагрузка — другие условия; убыток — отказ
+PUT {{base}}/applications/{{app12}}
+Authorization: Bearer {{newToken}}
+Content-Type: application/json
+
+{"revenue_year": 12000000, "expenses_year": 9000000, "liabilities_total": 500000}
