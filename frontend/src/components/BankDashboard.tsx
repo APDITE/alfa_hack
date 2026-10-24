@@ -100,7 +100,7 @@ export default function BankDashboard() {
 
   return (
     <section className="card bank-dashboard">
-      <div className="section-head">
+      <div className="section-head section-head--top">
         <div>
           <h2>Кредитные заявки</h2>
           <p className="muted">Очередь обновляется автоматически.</p>

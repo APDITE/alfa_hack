@@ -66,26 +66,28 @@ export default function RegistrationForm({ onRegistered, onCancel }: Props) {
       <h3>Регистрация компании</h3>
       {!company ? (
         <form className="stack" onSubmit={find} noValidate>
-          <label htmlFor="reg-inn">ИНН компании или ИП</label>
-          <input
-            id="reg-inn"
-            inputMode="numeric"
-            autoComplete="off"
-            maxLength={12}
-            value={inn}
-            onChange={(e) => setInn(e.target.value.replace(/\D/g, ""))}
-            placeholder="10 или 12 цифр"
-          />
+          <div className="field">
+            <label htmlFor="reg-inn">ИНН компании или ИП</label>
+            <input
+              id="reg-inn"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={12}
+              value={inn}
+              onChange={(e) => setInn(e.target.value.replace(/\D/g, ""))}
+              placeholder="10 или 12 цифр"
+            />
+          </div>
           <p className="muted small">
-            Реквизиты подставим из ЕГРЮЛ/ЕГРИП. В прототипе реестр синтетический: подойдёт любой
-            ИНН из 10 или 12 цифр, а выручку банк спросит после отправки заявки.
+            Реквизиты подставим из ЕГРЮЛ/ЕГРИП. Реестр в демо синтетический: подойдёт любой ИНН
+            из 10 или 12 цифр, а выручку банк спросит после отправки заявки.
           </p>
           {error && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
-          <button type="submit" className="button button--primary" disabled={busy}>
+          <button type="submit" className="button button--primary button--large" disabled={busy}>
             {busy ? "Ищем…" : "Найти компанию"}
           </button>
           <button type="button" className="link-button" onClick={onCancel}>
@@ -113,34 +115,40 @@ export default function RegistrationForm({ onRegistered, onCancel }: Props) {
           >
             Не ваша компания? Изменить ИНН
           </button>
-          <label htmlFor="reg-name">Ваше имя</label>
-          <input
-            id="reg-name"
-            autoComplete="name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <label htmlFor="reg-login">Логин</label>
-          <input
-            id="reg-login"
-            autoComplete="username"
-            value={login}
-            onChange={(e) => setLogin(e.target.value.trim())}
-          />
-          <label htmlFor="reg-password">Пароль, не короче 8 символов</label>
-          <input
-            id="reg-password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div className="field">
+            <label htmlFor="reg-name">Ваше имя</label>
+            <input
+              id="reg-name"
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="reg-login">Логин</label>
+            <input
+              id="reg-login"
+              autoComplete="username"
+              value={login}
+              onChange={(e) => setLogin(e.target.value.trim())}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="reg-password">Пароль, не короче 8 символов</label>
+            <input
+              id="reg-password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
           {error && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
-          <button type="submit" className="button button--primary" disabled={busy}>
+          <button type="submit" className="button button--primary button--large" disabled={busy}>
             {busy ? "Регистрируем…" : "Зарегистрироваться и войти"}
           </button>
           <button type="button" className="link-button" onClick={onCancel}>

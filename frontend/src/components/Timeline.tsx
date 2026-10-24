@@ -17,18 +17,18 @@ export default function Timeline({ history, audit = false }: Props) {
     <ol className="timeline">
       {history.map((item, index) => (
         <li key={`${item.at}-${index}`} className="timeline__item">
-          <div className="timeline__head">
+          <time className="timeline__time" dateTime={item.at}>
+            {dateTime(item.at)}
+          </time>
+          <div>
             <span className="timeline__status">{labels[item.to_status] ?? item.to_status}</span>
-            <time className="timeline__time" dateTime={item.at}>
-              {dateTime(item.at)}
-            </time>
+            {audit && (
+              <div className="timeline__meta">
+                {ACTOR_LABELS[item.actor]}
+                {item.comment ? ` · ${item.comment}` : ""}
+              </div>
+            )}
           </div>
-          {audit && (
-            <div className="timeline__meta">
-              {ACTOR_LABELS[item.actor]}
-              {item.comment ? ` · ${item.comment}` : ""}
-            </div>
-          )}
         </li>
       ))}
     </ol>

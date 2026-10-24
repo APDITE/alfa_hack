@@ -36,7 +36,7 @@ export default function MyApplications({
   const waiting = applications.filter((a) => PRIORITY[a.client_stage] === 0).length;
 
   return (
-    <section className="card">
+    <section className="applications">
       <div className="section-head">
         <div>
           <h2>Мои заявки</h2>

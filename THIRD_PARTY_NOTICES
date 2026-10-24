@@ -51,6 +51,9 @@ PyJWT (MIT), bcrypt (Apache-2.0), httpx (BSD-3-Clause), PyYAML (MIT).
 запросы к API — встроенный `fetch`. Сборка: Vite (MIT), TypeScript (Apache-2.0),
 @vitejs/plugin-react (MIT). Точные версии: `frontend/package-lock.json`.
 
+Шрифт Golos Text (SIL Open Font License 1.1) браузер загружает с Google Fonts
+(`frontend/index.html`); без доступа в интернет используется системный шрифт.
+
 ## Образы Docker
 
 | Образ | Лицензия | Где |
