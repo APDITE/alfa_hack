@@ -43,18 +43,43 @@ function stepOf(status: ApplicationSummary["status"]): number {
   }
 }
 
+function CheckIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
 function Progress({ status }: { status: ApplicationSummary["status"] }) {
   if (status === "withdrawn") return null;
   const current = stepOf(status);
   return (
-    <ol className="progress" aria-label="Этапы заявки">
+    <ol className="steps" aria-label="Этапы заявки">
       {STEPS.map((step, index) => {
         let state = index < current ? "done" : index === current ? "current" : "todo";
         if (status === "rejected" && index === current) state = "failed";
         if (status === "issued" && index === current) state = "done";
         return (
-          <li key={step} className={`progress__step progress__step--${state}`}>
-            {step}
+          <li
+            key={step}
+            className={`steps__item steps__item--${state}`}
+            aria-current={state === "current" || state === "failed" ? "step" : undefined}
+          >
+            <span className="steps__dot">
+              {state === "done" ? <CheckIcon /> : state === "failed" ? "×" : index + 1}
+            </span>
+            <span className="steps__label">{step}</span>
           </li>
         );
       })}
@@ -62,21 +87,32 @@ function Progress({ status }: { status: ApplicationSummary["status"] }) {
   );
 }
 
-function TermsList({ terms }: { terms: LoanTerms }) {
+/** Offered or signed terms as tiles; the product is shown only when it differs from the request. */
+function TermsList({ terms, showProduct }: { terms: LoanTerms; showProduct: boolean }) {
   return (
     <dl className="terms">
-      <dt>Продукт</dt>
-      <dd>{PRODUCT_NAMES[terms.product_id]}</dd>
-      <dt>Сумма</dt>
-      <dd>{money(terms.amount)}</dd>
-      <dt>Срок</dt>
-      <dd>{months(terms.term_months)}</dd>
-      <dt>Ставка</dt>
-      <dd>{percent(terms.rate)} годовых</dd>
-      <dt>Платёж</dt>
-      <dd>
-        <strong>{money(terms.monthly_payment)}</strong> в месяц
-      </dd>
+      {showProduct && (
+        <div className="terms__item terms__item--text">
+          <dt>Продукт</dt>
+          <dd>{PRODUCT_NAMES[terms.product_id]}</dd>
+        </div>
+      )}
+      <div className="terms__item">
+        <dt>Сумма</dt>
+        <dd>{money(terms.amount)}</dd>
+      </div>
+      <div className="terms__item">
+        <dt>Срок</dt>
+        <dd>{months(terms.term_months)}</dd>
+      </div>
+      <div className="terms__item">
+        <dt>Ставка, годовых</dt>
+        <dd>{percent(terms.rate)}</dd>
+      </div>
+      <div className="terms__item terms__item--accent">
+        <dt>Платёж в месяц</dt>
+        <dd>{money(terms.monthly_payment)}</dd>
+      </div>
     </dl>
   );
 }
@@ -260,10 +296,32 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
       <Progress status={summary.status} />
 
       {detail && (
-        <p className={`next-step${working ? " next-step--working" : ""}`}>
-          {working && <span className="spinner" aria-hidden="true" />}
-          {detail.next_step}
-        </p>
+        <div className={`next-step${working ? " next-step--working" : ""}`}>
+          {working ? (
+            <span className="spinner" aria-hidden="true" />
+          ) : (
+            <svg
+              className="next-step__icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+          )}
+          <div>
+            <span className="next-step__label">
+              {working ? "Сейчас" : summary.client_stage === "completed" ? "Итог" : "Что дальше"}
+            </span>
+            <p className="next-step__text">{detail.next_step}</p>
+          </div>
+        </div>
       )}
 
       {detail && actions.includes("answer_clarification") && (
@@ -272,14 +330,14 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
 
       {detail && (actions.includes("accept") || actions.includes("decline")) && terms && (
         <div className="panel panel--success">
-          <h4>{summary.status === "counter_offer" ? "Банк предлагает другие условия" : "Заявка одобрена"}</h4>
+          <h4>{summary.status === "counter_offer" ? "Банк предлагает другие условия" : "Условия банка"}</h4>
           {summary.status === "counter_offer" ? (
             <>
               {decision?.reason && <p>{decision.reason}</p>}
               <OfferCompare summary={summary} terms={terms} />
             </>
           ) : (
-            <TermsList terms={terms} />
+            <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
           )}
           <div className="actions">
             <button
@@ -311,7 +369,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
       {detail && actions.includes("sign") && (
         <div className="panel panel--accent">
           <h4>Подписание документов</h4>
-          {terms && <TermsList terms={terms} />}
+          {terms && <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />}
           <label className="checkbox">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
             Я ознакомился с условиями кредитного договора и графиком платежей
@@ -341,7 +399,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
       {detail && summary.status === "issued" && terms && (
         <div className="panel panel--success">
           <h4>Кредит выдан</h4>
-          <TermsList terms={terms} />
+          <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
         </div>
       )}
 

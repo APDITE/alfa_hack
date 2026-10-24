@@ -201,75 +201,79 @@ export default function ClientCabinet({ user }: { user: AuthUser }) {
 
   return (
     <div className="cabinet">
-      <nav className="tabs" role="tablist" aria-label="Разделы кабинета">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === "applications" && !form}
-          className="tab"
-          onClick={() => switchTab("applications")}
-        >
-          Мои заявки{active > 0 && <span className="tab__count">{active}</span>}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === "products" || Boolean(form)}
-          className="tab"
-          onClick={() => switchTab("products")}
-        >
-          Кредитные продукты
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={tab === "feed" && !form}
-          className="tab"
-          onClick={() => switchTab("feed")}
-        >
-          Уведомления{unread > 0 && <span className="tab__badge">{unread}</span>}
-        </button>
-      </nav>
+      <div className="tabs-bar">
+        <nav className="tabs container" role="tablist" aria-label="Разделы кабинета">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "applications" && !form}
+            className="tab"
+            onClick={() => switchTab("applications")}
+          >
+            Мои заявки{active > 0 && <span className="tab__count">{active}</span>}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "products" || Boolean(form)}
+            className="tab"
+            onClick={() => switchTab("products")}
+          >
+            Кредитные продукты
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "feed" && !form}
+            className="tab"
+            onClick={() => switchTab("feed")}
+          >
+            Уведомления{unread > 0 && <span className="tab__badge">{unread}</span>}
+          </button>
+        </nav>
+      </div>
 
-      {error && (
-        <p className="form-error banner" role="alert">
-          {error}
-        </p>
-      )}
+      <div className="container page">
+        {error && (
+          <p className="form-error banner" role="alert">
+            {error}
+          </p>
+        )}
 
-      {form ? (
-        <CreditApplicationForm
-          key={form.draft?.id ?? form.product.id}
-          product={form.product}
-          purpose={form.purpose}
-          company={company}
-          draft={form.draft}
-          onCancel={() => setForm(null)}
-          onDone={(detail, submitted) => {
-            setForm(null);
-            handleChanged(detail);
-            pushToast(submitted ? "Заявка отправлена, банк начал проверку" : "Черновик сохранён");
-            openApplication(detail.id);
-          }}
-        />
-      ) : tab === null || (tab === "applications" && applications === null) ? (
-        <section className="card">
-          <p className="muted">Загружаем заявки…</p>
-        </section>
-      ) : tab === "applications" ? (
-        <MyApplications
-          applications={applications ?? []}
-          details={details}
-          highlightId={highlightId}
-          onChanged={handleChanged}
-          onEdit={editDraft}
-          onNew={() => switchTab("products")}
-        />
-      ) : tab === "products" ? (
-        <ProductCatalog onApply={(product, purpose) => setForm({ product, purpose })} />
-      ) : (
-        <Feed feed={feed} error={feedError} onOpenApplication={openApplication} />
-      )}
+        {form ? (
+          <CreditApplicationForm
+            key={form.draft?.id ?? form.product.id}
+            product={form.product}
+            purpose={form.purpose}
+            company={company}
+            draft={form.draft}
+            onCancel={() => setForm(null)}
+            onDone={(detail, submitted) => {
+              setForm(null);
+              handleChanged(detail);
+              pushToast(submitted ? "Заявка отправлена, банк начал проверку" : "Черновик сохранён");
+              openApplication(detail.id);
+            }}
+          />
+        ) : tab === null || (tab === "applications" && applications === null) ? (
+          <section className="card">
+            <p className="muted">Загружаем заявки…</p>
+          </section>
+        ) : tab === "applications" ? (
+          <MyApplications
+            applications={applications ?? []}
+            details={details}
+            highlightId={highlightId}
+            onChanged={handleChanged}
+            onEdit={editDraft}
+            onNew={() => switchTab("products")}
+          />
+        ) : tab === "products" ? (
+          <ProductCatalog onApply={(product, purpose) => setForm({ product, purpose })} />
+        ) : (
+          <Feed feed={feed} error={feedError} onOpenApplication={openApplication} />
+        )}
+      </div>
 
       <div className="toasts" aria-live="polite">
         {toasts.map((toast) => (

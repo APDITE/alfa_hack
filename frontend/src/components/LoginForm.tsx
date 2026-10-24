@@ -49,20 +49,24 @@ export default function LoginForm({ onLogin }: Props) {
   return (
     <section className="login-page">
       <div className="login-intro">
-        <h2>Кредит для бизнеса — в одном кабинете</h2>
-        <p>
-          Подберите продукт под задачу, подайте заявку и следите за решением. Банк проверит
-          данные компании сам: реквизиты, выручку и кредитную историю.
-        </p>
+        <div>
+          <h2 className="login-intro__title">Кредит для бизнеса&nbsp;— в одном кабинете</h2>
+          <p className="login-intro__lead">
+            Подберите продукт под задачу, подайте заявку и следите за решением. Банк проверит
+            данные компании сам: реквизиты, выручку и кредитную историю.
+          </p>
+        </div>
         <div className="demo-accounts">
-          <h3>Демо-доступ</h3>
-          <p className="muted">Нажмите на учётную запись, чтобы войти. Пароль совпадает с логином.</p>
+          <div className="demo-accounts__head">
+            <h3>Демо-доступ</h3>
+            <span className="muted small">Нажмите на учётную запись — пароль совпадает с логином</span>
+          </div>
           <ul>
             {DEMO_ACCOUNTS.map((account) => (
               <li key={account.login}>
                 <button
                   type="button"
-                  className="demo-account"
+                  className={`demo-account${account.login === "analyst" ? " demo-account--staff" : ""}`}
                   disabled={loading}
                   onClick={() => {
                     setRegistering(false);
@@ -85,36 +89,47 @@ export default function LoginForm({ onLogin }: Props) {
         <RegistrationForm onRegistered={onLogin} onCancel={() => setRegistering(false)} />
       ) : (
         <form className="login-form card" onSubmit={handleSubmit}>
-          <h3>Вход в систему</h3>
-          <label htmlFor="auth-login">Логин</label>
-          <input
-            id="auth-login"
-            type="text"
-            autoComplete="username"
-            required
-            value={login}
-            onChange={(event) => setLogin(event.target.value)}
-          />
-          <label htmlFor="auth-password">Пароль</label>
-          <input
-            id="auth-password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
+          <h3>Вход</h3>
+          <div className="field">
+            <label htmlFor="auth-login">Логин</label>
+            <input
+              id="auth-login"
+              type="text"
+              autoComplete="username"
+              placeholder="Например, client1"
+              required
+              value={login}
+              onChange={(event) => setLogin(event.target.value)}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="auth-password">Пароль</label>
+            <input
+              id="auth-password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </div>
           {error && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
-          <button type="submit" className="button button--primary" disabled={loading}>
+          <button type="submit" className="button button--primary button--large" disabled={loading}>
             {loading ? "Входим…" : "Войти"}
           </button>
-          <button type="button" className="link-button" onClick={() => setRegistering(true)}>
-            Нет учётной записи? Зарегистрируйте компанию по ИНН
+          <div className="divider">или</div>
+          <button
+            type="button"
+            className="button button--outline button--large"
+            onClick={() => setRegistering(true)}
+          >
+            Зарегистрировать компанию по ИНН
           </button>
+          <p className="muted small">Реквизиты подставим из ЕГРЮЛ/ЕГРИП — останется придумать логин и пароль.</p>
         </form>
       )}
     </section>

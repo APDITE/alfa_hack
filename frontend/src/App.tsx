@@ -44,47 +44,52 @@ export default function App() {
     setUser(null);
   }
 
+  const signedInClient = !checkingSession && user?.role === "client";
+
   return (
     <div className="app">
       <header className="topbar">
-        <div className="topbar__brand">
-          <span className="topbar__logo" aria-hidden="true">
-            ₽
-          </span>
-          <div>
-            <h1>Умный кредитный кабинет</h1>
-            <p>Прототип кредитного конвейера для малого бизнеса</p>
+        <div className="topbar__inner container">
+          <div className="topbar__brand">
+            <h1 className="topbar__title">Умный кредитный кабинет</h1>
+            <span className="topbar__subtitle">Кредиты для малого бизнеса</span>
           </div>
+          {user && (
+            <div className="topbar__user">
+              <div className="topbar__who">
+                <span className="topbar__name">{user.full_name}</span>
+                <span className="topbar__role">
+                  {user.role === "employee" ? "Сотрудник банка" : "Предприниматель"}
+                </span>
+              </div>
+              <button type="button" className="button button--secondary button--small" onClick={handleLogout}>
+                Выйти
+              </button>
+            </div>
+          )}
         </div>
-        {user && (
-          <div className="topbar__user">
-            <span>
-              {user.full_name}
-              <span className="muted"> · {user.role === "employee" ? "сотрудник банка" : "предприниматель"}</span>
-            </span>
-            <button type="button" className="button button--ghost" onClick={handleLogout}>
-              Выйти
-            </button>
-          </div>
-        )}
       </header>
 
       <main>
-        {sessionExpired && !user && (
-          <p className="notice" role="status">
-            Сессия истекла — войдите снова.
-          </p>
-        )}
-        {checkingSession ? (
-          <p className="muted" role="status">
-            Проверяем вход…
-          </p>
-        ) : !user ? (
-          <LoginForm onLogin={handleLogin} />
-        ) : user.role === "client" ? (
+        {signedInClient && user ? (
           <ClientCabinet key={user.id} user={user} />
         ) : (
-          <BankDashboard key={user.id} />
+          <div className="container page">
+            {sessionExpired && !user && (
+              <p className="notice" role="status">
+                Сессия истекла — войдите снова.
+              </p>
+            )}
+            {checkingSession ? (
+              <p className="muted" role="status">
+                Проверяем вход…
+              </p>
+            ) : !user ? (
+              <LoginForm onLogin={handleLogin} />
+            ) : (
+              <BankDashboard key={user.id} />
+            )}
+          </div>
         )}
       </main>
     </div>
