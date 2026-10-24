@@ -1,0 +1,63 @@
+# Сторонние компоненты, модели, датасеты и смоделированные интеграции
+
+Все версии зафиксированы lock-файлами: `backend/uv.lock`, `scoring/uv.lock`,
+`mocks/uv.lock`, `frontend/package-lock.json`, образы Docker привязаны к тегам.
+Платных API, подписок и закрытых лицензий нет. Файл ведём вместе: новую зависимость
+добавляем сюда в том же PR.
+
+## Модели и датасеты
+
+Моделей машинного обучения и LLM в проверяемой версии нет. Скоринг это балльная карта
+с весами в `scoring/config/scorecard.yaml`, без обучения. Внешних датасетов нет: все данные
+(компании, финансы, кредитные истории) синтетические, их пишет `mocks/generate.py`
+с фиксированным seed.
+
+## Смоделированные интеграции
+
+| Что | Как смоделировано |
+|---|---|
+| ЕГРЮЛ/ЕГРИП | сервис `mocks`, `GET /mock/egrul/{inn}`, синтетические данные |
+| «Прозрачный бизнес» ФНС | сервис `mocks`, `GET /mock/transparent-business/{inn}`, синтетические данные |
+| Бюро кредитных историй | сервис `mocks`, `GET /mock/bki/{inn}`, синтетические данные |
+| Подписание документов и выдача денег | симуляция в бэкенде, реальных операций нет |
+
+Доступ к системам Альфа-Банка и государственным сервисам не используется.
+
+## Скоринг (`scoring/`) и моки (`mocks/`), Python 3.12
+
+Прямые зависимости времени выполнения:
+
+| Пакет | Версия | Лицензия | Где |
+|---|---|---|---|
+| FastAPI | 0.157.0 | MIT | scoring, mocks |
+| Pydantic | 2.14.1 | MIT | scoring, mocks |
+| Uvicorn | 0.54.0 | BSD-3-Clause | scoring, mocks |
+| PyYAML | 6.0.3 | MIT | scoring |
+
+Только разработка и тесты: pytest (MIT), httpx (BSD-3-Clause), ruff (MIT), mypy (MIT),
+types-pyyaml (Apache-2.0). Транзитивные зависимости перечислены в `uv.lock`.
+
+## Бэкенд (`backend/`), Python 3.12
+
+Прямые зависимости времени выполнения из `backend/pyproject.toml`: FastAPI (MIT),
+pydantic-settings (MIT), SQLAlchemy (MIT), Alembic (MIT), psycopg (LGPL-3.0),
+PyJWT (MIT), bcrypt (Apache-2.0), httpx (BSD-3-Clause), PyYAML (MIT).
+Точные версии: `backend/uv.lock`.
+
+## Фронтенд (`frontend/`)
+
+Прямые зависимости времени выполнения на момент записи: React и React DOM (MIT).
+Сборка: Vite (MIT), TypeScript (Apache-2.0), @vitejs/plugin-react (MIT).
+Точные версии: `frontend/package-lock.json`. Пакеты, добавленные позже, дописывает
+автор фронтенда.
+
+## Образы Docker
+
+| Образ | Лицензия | Где |
+|---|---|---|
+| `python:3.12-slim-bookworm` | PSF и лицензии пакетов Debian | scoring, mocks |
+| `ghcr.io/astral-sh/uv:0.13.4` | MIT или Apache-2.0 | backend, scoring, mocks |
+| `python:3.12-slim` | PSF и лицензии пакетов Debian | backend |
+| `node:22-alpine` | MIT | frontend (сборка) |
+| `postgres:16-alpine` | PostgreSQL License | база данных |
+| `nginx:1.27-alpine` | BSD-2-Clause | прокси |

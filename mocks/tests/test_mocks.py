@@ -36,8 +36,50 @@ def test_bki_contract(client):
 
 
 @pytest.mark.parametrize("path", ["egrul", "transparent-business", "bki"])
-def test_unknown_inn_is_404(client, path):
-    assert client.get(f"/mock/{path}/1234567890").status_code == 404
+@pytest.mark.parametrize("inn", ["abc", "12345", "12345678901", "77000000х1"])
+def test_malformed_inn_is_404(client, path, inn):
+    assert client.get(f"/mock/{path}/{inn}").status_code == 404
+
+
+def test_unknown_inn_gets_deterministic_synthetic_data(client):
+    first = client.get("/mock/egrul/5012345678").json()
+    assert first == client.get("/mock/egrul/5012345678").json()
+    assert first != client.get("/mock/egrul/5012345679").json()
+    assert (first["inn"], first["region"], first["status"], first["legal_form"]) == (
+        "5012345678", "50", "active", "OOO",
+    )
+    assert client.get("/mock/bki/5012345678").json() == client.get("/mock/bki/5012345678").json()
+
+
+def test_synthetic_values_are_pinned(client):
+    # значения зафиксированы: если генератор синтетики изменится, демо у жюри поплывёт
+    r = client.get("/mock/egrul/5012345678").json()
+    assert (r["name"], r["registration_date"], r["okved"]) == ("ООО «Бриз Лого»", "2018-04-21", "10.71")
+    assert client.get("/mock/bki/5012345678").json()["total_debt"] == 1_000_000
+
+
+def test_synthetic_company_has_no_financials_and_clean_history(client):
+    assert client.get("/mock/transparent-business/5012345678").status_code == 404
+    bki = client.get("/mock/bki/5012345678").json()
+    assert set(bki) == {"inn", "active_loans", "overdue_count", "max_overdue_days", "total_debt"}
+    assert bki["max_overdue_days"] < 30
+
+
+def test_synthetic_individual_entrepreneur_has_12_digit_inn(client):
+    r = client.get("/mock/egrul/501234567890").json()
+    assert r["legal_form"] == "IP" and r["name"].startswith("ИП ")
+
+
+def test_synthetic_respects_availability(client):
+    client.post("/mock/admin/availability", json={"service": "egrul", "available": False})
+    assert client.get("/mock/egrul/5012345678").status_code == 503
+
+
+def test_synthetic_can_be_disabled(monkeypatch):
+    monkeypatch.setenv("MOCKS_SYNTHETIC_UNKNOWN_INN", "0")
+    with TestClient(app) as c:
+        assert c.get("/mock/egrul/5012345678").status_code == 404
+        assert c.get("/mock/egrul/7700000001").status_code == 200
 
 
 def test_scenario_3_has_no_transparent_business_record(client):
@@ -75,7 +117,7 @@ def test_availability_switch_gives_503_and_restores(client, service, path):
 
 def test_503_wins_over_404_for_disabled_service(client):
     client.post("/mock/admin/availability", json={"service": "bki", "available": False})
-    assert client.get("/mock/bki/1234567890").status_code == 503
+    assert client.get("/mock/bki/abc").status_code == 503
 
 
 def test_availability_rejects_unknown_service(client):
