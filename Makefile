@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help env up down reset logs test
+.PHONY: help env up down reset logs db docs test
 
 help: ## List available commands
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  %-8s %s\n", $$1, $$2}'
@@ -18,6 +18,12 @@ reset: ## Stop everything and delete the database
 
 logs: ## Follow backend and worker logs
 	docker compose logs -f backend worker
+
+db: ## Only Postgres, published on localhost:5432 (backend outside Docker)
+	docker compose -f docker-compose.yml -f compose.dev.yml up db
+
+docs: ## Regenerate docs/state-diagram.md, docs/data-model.md and docs/openapi.json
+	cd backend && uv run python -m app.docgen
 
 test: ## Run backend, scoring, mocks and frontend checks locally
 	cd backend && uv run ruff check app tests && uv run mypy app && uv run pytest -q

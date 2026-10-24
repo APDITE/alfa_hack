@@ -9,8 +9,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-app}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # Not published to the host: a local Postgres on 5432 would block `make up`.
+    # For running the backend outside Docker: docker compose -f docker-compose.yml -f compose.dev.yml up db
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
@@ -25,7 +25,9 @@ services:
     build:
       context: ./backend
       target: dev
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment:
       APP_ENV: development
       DOCS_ENABLED: "true"
@@ -49,10 +51,11 @@ services:
       context: ./backend
       target: dev
     command: ["python", "-m", "app.worker"]
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-app}@db:5432/${POSTGRES_DB:-app}
-      # Services of ML A; until they exist the worker retries and hands applications to an employee.
       MOCKS_URL: http://mocks:8000
       SCORING_URL: http://scoring:8000
     volumes:
@@ -83,6 +86,7 @@ services:
     depends_on:
       - backend
       - frontend
+      - mocks
 
 volumes:
   pgdata:
