@@ -282,7 +282,6 @@ class WithdrawRequest(BaseModel):
 
 class FeedItemType(StrEnum):
     EVENT = "event"
-    NEWS = "news"
 
 
 class FeedItem(BaseModel):
@@ -293,6 +292,11 @@ class FeedItem(BaseModel):
     application_id: UUID | None = None
     created_at: datetime
     read: bool
+
+
+class FeedResponse(BaseModel):
+    events: list[FeedItem] = Field(description="Events of the client's applications, newest first")
+    unread_events: int
 
 
 # --- Meta -------------------------------------------------------------------

@@ -9,10 +9,23 @@ from app.db import make_engine, make_session_factory
 from app.products import load_products
 from app.routes import applications, auth, catalog, feed, health, meta
 
+_DEV_SECRET_PREFIX = "dev-only"
+
+
+def check_settings(settings: Settings) -> None:
+    """Refuse to start outside development with the default or a short JWT secret."""
+    if settings.app_env == "development":
+        return
+    if settings.jwt_secret.startswith(_DEV_SECRET_PREFIX) or len(settings.jwt_secret) < 32:
+        raise RuntimeError(
+            f"APP_ENV={settings.app_env}: set JWT_SECRET to a random value of 32+ characters"
+        )
+
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     """App factory. Run with `uvicorn app.main:create_app --factory`."""
     settings = settings or Settings()
+    check_settings(settings)
     engine = make_engine(settings.database_url)
 
     @asynccontextmanager
@@ -23,7 +36,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title="Smart Credit Cabinet API",
         description="Кредитный конвейер для МСБ: кабинет клиента и рабочее место банка.",
-        version="0.1.0",
+        version="1.0.0",
         docs_url="/api/docs" if settings.docs_enabled else None,
         redoc_url=None,
         openapi_url="/api/openapi.json" if settings.docs_enabled else None,

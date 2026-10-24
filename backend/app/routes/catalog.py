@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 
 from app.db import SessionDep
@@ -12,6 +12,7 @@ from app.schemas import (
     RecommendRequest,
     RecommendResponse,
 )
+from app.security import get_current_user
 
 router = APIRouter(tags=["catalog"])
 
@@ -60,9 +61,13 @@ def recommend_product(body: RecommendRequest, session: SessionDep) -> RecommendR
     return RecommendResponse(product=_to_response(match), reason=_REASONS[body.purpose_category])
 
 
-@router.get("/companies/lookup/{inn}", response_model=CompanyResponse)
+@router.get(
+    "/companies/lookup/{inn}",
+    response_model=CompanyResponse,
+    dependencies=[Depends(get_current_user)],
+)
 def lookup_company(inn: str, session: SessionDep) -> CompanyResponse:
-    """Prefill company data by INN. Demo companies: 7700000001 … 7700000008."""
+    """Prefill company data by INN (signed-in users). Demo companies: 7700000001 … 7700000008."""
     if not inn.isdigit() or len(inn) not in (10, 12):
         raise HTTPException(422, "INN must be 10 or 12 digits")
     company = session.get(Company, inn)
