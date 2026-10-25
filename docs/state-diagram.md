@@ -46,8 +46,10 @@ stateDiagram-v2
     manual_review --> clarification_required : сотрудник
     manual_review --> counter_offer : сотрудник
     manual_review --> rejected : сотрудник
+    approved --> manual_review : клиент
     approved --> signing : клиент
     approved --> withdrawn : клиент
+    counter_offer --> manual_review : клиент
     counter_offer --> signing : клиент
     counter_offer --> withdrawn : клиент
     signing --> issued : клиент
@@ -67,8 +69,8 @@ stateDiagram-v2
 | `scoring` | Скоринг | Проверяем заявку | система | `credit_decision`, `manual_review` | Оцениваем финансовое положение компании. |
 | `credit_decision` | Кредитное решение | Проверяем заявку | система | `approved`, `clarification_required`, `counter_offer`, `manual_review`, `rejected` | Готовим решение по заявке. |
 | `manual_review` | Ручная проверка | Проверяем заявку | сотрудник | `approved`, `clarification_required`, `counter_offer`, `rejected` | Заявку смотрит кредитный специалист. Обычно это занимает до одного дня. |
-| `approved` | Одобрена | Решение готово | клиент | `signing`, `withdrawn` | Банк готов выдать кредит на запрошенных условиях. Примите или отклоните их. |
-| `counter_offer` | Одобрена на других условиях | Решение готово | клиент | `signing`, `withdrawn` | Банк готов выдать кредит на других условиях. Посмотрите их и примите или отклоните. |
+| `approved` | Одобрена | Решение готово | клиент | `manual_review`, `signing`, `withdrawn` | Банк готов выдать кредит на запрошенных условиях. Примите их, предложите свои или откажитесь. |
+| `counter_offer` | Одобрена на других условиях | Решение готово | клиент | `manual_review`, `signing`, `withdrawn` | Банк готов выдать кредит на других условиях. Примите их, предложите свои или откажитесь. |
 | `rejected` | Отказ | Готово | — | — | К сожалению, банк не может выдать кредит. Причина указана ниже. |
 | `signing` | Подписание | Оформление | клиент | `issued`, `withdrawn` | Подпишите документы, после этого деньги поступят на счёт. |
 | `issued` | Выдана | Готово | — | — | Кредит выдан, деньги поступили на счёт компании. |

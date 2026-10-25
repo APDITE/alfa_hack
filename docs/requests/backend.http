@@ -213,6 +213,41 @@ Content-Type: application/json
   "terms": {"product_id": "working_capital", "amount": 1500000, "term_months": 18}
 }
 
+### ==== Переговоры и договор: продолжение сценария 5 ====
+
+### Клиент отвечает своими условиями (до трёх раундов) — заявка снова у сотрудника
+POST {{base}}/applications/{{app5}}/proposals
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"amount": 1800000, "term_months": 18, "rate": 20, "comment": "Сезонная закупка: нужна сумма побольше"}
+
+### Сотрудник: в переговорах «approved» принимает условия клиента вместе с его ставкой
+POST {{base}}/applications/{{app5}}/decision
+Authorization: Bearer {{analystToken}}
+Content-Type: application/json
+
+{"outcome": "approved", "comment": "Согласовано"}
+
+### Версии и раунды — в negotiation. Принять условия → signing и договор с хешем
+POST {{base}}/applications/{{app5}}/accept
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"accept": true}
+
+### Текст договора, SHA-256 и проверка подлинности (verified)
+# @name agreement5
+GET {{base}}/applications/{{app5}}/agreement
+Authorization: Bearer {{client5Token}}
+
+### Подписать именно эту редакцию: другой хеш — 409
+POST {{base}}/applications/{{app5}}/sign
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"agreement_sha256": "{{agreement5.response.body.sha256}}"}
+
 
 ### ==== Сценарий 7: сбой внешнего источника (демо-переключатель через nginx) ====
 

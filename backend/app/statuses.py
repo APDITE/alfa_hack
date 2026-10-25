@@ -45,7 +45,8 @@ S = ApplicationStatus
 
 # From every automatic stage the system may hand the application to an employee
 # (MANUAL_REVIEW): an external source stayed unavailable after all retries, or the
-# stage kept failing with an unexpected error.
+# stage kept failing with an unexpected error. The client may answer an offer with their
+# own terms (negotiation, app/negotiation.py): the application goes back to an employee.
 TRANSITIONS: dict[ApplicationStatus, frozenset[ApplicationStatus]] = {
     S.DRAFT: frozenset({S.SUBMITTED, S.WITHDRAWN}),
     S.SUBMITTED: frozenset({S.DATA_CHECK, S.MANUAL_REVIEW}),
@@ -57,8 +58,8 @@ TRANSITIONS: dict[ApplicationStatus, frozenset[ApplicationStatus]] = {
         {S.APPROVED, S.COUNTER_OFFER, S.REJECTED, S.CLARIFICATION_REQUIRED, S.MANUAL_REVIEW}
     ),
     S.MANUAL_REVIEW: frozenset({S.APPROVED, S.COUNTER_OFFER, S.REJECTED, S.CLARIFICATION_REQUIRED}),
-    S.APPROVED: frozenset({S.SIGNING, S.WITHDRAWN}),
-    S.COUNTER_OFFER: frozenset({S.SIGNING, S.WITHDRAWN}),
+    S.APPROVED: frozenset({S.SIGNING, S.MANUAL_REVIEW, S.WITHDRAWN}),
+    S.COUNTER_OFFER: frozenset({S.SIGNING, S.MANUAL_REVIEW, S.WITHDRAWN}),
     S.SIGNING: frozenset({S.ISSUED, S.WITHDRAWN}),
     S.ISSUED: frozenset(),
     S.REJECTED: frozenset(),
@@ -174,9 +175,10 @@ NEXT_STEPS: dict[ApplicationStatus, str] = {
     S.SCORING: "Оцениваем финансовое положение компании.",
     S.CREDIT_DECISION: "Готовим решение по заявке.",
     S.MANUAL_REVIEW: "Заявку смотрит кредитный специалист. Обычно это занимает до одного дня.",
-    S.APPROVED: "Банк готов выдать кредит на запрошенных условиях. Примите или отклоните их.",
-    S.COUNTER_OFFER: "Банк готов выдать кредит на других условиях. "
-    "Посмотрите их и примите или отклоните.",
+    S.APPROVED: "Банк готов выдать кредит на запрошенных условиях. Примите их, предложите "
+    "свои или откажитесь.",
+    S.COUNTER_OFFER: "Банк готов выдать кредит на других условиях. Примите их, предложите "
+    "свои или откажитесь.",
     S.REJECTED: "К сожалению, банк не может выдать кредит. Причина указана ниже.",
     S.SIGNING: "Подпишите документы, после этого деньги поступят на счёт.",
     S.ISSUED: "Кредит выдан, деньги поступили на счёт компании.",
@@ -184,3 +186,7 @@ NEXT_STEPS: dict[ApplicationStatus, str] = {
 }
 
 WAITING_EXTERNAL_STEP = "Ждём ответ от внешней службы. Это не требует ваших действий."
+PROPOSAL_STEP = (
+    "Кредитный специалист рассматривает ваши условия. Ответ появится здесь — "
+    "обычно в течение рабочего дня."
+)

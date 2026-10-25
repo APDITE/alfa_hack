@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Application, FeedItemRecord
 from app.schemas import FeedItem, FeedItemType, FeedResponse
-from app.statuses import ApplicationStatus
+from app.statuses import Actor, ApplicationStatus
 
 S = ApplicationStatus
 
@@ -52,6 +52,13 @@ _EVENTS: dict[ApplicationStatus, tuple[str, str]] = {
     S.WITHDRAWN: ("Заявка отозвана", "Заявка на {amount} отозвана."),
 }
 
+# The client's own proposal also sends the application to manual review.
+_PROPOSAL_EVENT = (
+    "Ваши условия переданы банку",
+    "Вы предложили {amount} на {term} мес. Ответ кредитного специалиста появится в карточке "
+    "заявки.",
+)
+
 
 def money(amount: int | None) -> str:
     """1500000 -> '1 500 000 ₽' with non-breaking spaces."""
@@ -60,9 +67,17 @@ def money(amount: int | None) -> str:
     return f"{amount:,}".replace(",", " ") + " ₽"
 
 
-def record_event(session: Session, application: Application, status: ApplicationStatus) -> None:
+def record_event(
+    session: Session,
+    application: Application,
+    status: ApplicationStatus,
+    actor: Actor | None = None,
+) -> None:
     """Notify the application's client about `status`, if it is one they care about."""
-    template = _EVENTS.get(status)
+    if status is S.MANUAL_REVIEW and actor is Actor.CLIENT:
+        template: tuple[str, str] | None = _PROPOSAL_EVENT
+    else:
+        template = _EVENTS.get(status)
     if template is None:
         return
     title, text = template

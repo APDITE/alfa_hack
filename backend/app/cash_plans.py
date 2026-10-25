@@ -13,6 +13,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app import agreements
 from app import cash_calendar as cc
 from app.models import Application, DecisionRecord, StatusHistory
 from app.pipeline import company_facts
@@ -172,8 +173,12 @@ def save(
     session: Session, user: CurrentUser, application: Application, body: CashPlanRequest
 ) -> Application:
     _editable_terms(application, user, session)
+    changed = application.payment_day != body.payment_day
     application.payment_day = body.payment_day
     application.cash_calendar = body.calendar.model_dump()
+    if changed and application.status is S.SIGNING:
+        # The agreement states the payment day: the client signs a new version.
+        agreements.refresh(session, application, "Изменилась дата платежа")
     session.commit()
     return application
 

@@ -786,13 +786,140 @@
         }
       }
     },
+    "/api/applications/{application_id}/proposals": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Propose Terms",
+        "description": "Client answers the bank's offer with their own terms (a negotiation round); the\napplication goes back to an employee.",
+        "operationId": "propose_terms_api_applications__application_id__proposals_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/agreement": {
+      "get": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Get Agreement",
+        "description": "The loan agreement text with its SHA-256 and a check that the text still matches it.",
+        "operationId": "get_agreement_api_applications__application_id__agreement_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latest if omitted",
+              "title": "Version"
+            },
+            "description": "Latest if omitted"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgreementDocument"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/applications/{application_id}/sign": {
       "post": {
         "tags": [
           "applications"
         ],
         "summary": "Sign Documents",
-        "description": "Simulated signing and disbursement.",
+        "description": "Simulated signing and disbursement. With `agreement_sha256`, nothing is signed if the\nagreement has changed since the client read it (409).",
         "operationId": "sign_documents_api_applications__application_id__sign_post",
         "security": [
           {
@@ -811,6 +938,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SignRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1074,6 +1218,123 @@
         ],
         "title": "Actor"
       },
+      "AgreementDocument": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "offer_version": {
+            "type": "integer",
+            "title": "Offer Version",
+            "description": "The bank's offer version the agreement is made of"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Why this version was made"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "signed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signed At"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified",
+            "description": "SHA-256 of the stored text matches the recorded hash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "version",
+          "offer_version",
+          "reason",
+          "sha256",
+          "created_at",
+          "text",
+          "verified"
+        ],
+        "title": "AgreementDocument"
+      },
+      "AgreementSummary": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "offer_version": {
+            "type": "integer",
+            "title": "Offer Version",
+            "description": "The bank's offer version the agreement is made of"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Why this version was made"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "signed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "version",
+          "offer_version",
+          "reason",
+          "sha256",
+          "created_at"
+        ],
+        "title": "AgreementSummary"
+      },
       "ApplicationAction": {
         "type": "string",
         "enum": [
@@ -1082,6 +1343,7 @@
           "answer_clarification",
           "accept",
           "decline",
+          "propose",
           "sign",
           "withdraw",
           "decide"
@@ -1308,6 +1570,25 @@
               }
             ],
             "description": "Payment day chosen with the cash calendar"
+          },
+          "negotiation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NegotiationView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The bank's offer versions and the client's proposals"
+          },
+          "agreements": {
+            "items": {
+              "$ref": "#/components/schemas/AgreementSummary"
+            },
+            "type": "array",
+            "title": "Agreements",
+            "description": "Versions of the loan agreement, oldest first"
           },
           "clarification": {
             "anyOf": [
@@ -2094,6 +2375,16 @@
         ],
         "title": "HealthResponse"
       },
+      "HistoryKind": {
+        "type": "string",
+        "enum": [
+          "status",
+          "proposal",
+          "offer",
+          "agreement"
+        ],
+        "title": "HistoryKind"
+      },
       "LegalForm": {
         "type": "string",
         "enum": [
@@ -2249,6 +2540,92 @@
           "comment"
         ],
         "title": "ManualDecisionRequest"
+      },
+      "NegotiationView": {
+        "properties": {
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/OfferVersionView"
+            },
+            "type": "array",
+            "title": "Versions",
+            "description": "The bank's offers, oldest first"
+          },
+          "proposals": {
+            "items": {
+              "$ref": "#/components/schemas/ProposalView"
+            },
+            "type": "array",
+            "title": "Proposals",
+            "description": "The client's proposals, oldest first"
+          },
+          "max_rounds": {
+            "type": "integer",
+            "title": "Max Rounds"
+          },
+          "rounds_left": {
+            "type": "integer",
+            "title": "Rounds Left"
+          }
+        },
+        "type": "object",
+        "required": [
+          "versions",
+          "proposals",
+          "max_rounds",
+          "rounds_left"
+        ],
+        "title": "NegotiationView"
+      },
+      "OfferVersionView": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "terms": {
+            "$ref": "#/components/schemas/LoanTerms"
+          },
+          "total_interest": {
+            "type": "integer",
+            "title": "Total Interest",
+            "description": "Overpayment over the whole term, rubles"
+          },
+          "decided_by": {
+            "$ref": "#/components/schemas/Actor"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "in_reply_to": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Reply To",
+            "description": "Round of the client's proposal this version answers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "terms",
+          "total_interest",
+          "decided_by",
+          "reason",
+          "created_at"
+        ],
+        "title": "OfferVersionView"
       },
       "OpsAlert": {
         "properties": {
@@ -2528,6 +2905,125 @@
         ],
         "title": "ProductResponse"
       },
+      "ProposalRequest": {
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "description": "Rubles"
+          },
+          "term_months": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Term Months"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMaximum": 100.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Desired annual rate, percent; optional"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Comment",
+            "description": "What the client wants and why"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount",
+          "term_months",
+          "comment"
+        ],
+        "title": "ProposalRequest",
+        "description": "The client's own terms in answer to the bank's offer."
+      },
+      "ProposalView": {
+        "properties": {
+          "round": {
+            "type": "integer",
+            "title": "Round"
+          },
+          "offer_version": {
+            "type": "integer",
+            "title": "Offer Version",
+            "description": "The bank's version the client answered"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          },
+          "term_months": {
+            "type": "integer",
+            "title": "Term Months"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate"
+          },
+          "monthly_payment": {
+            "type": "integer",
+            "title": "Monthly Payment",
+            "description": "At the desired rate, or at the rate of the answered version"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "answered": {
+            "type": "boolean",
+            "title": "Answered"
+          },
+          "answer_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Version",
+            "description": "The bank's version that answered it, if the answer was an offer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "round",
+          "offer_version",
+          "amount",
+          "term_months",
+          "rate",
+          "monthly_payment",
+          "comment",
+          "created_at",
+          "answered"
+        ],
+        "title": "ProposalView"
+      },
       "ProposedTerms": {
         "properties": {
           "product_id": {
@@ -2772,6 +3268,25 @@
         ],
         "title": "ScoreView"
       },
+      "SignRequest": {
+        "properties": {
+          "agreement_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agreement Sha256",
+            "description": "The hash of the agreement the client read; 409 if it has changed since"
+          }
+        },
+        "type": "object",
+        "title": "SignRequest"
+      },
       "StageMeta": {
         "properties": {
           "stage": {
@@ -2822,6 +3337,23 @@
             "type": "string",
             "format": "date-time",
             "title": "At"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/HistoryKind",
+            "description": "An offer, a proposal of the client, an agreement step or another status",
+            "default": "status"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details",
+            "description": "Terms of the offer or proposal, the agreement and its hash"
           }
         },
         "type": "object",
@@ -2831,7 +3363,8 @@
           "actor",
           "at"
         ],
-        "title": "StatusHistoryItem"
+        "title": "StatusHistoryItem",
+        "description": "A status change; a new version of the agreement is listed too (from = to = signing)."
       },
       "StatusMeta": {
         "properties": {

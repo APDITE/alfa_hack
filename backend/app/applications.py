@@ -13,20 +13,24 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app import cash_plans
+from app import agreements, cash_plans, negotiation
 from app.credit_decision import annuity_payment
 from app.lifecycle import record_created, transition
 from app.models import (
+    Agreement,
     Application,
     CheckResultRecord,
     Clarification,
     DecisionRecord,
+    Proposal,
     ScoreRecord,
+    StatusHistory,
 )
 from app.products import ProductConfig
 from app.schedule import annuity_schedule
 from app.schemas import (
     AcceptOfferRequest,
+    AgreementDocument,
     ApplicationAction,
     ApplicationDetail,
     ApplicationSummary,
@@ -38,16 +42,19 @@ from app.schemas import (
     CreateApplicationRequest,
     DecisionOutcome,
     DecisionView,
+    HistoryKind,
     LegalForm,
     LoanTerms,
     ManualDecisionRequest,
     PaymentSchedule,
     ProductId,
+    ProposalRequest,
     PurposeCategory,
     RiskClass,
     SchedulePayment,
     ScoreFactor,
     ScoreView,
+    SignRequest,
     StatusHistoryItem,
     UpdateApplicationRequest,
 )
@@ -55,6 +62,7 @@ from app.security import CurrentUser
 from app.statuses import (
     CLIENT_STAGE,
     NEXT_STEPS,
+    PROPOSAL_STEP,
     STAGE_LABELS,
     STATUS_LABELS,
     WAITING_EXTERNAL_STEP,
@@ -270,6 +278,7 @@ def respond_to_offer(
             application.amount = decision.offer["amount"]
             application.term_months = decision.offer["term_months"]
         _move(session, application, S.SIGNING, Actor.CLIENT, user, "Клиент принял условия")
+        agreements.refresh(session, application, "Клиент принял условия")
     else:
         _move(session, application, S.WITHDRAWN, Actor.CLIENT, user, "Клиент отклонил предложение")
     session.commit()
@@ -285,10 +294,89 @@ def withdraw(
     return application
 
 
-def sign(session: Session, user: CurrentUser, application: Application) -> Application:
-    """Simulated signing and disbursement."""
+def sign(
+    session: Session, user: CurrentUser, application: Application, body: SignRequest | None = None
+) -> Application:
+    """Simulated signing and disbursement of the latest version of the agreement.
+
+    With `agreement_sha256` the client confirms which text they read: if the agreement has
+    changed since (a new payment day, or the issue moved to another day), nothing is signed.
+    """
     require_client(user)
-    _move(session, application, S.ISSUED, Actor.CLIENT, user, "Документы подписаны, кредит выдан")
+    if application.status is not S.SIGNING:
+        raise _conflict("There is nothing to sign")
+    agreement = agreements.latest(session, application.id)
+    if agreement is None or not agreements.is_current(agreement, _now().date()):
+        reason = "Договор сформирован" if agreement is None else "Новая дата выдачи"
+        agreement = agreements.refresh(session, application, reason)
+    if body is not None and body.agreement_sha256 not in (None, agreement.sha256):
+        session.commit()  # keep the new version for the client to read
+        raise _conflict("The agreement has changed, review the new version")
+    agreement.signed_at = _now()
+    _move(
+        session,
+        application,
+        S.ISSUED,
+        Actor.CLIENT,
+        user,
+        f"Документы подписаны, кредит выдан. Договор {agreement.number}, "
+        f"редакция {agreement.version}, SHA-256 {agreement.sha256}",
+    )
+    session.commit()
+    return application
+
+
+def propose(
+    session: Session,
+    user: CurrentUser,
+    application: Application,
+    body: ProposalRequest,
+    products: dict[str, ProductConfig],
+) -> Application:
+    """The client answers the bank's offer with their own terms; an employee decides."""
+    require_client(user)
+    records = negotiation.offers(session, application.id)
+    if application.status not in (S.APPROVED, S.COUNTER_OFFER) or not records:
+        raise _conflict("There is no offer to negotiate")
+    used = len(negotiation.proposals(session, application.id))
+    if used >= negotiation.MAX_ROUNDS:
+        raise _conflict("No negotiation rounds left")
+    current = LoanTerms.model_validate(records[-1].offer)
+    p = products[current.product_id.value].params
+    if not p.min_amount <= body.amount <= p.max_amount:
+        raise HTTPException(422, "amount out of product range")
+    if not p.min_term_months <= body.term_months <= p.max_term_months:
+        raise HTTPException(422, "term out of product range")
+    same_terms = (body.amount, body.term_months) == (current.amount, current.term_months)
+    if same_terms and body.rate in (None, current.rate):
+        raise HTTPException(422, "The proposal repeats the bank's offer")
+
+    round_number = used + 1
+    session.add(
+        Proposal(
+            application_id=application.id,
+            round=round_number,
+            offer_version=len(records),
+            amount=body.amount,
+            term_months=body.term_months,
+            rate=body.rate,
+            comment=body.comment.strip(),
+            created_by_user_id=user.id,
+        )
+    )
+    # The client's latest wish is what the application asks for now.
+    application.product_id = current.product_id.value
+    application.amount = body.amount
+    application.term_months = body.term_months
+    terms = negotiation.terms_text(body.amount, body.term_months, body.rate, None)
+    _move(
+        session,
+        application,
+        S.MANUAL_REVIEW,
+        Actor.CLIENT,
+        user,
+        f"Клиент предложил свои условия, раунд {round_number} из {negotiation.MAX_ROUNDS}: {terms}",
+    )
     session.commit()
     return application
 
@@ -331,13 +419,20 @@ def decide_manually(
     risk_class = score.risk_class if score else None
     offer: dict[str, Any] | None = None
     reason = body.comment
+    proposal = negotiation.open_proposal(session, application.id)
 
     if body.outcome is DecisionOutcome.APPROVED:
         product = products[application.product_id]
         if application.amount is None or application.term_months is None:
             raise _conflict("Application has no amount or term")
-        offer = make_offer(product, application.amount, application.term_months, risk_class, None)
-        reason = "Банк одобрил заявку на запрошенных условиях."
+        # In a negotiation "approve" accepts the client's terms, the desired rate included.
+        rate = proposal.rate if proposal is not None else None
+        offer = make_offer(product, application.amount, application.term_months, risk_class, rate)
+        reason = (
+            "Банк принял ваши условия."
+            if proposal is not None
+            else "Банк одобрил заявку на запрошенных условиях."
+        )
     elif body.outcome is DecisionOutcome.COUNTER_OFFER:
         if body.terms is None:
             raise HTTPException(422, "terms are required for counter_offer")
@@ -350,7 +445,11 @@ def decide_manually(
         offer = make_offer(
             product, body.terms.amount, body.terms.term_months, risk_class, body.terms.rate
         )
-        reason = "Банк готов выдать кредит на других условиях."
+        reason = (
+            "Банк предлагает новые условия в ответ на ваши."
+            if proposal is not None
+            else "Банк готов выдать кредит на других условиях."
+        )
     elif body.outcome is DecisionOutcome.CLARIFICATION:
         session.add(
             Clarification(
@@ -361,6 +460,10 @@ def decide_manually(
             )
         )
 
+    if proposal is not None:
+        proposal.answered_at = _now()
+        if offer is not None:
+            proposal.answer_version = len(negotiation.offers(session, application.id)) + 1
     session.add(
         DecisionRecord(
             application_id=application.id,
@@ -390,17 +493,104 @@ def _latest(session: Session, model: Any, application_id: uuid.UUID) -> Any:
     )
 
 
-def available_actions(application: Application, user: CurrentUser) -> list[ApplicationAction]:
+def available_actions(
+    application: Application, user: CurrentUser, can_propose: bool = False
+) -> list[ApplicationAction]:
     a = ApplicationAction
     if user.is_employee:
         return [a.DECIDE] if application.status is S.MANUAL_REVIEW else []
+    offer = [a.ACCEPT, a.PROPOSE, a.DECLINE] if can_propose else [a.ACCEPT, a.DECLINE]
     return {
         S.DRAFT: [a.EDIT, a.SUBMIT, a.WITHDRAW],
         S.CLARIFICATION_REQUIRED: [a.ANSWER_CLARIFICATION, a.WITHDRAW],
-        S.APPROVED: [a.ACCEPT, a.DECLINE],
-        S.COUNTER_OFFER: [a.ACCEPT, a.DECLINE],
+        S.APPROVED: offer,
+        S.COUNTER_OFFER: offer,
         S.SIGNING: [a.SIGN, a.WITHDRAW],
     }.get(application.status, [])
+
+
+def agreement_document(
+    session: Session, application: Application, version: int | None
+) -> AgreementDocument:
+    made = agreements.versions(session, application.id)
+    found = [ag for ag in made if version is None or ag.version == version]
+    if not found:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "There is no agreement yet")
+    return agreements.document(found[-1])
+
+
+def _history(
+    application: Application,
+    offer_records: list[DecisionRecord],
+    rounds: list[Proposal],
+    made: list[Agreement],
+) -> list[StatusHistoryItem]:
+    """Status changes with what each negotiation step was about, and agreement versions.
+
+    The N-th move to an offer status is the N-th offer, the N-th move of the client to
+    manual review is the N-th proposal: both are written in the same transaction.
+    """
+    offers_left = iter(enumerate(offer_records, start=1))
+    rounds_left = iter(rounds)
+    signed = next((ag for ag in made if ag.signed_at is not None), None)
+    items: list[StatusHistoryItem] = []
+    for h in application.history:
+        kind, details = HistoryKind.STATUS, None
+        if h.to_status in (S.APPROVED, S.COUNTER_OFFER):
+            kind = HistoryKind.OFFER
+            found = next(offers_left, None)
+            if found is not None and found[1].offer:
+                details = f"Версия {found[0]}: {negotiation.offer_text(found[1].offer)}"
+        elif h.to_status is S.MANUAL_REVIEW and h.actor is Actor.CLIENT:
+            kind = HistoryKind.PROPOSAL
+            proposal = next(rounds_left, None)
+            if proposal is not None:
+                terms = negotiation.terms_text(
+                    proposal.amount, proposal.term_months, proposal.rate, None
+                )
+                details = f"Раунд {proposal.round}: {terms}. Пожелание: {proposal.comment}"
+        elif h.to_status is S.SIGNING and made:
+            kind, details = HistoryKind.AGREEMENT, _agreement_text(made[0])
+        elif h.to_status is S.ISSUED and signed is not None:
+            kind, details = HistoryKind.AGREEMENT, f"Подписан: {_agreement_text(signed)}"
+        items.append(_history_item(h, kind, details))
+    # Later versions of the agreement are not status changes, but belong to the story.
+    for ag in made[1:]:
+        items.append(
+            StatusHistoryItem(
+                from_status=S.SIGNING,
+                to_status=S.SIGNING,
+                actor=Actor.SYSTEM,
+                at=ag.created_at,
+                kind=HistoryKind.AGREEMENT,
+                details=f"{ag.reason}: {_agreement_text(ag)}",
+            )
+        )
+    return sorted(items, key=lambda item: _utc(item.at))
+
+
+def _utc(moment: datetime) -> datetime:
+    """Comparable moments: SQLite returns naive UTC, fresh objects keep their time zone."""
+    return moment.astimezone(UTC).replace(tzinfo=None) if moment.tzinfo else moment
+
+
+def _agreement_text(agreement: Agreement) -> str:
+    return (
+        f"договор {agreement.number}, редакция {agreement.version}, "
+        f"SHA-256 {agreement.sha256[:16]}…"
+    )
+
+
+def _history_item(h: StatusHistory, kind: HistoryKind, details: str | None) -> StatusHistoryItem:
+    return StatusHistoryItem(
+        from_status=h.from_status,
+        to_status=h.to_status,
+        actor=h.actor,
+        comment=h.comment,
+        at=h.created_at,
+        kind=kind,
+        details=details,
+    )
 
 
 def to_summary(session: Session, application: Application, user: CurrentUser) -> ApplicationSummary:
@@ -487,6 +677,20 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
             issue_date=issue,
         )
 
+    offer_records = negotiation.offers(session, application.id)
+    rounds = negotiation.proposals(session, application.id)
+    made = agreements.versions(session, application.id)
+    negotiation_view = negotiation.view(offer_records, rounds)
+    can_propose = negotiation_view is not None and negotiation_view.rounds_left > 0
+    waiting_answer = application.status is S.MANUAL_REVIEW and bool(rounds)
+    waiting_answer = waiting_answer and rounds[-1].answered_at is None
+    if application.waiting_external:
+        next_step = WAITING_EXTERNAL_STEP
+    elif waiting_answer:
+        next_step = PROPOSAL_STEP
+    else:
+        next_step = NEXT_STEPS[application.status]
+
     clarification = _latest(session, Clarification, application.id)
     clarification_view = None
     if clarification is not None:
@@ -506,10 +710,8 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
         expenses_year=application.expenses_year,
         liabilities_total=application.liabilities_total,
         submitted_at=application.submitted_at,
-        available_actions=available_actions(application, user),
-        next_step=WAITING_EXTERNAL_STEP
-        if application.waiting_external
-        else NEXT_STEPS[application.status],
+        available_actions=available_actions(application, user, can_propose),
+        next_step=next_step,
         waiting_external=application.waiting_external,
         company=CompanyResponse(
             inn=company.inn,
@@ -520,20 +722,13 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
             region=company.region,
             director=company.director,
         ),
-        history=[
-            StatusHistoryItem(
-                from_status=h.from_status,
-                to_status=h.to_status,
-                actor=h.actor,
-                comment=h.comment,
-                at=h.created_at,
-            )
-            for h in application.history
-        ],
+        history=_history(application, offer_records, rounds, made),
         checks=checks,
         score=score_view,
         decision=decision_view,
         schedule=schedule,
         cash_plan=cash_plans.plan_view(session, application),
+        negotiation=negotiation_view,
+        agreements=[agreements.summary(ag) for ag in made],
         clarification=clarification_view,
     )

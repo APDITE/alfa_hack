@@ -126,12 +126,28 @@ class UpdateApplicationRequest(BaseModel):
     clarification_answer: str | None = Field(default=None, max_length=2000)
 
 
+class HistoryKind(StrEnum):
+    STATUS = "status"
+    PROPOSAL = "proposal"
+    OFFER = "offer"
+    AGREEMENT = "agreement"
+
+
 class StatusHistoryItem(BaseModel):
+    """A status change; a new version of the agreement is listed too (from = to = signing)."""
+
     from_status: ApplicationStatus | None
     to_status: ApplicationStatus
     actor: Actor
     comment: str | None = None
     at: datetime
+    kind: HistoryKind = Field(
+        default=HistoryKind.STATUS,
+        description="An offer, a proposal of the client, an agreement step or another status",
+    )
+    details: str | None = Field(
+        default=None, description="Terms of the offer or proposal, the agreement and its hash"
+    )
 
 
 class CheckType(StrEnum):
@@ -313,6 +329,76 @@ class CashPlanView(BaseModel):
     delayed: CashSimulationView
 
 
+class ProposalRequest(BaseModel):
+    """The client's own terms in answer to the bank's offer."""
+
+    amount: int = Field(gt=0, description="Rubles")
+    term_months: int = Field(gt=0)
+    rate: float | None = Field(
+        default=None, gt=0, lt=100, description="Desired annual rate, percent; optional"
+    )
+    comment: str = Field(min_length=1, max_length=1000, description="What the client wants and why")
+
+
+class ProposalView(BaseModel):
+    round: int
+    offer_version: int = Field(description="The bank's version the client answered")
+    amount: int
+    term_months: int
+    rate: float | None
+    monthly_payment: int = Field(
+        description="At the desired rate, or at the rate of the answered version"
+    )
+    comment: str
+    created_at: datetime
+    answered: bool
+    answer_version: int | None = Field(
+        default=None, description="The bank's version that answered it, if the answer was an offer"
+    )
+
+
+class OfferVersionView(BaseModel):
+    version: int
+    terms: LoanTerms
+    total_interest: int = Field(description="Overpayment over the whole term, rubles")
+    decided_by: Actor
+    reason: str
+    created_at: datetime
+    in_reply_to: int | None = Field(
+        default=None, description="Round of the client's proposal this version answers"
+    )
+
+
+class NegotiationView(BaseModel):
+    versions: list[OfferVersionView] = Field(description="The bank's offers, oldest first")
+    proposals: list[ProposalView] = Field(description="The client's proposals, oldest first")
+    max_rounds: int
+    rounds_left: int
+
+
+class AgreementSummary(BaseModel):
+    number: str
+    version: int
+    offer_version: int = Field(description="The bank's offer version the agreement is made of")
+    reason: str = Field(description="Why this version was made")
+    sha256: str
+    created_at: datetime
+    signed_at: datetime | None = None
+
+
+class AgreementDocument(AgreementSummary):
+    text: str
+    verified: bool = Field(description="SHA-256 of the stored text matches the recorded hash")
+
+
+class SignRequest(BaseModel):
+    agreement_sha256: str | None = Field(
+        default=None,
+        pattern="^[0-9a-f]{64}$",
+        description="The hash of the agreement the client read; 409 if it has changed since",
+    )
+
+
 class ClarificationView(BaseModel):
     requested_fields: list[str]
     message: str
@@ -343,6 +429,7 @@ class ApplicationAction(StrEnum):
     ANSWER_CLARIFICATION = "answer_clarification"
     ACCEPT = "accept"
     DECLINE = "decline"
+    PROPOSE = "propose"
     SIGN = "sign"
     WITHDRAW = "withdraw"
     DECIDE = "decide"
@@ -370,6 +457,12 @@ class ApplicationDetail(ApplicationSummary):
     )
     cash_plan: CashPlanView | None = Field(
         default=None, description="Payment day chosen with the cash calendar"
+    )
+    negotiation: NegotiationView | None = Field(
+        default=None, description="The bank's offer versions and the client's proposals"
+    )
+    agreements: list[AgreementSummary] = Field(
+        default_factory=list, description="Versions of the loan agreement, oldest first"
     )
     clarification: ClarificationView | None = None
 
