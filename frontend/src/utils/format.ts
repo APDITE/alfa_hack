@@ -35,7 +35,36 @@ export function dateTime(iso: string): string {
 }
 
 export function date(iso: string): string {
-  return new Date(iso).toLocaleDateString("ru-RU");
+  // A bare date is a calendar day, not UTC midnight: keep it the same day in any time zone.
+  return new Date(iso.length === 10 ? `${iso}T12:00:00` : iso).toLocaleDateString("ru-RU");
+}
+
+/** "2026-11-28" -> "28 ноября". */
+export function dayMonth(iso: string): string {
+  return new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+  });
+}
+
+/** "2028-10-28" -> "28 октября 2028 г.". */
+export function dayMonthYear(iso: string): string {
+  return new Date(`${iso.slice(0, 10)}T12:00:00`).toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+/** 1250000 -> "1,3 млн ₽", -143091 -> "−143 тыс. ₽": for chart axes. */
+export function compactMoney(value: number): string {
+  const sign = value < 0 ? "−" : "";
+  const abs = Math.abs(value);
+  if (abs >= 1_000_000) {
+    return `${sign}${(abs / 1_000_000).toLocaleString("ru-RU", { maximumFractionDigits: 1 })} млн ₽`;
+  }
+  if (abs >= 1_000) return `${sign}${Math.round(abs / 1_000)} тыс. ₽`;
+  return `${sign}${abs} ₽`;
 }
 
 export function timeAgo(iso: string, now: number = Date.now()): string {

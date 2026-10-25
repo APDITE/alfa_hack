@@ -4,14 +4,21 @@ from uuid import UUID
 from fastapi import APIRouter, Header, Query, status
 
 from app import applications as service
+from app import cash_plans
 from app.db import SessionDep
 from app.products import ProductsDep
 from app.schemas import (
     AcceptOfferRequest,
+    AgreementDocument,
     ApplicationDetail,
     ApplicationSummary,
+    CashPlanRequest,
+    CashPreviewRequest,
+    CashPreviewResponse,
     CreateApplicationRequest,
     ManualDecisionRequest,
+    ProposalRequest,
+    SignRequest,
     UpdateApplicationRequest,
     WithdrawRequest,
 )
@@ -111,11 +118,62 @@ def withdraw_application(
     return service.to_detail(session, application, user)
 
 
+@router.post("/{application_id}/proposals", response_model=ApplicationDetail)
+def propose_terms(
+    application_id: UUID,
+    body: ProposalRequest,
+    session: SessionDep,
+    user: CurrentUserDep,
+    products: ProductsDep,
+) -> ApplicationDetail:
+    """Client answers the bank's offer with their own terms (a negotiation round); the
+    application goes back to an employee."""
+    application = service.get_for_user(session, application_id, user)
+    service.propose(session, user, application, body, products)
+    return service.to_detail(session, application, user)
+
+
+@router.get("/{application_id}/agreement", response_model=AgreementDocument)
+def get_agreement(
+    application_id: UUID,
+    session: SessionDep,
+    user: CurrentUserDep,
+    version: int | None = Query(default=None, ge=1, description="Latest if omitted"),
+) -> AgreementDocument:
+    """The loan agreement text with its SHA-256 and a check that the text still matches it."""
+    application = service.get_for_user(session, application_id, user)
+    return service.agreement_document(session, application, version)
+
+
 @router.post("/{application_id}/sign", response_model=ApplicationDetail)
 def sign_documents(
-    application_id: UUID, session: SessionDep, user: CurrentUserDep
+    application_id: UUID,
+    session: SessionDep,
+    user: CurrentUserDep,
+    body: SignRequest | None = None,
 ) -> ApplicationDetail:
-    """Simulated signing and disbursement."""
+    """Simulated signing and disbursement. With `agreement_sha256`, nothing is signed if the
+    agreement has changed since the client read it (409)."""
     application = service.get_for_user(session, application_id, user)
-    service.sign(session, user, application)
+    service.sign(session, user, application, body)
+    return service.to_detail(session, application, user)
+
+
+@router.post("/{application_id}/cash-calendar/preview", response_model=CashPreviewResponse)
+def preview_cash_calendar(
+    application_id: UUID, body: CashPreviewRequest, session: SessionDep, user: CurrentUserDep
+) -> CashPreviewResponse:
+    """Compare payment days against the client's cash flow, as planned and with receipts a week
+    late; nothing is saved. Without a calendar: the saved one or a template from revenue."""
+    application = service.get_for_user(session, application_id, user)
+    return cash_plans.preview(session, user, application, body)
+
+
+@router.put("/{application_id}/cash-calendar", response_model=ApplicationDetail)
+def save_cash_calendar(
+    application_id: UUID, body: CashPlanRequest, session: SessionDep, user: CurrentUserDep
+) -> ApplicationDetail:
+    """Save the client's typical month and the payment day; the schedule gets dates."""
+    application = service.get_for_user(session, application_id, user)
+    cash_plans.save(session, user, application, body)
     return service.to_detail(session, application, user)

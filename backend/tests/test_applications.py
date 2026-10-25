@@ -228,7 +228,7 @@ def test_full_happy_path_with_manual_approval(
 
     client_view = client.get(f"/api/applications/{app_id}", headers=client1).json()
     assert client_view["status"] == "approved"
-    assert client_view["available_actions"] == ["accept", "decline"]
+    assert client_view["available_actions"] == ["accept", "propose", "decline"]
     assert client_view["decision"]["comment"] is None  # internal comment stays in the bank
 
     accepted = client.post(

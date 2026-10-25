@@ -37,6 +37,7 @@ export type ApplicationAction =
   | "submit"
   | "answer_clarification"
   | "accept"
+  | "propose"
   | "decline"
   | "sign"
   | "withdraw"
@@ -150,13 +151,70 @@ export type Score = {
   model_version: string;
 };
 
+export type HistoryKind = "status" | "proposal" | "offer" | "agreement";
+
+/** A status change; a new version of the agreement is listed too (from = to = signing). */
 export type HistoryItem = {
   from_status: ApplicationStatus | null;
   to_status: ApplicationStatus;
   actor: Actor;
   comment: string | null;
   at: string;
+  kind: HistoryKind;
+  /** Terms of an offer or proposal, the agreement and its hash. */
+  details: string | null;
 };
+
+export type ProposalInput = {
+  amount: number;
+  term_months: number;
+  rate: number | null;
+  comment: string;
+};
+
+export type Proposal = {
+  round: number;
+  /** The bank's version the client answered. */
+  offer_version: number;
+  amount: number;
+  term_months: number;
+  rate: number | null;
+  monthly_payment: number;
+  comment: string;
+  created_at: string;
+  answered: boolean;
+  answer_version: number | null;
+};
+
+export type OfferVersion = {
+  version: number;
+  terms: LoanTerms;
+  total_interest: number;
+  decided_by: Actor;
+  reason: string;
+  created_at: string;
+  /** Round of the client's proposal this version answers. */
+  in_reply_to: number | null;
+};
+
+export type Negotiation = {
+  versions: OfferVersion[];
+  proposals: Proposal[];
+  max_rounds: number;
+  rounds_left: number;
+};
+
+export type AgreementSummary = {
+  number: string;
+  version: number;
+  offer_version: number;
+  reason: string;
+  sha256: string;
+  created_at: string;
+  signed_at: string | null;
+};
+
+export type AgreementDocument = AgreementSummary & { text: string; verified: boolean };
 
 export type ApplicationDetail = ApplicationSummary & {
   purpose_category: PurposeCategory | null;
@@ -175,6 +233,12 @@ export type ApplicationDetail = ApplicationSummary & {
   decision: Decision | null;
   /** Payment schedule for the offered or signed terms. */
   schedule: PaymentSchedule | null;
+  /** Payment day chosen with the cash calendar. */
+  cash_plan: CashPlan | null;
+  /** The bank's offer versions and the client's proposals. */
+  negotiation: Negotiation | null;
+  /** Versions of the loan agreement, oldest first. */
+  agreements: AgreementSummary[];
   clarification: Clarification | null;
 };
 
@@ -185,6 +249,8 @@ export type SchedulePayment = {
   interest: number;
   /** Debt left after this payment. */
   balance: number;
+  /** Once a payment day is chosen. */
+  due_date: string | null;
 };
 
 export type PaymentSchedule = {
@@ -192,6 +258,60 @@ export type PaymentSchedule = {
   total_paid: number;
   /** Interest over the whole term. */
   overpayment: number;
+  payment_day: number | null;
+  /** Actual issue date, or today until the loan is issued. */
+  issue_date: string | null;
+};
+
+/** One line of the client's typical month: positive — a receipt, negative — a payment. */
+export type CashEvent = { day: number; amount: number; label: string };
+
+export type CashCalendarData = {
+  /** Balance at the start of the month of the first loan payment. */
+  opening_balance: number;
+  /** Balance to keep; below it is a cash gap. */
+  reserve: number;
+  events: CashEvent[];
+};
+
+export type CashSimulation = {
+  min_balance: number;
+  min_date: string;
+  first_gap: string | null;
+  /** Missing below the reserve at the worst moment. */
+  shortfall: number;
+};
+
+export type PaymentDayOption = {
+  payment_day: number;
+  first_payment_date: string;
+  first_payment: number;
+  /** Interest above the cheapest compared day. */
+  extra_cost: number;
+  base: CashSimulation;
+  /** Every receipt a week late. */
+  delayed: CashSimulation;
+};
+
+/** The lowest balance of a day; for loans longer than two years, of a few days. */
+export type BalancePoint = { day: string; balance: number };
+
+export type CashPreview = {
+  calendar: CashCalendarData;
+  template: boolean;
+  payment_day: number;
+  recommended_day: number | null;
+  recommendation: string;
+  options: PaymentDayOption[];
+  chart_base: BalancePoint[];
+  chart_delayed: BalancePoint[];
+};
+
+export type CashPlan = {
+  payment_day: number;
+  calendar: CashCalendarData;
+  base: CashSimulation;
+  delayed: CashSimulation;
 };
 
 /** What the bank would approve automatically right now, per product. */

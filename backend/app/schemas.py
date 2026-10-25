@@ -126,12 +126,28 @@ class UpdateApplicationRequest(BaseModel):
     clarification_answer: str | None = Field(default=None, max_length=2000)
 
 
+class HistoryKind(StrEnum):
+    STATUS = "status"
+    PROPOSAL = "proposal"
+    OFFER = "offer"
+    AGREEMENT = "agreement"
+
+
 class StatusHistoryItem(BaseModel):
+    """A status change; a new version of the agreement is listed too (from = to = signing)."""
+
     from_status: ApplicationStatus | None
     to_status: ApplicationStatus
     actor: Actor
     comment: str | None = None
     at: datetime
+    kind: HistoryKind = Field(
+        default=HistoryKind.STATUS,
+        description="An offer, a proposal of the client, an agreement step or another status",
+    )
+    details: str | None = Field(
+        default=None, description="Terms of the offer or proposal, the agreement and its hash"
+    )
 
 
 class CheckType(StrEnum):
@@ -212,6 +228,7 @@ class SchedulePayment(BaseModel):
     principal: int
     interest: int
     balance: int = Field(description="Debt left after this payment")
+    due_date: date | None = Field(default=None, description="Once a payment day is chosen")
 
 
 class PaymentSchedule(BaseModel):
@@ -220,6 +237,166 @@ class PaymentSchedule(BaseModel):
     payments: list[SchedulePayment]
     total_paid: int
     overpayment: int = Field(description="Interest over the whole term, rubles")
+    payment_day: int | None = Field(default=None, description="Chosen with the cash calendar")
+    issue_date: date | None = Field(
+        default=None, description="Issue date the dates count from: actual, or today until issued"
+    )
+
+
+# --- Cash calendar ----------------------------------------------------------------
+
+
+class CashEventIn(BaseModel):
+    day: int = Field(
+        ge=1, le=31, description="Day of month; past the month's end means its last day"
+    )
+    amount: int = Field(
+        ge=-10_000_000_000,
+        le=10_000_000_000,
+        description="Rubles: positive — a receipt, negative — a payment",
+    )
+    label: str = Field(default="", max_length=60)
+
+
+class CashCalendarIn(BaseModel):
+    """The company's typical month."""
+
+    opening_balance: int = Field(
+        ge=-10_000_000_000,
+        le=10_000_000_000,
+        description="Balance at the start of the month of the first loan payment",
+    )
+    reserve: int = Field(
+        default=0, ge=0, le=10_000_000_000, description="Balance to keep; below it is a cash gap"
+    )
+    events: list[CashEventIn] = Field(max_length=40)
+
+
+class CashPreviewRequest(BaseModel):
+    calendar: CashCalendarIn | None = Field(
+        default=None, description="Omit to use the saved calendar or a template from revenue"
+    )
+    payment_day: int | None = Field(
+        default=None, ge=1, le=28, description="Day for the chart; omit for the recommended one"
+    )
+
+
+class CashPlanRequest(BaseModel):
+    calendar: CashCalendarIn
+    payment_day: int = Field(ge=1, le=28)
+
+
+class CashSimulationView(BaseModel):
+    min_balance: int
+    min_date: date
+    first_gap: date | None = Field(description="First day below the reserve; null — no gap")
+    shortfall: int = Field(description="Missing below the reserve at the worst moment, rubles")
+
+
+class PaymentDayOption(BaseModel):
+    payment_day: int
+    first_payment_date: date
+    first_payment: int = Field(description="Includes interest from the issue, by days")
+    extra_cost: int = Field(description="Interest above the cheapest compared day, rubles")
+    base: CashSimulationView
+    delayed: CashSimulationView = Field(description="Every receipt a week late")
+
+
+class BalancePoint(BaseModel):
+    day: date = Field(description="The first day the point covers")
+    balance: int = Field(description="The lowest balance of the day, or of the few days")
+
+
+class CashPreviewResponse(BaseModel):
+    calendar: CashCalendarIn
+    template: bool = Field(description="The calendar is a template from yearly revenue")
+    payment_day: int = Field(description="The day the chart is drawn for")
+    recommended_day: int | None
+    recommendation: str
+    options: list[PaymentDayOption]
+    chart_base: list[BalancePoint] = Field(
+        description="The whole term: daily up to two years, then a few days per point"
+    )
+    chart_delayed: list[BalancePoint]
+
+
+class CashPlanView(BaseModel):
+    """The saved choice, for the client and the employee."""
+
+    payment_day: int
+    calendar: CashCalendarIn
+    base: CashSimulationView
+    delayed: CashSimulationView
+
+
+class ProposalRequest(BaseModel):
+    """The client's own terms in answer to the bank's offer."""
+
+    amount: int = Field(gt=0, description="Rubles")
+    term_months: int = Field(gt=0)
+    rate: float | None = Field(
+        default=None, gt=0, lt=100, description="Desired annual rate, percent; optional"
+    )
+    comment: str = Field(min_length=1, max_length=1000, description="What the client wants and why")
+
+
+class ProposalView(BaseModel):
+    round: int
+    offer_version: int = Field(description="The bank's version the client answered")
+    amount: int
+    term_months: int
+    rate: float | None
+    monthly_payment: int = Field(
+        description="At the desired rate, or at the rate of the answered version"
+    )
+    comment: str
+    created_at: datetime
+    answered: bool
+    answer_version: int | None = Field(
+        default=None, description="The bank's version that answered it, if the answer was an offer"
+    )
+
+
+class OfferVersionView(BaseModel):
+    version: int
+    terms: LoanTerms
+    total_interest: int = Field(description="Overpayment over the whole term, rubles")
+    decided_by: Actor
+    reason: str
+    created_at: datetime
+    in_reply_to: int | None = Field(
+        default=None, description="Round of the client's proposal this version answers"
+    )
+
+
+class NegotiationView(BaseModel):
+    versions: list[OfferVersionView] = Field(description="The bank's offers, oldest first")
+    proposals: list[ProposalView] = Field(description="The client's proposals, oldest first")
+    max_rounds: int
+    rounds_left: int
+
+
+class AgreementSummary(BaseModel):
+    number: str
+    version: int
+    offer_version: int = Field(description="The bank's offer version the agreement is made of")
+    reason: str = Field(description="Why this version was made")
+    sha256: str
+    created_at: datetime
+    signed_at: datetime | None = None
+
+
+class AgreementDocument(AgreementSummary):
+    text: str
+    verified: bool = Field(description="SHA-256 of the stored text matches the recorded hash")
+
+
+class SignRequest(BaseModel):
+    agreement_sha256: str | None = Field(
+        default=None,
+        pattern="^[0-9a-f]{64}$",
+        description="The hash of the agreement the client read; 409 if it has changed since",
+    )
 
 
 class ClarificationView(BaseModel):
@@ -252,6 +429,7 @@ class ApplicationAction(StrEnum):
     ANSWER_CLARIFICATION = "answer_clarification"
     ACCEPT = "accept"
     DECLINE = "decline"
+    PROPOSE = "propose"
     SIGN = "sign"
     WITHDRAW = "withdraw"
     DECIDE = "decide"
@@ -276,6 +454,15 @@ class ApplicationDetail(ApplicationSummary):
     decision: DecisionView | None = None
     schedule: PaymentSchedule | None = Field(
         default=None, description="Payment schedule for the offered or signed terms"
+    )
+    cash_plan: CashPlanView | None = Field(
+        default=None, description="Payment day chosen with the cash calendar"
+    )
+    negotiation: NegotiationView | None = Field(
+        default=None, description="The bank's offer versions and the client's proposals"
+    )
+    agreements: list[AgreementSummary] = Field(
+        default_factory=list, description="Versions of the loan agreement, oldest first"
     )
     clarification: ClarificationView | None = None
 

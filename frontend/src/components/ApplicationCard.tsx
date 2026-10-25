@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 
-import { api, errorText } from "../api/client";
+import { ApiError, api, errorText } from "../api/client";
 import type { ApplicationDetail, ApplicationSummary, ClarificationAnswer, LoanTerms } from "../api/types";
 import {
   annuityPayment,
@@ -13,6 +13,10 @@ import {
   percent,
 } from "../utils/format";
 import { FIELD_LABELS, IN_PROGRESS, PRODUCT_NAMES, PURPOSE_LABELS } from "../utils/labels";
+import { cashPlanSummary } from "../utils/cash";
+import AgreementPanel from "./AgreementPanel";
+import CashCalendar from "./CashCalendar";
+import { NegotiationPanel, ProposalForm } from "./Negotiation";
 import PaymentScheduleView from "./PaymentScheduleView";
 import StatusBadge from "./StatusBadge";
 import Timeline from "./Timeline";
@@ -59,6 +63,53 @@ function CheckIcon() {
     >
       <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
+  );
+}
+
+/** Payment day: the saved choice in one line, or the cash calendar to choose it. */
+function CashPlanSection({
+  detail,
+  onChanged,
+}: {
+  detail: ApplicationDetail;
+  onChanged: (detail: ApplicationDetail) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const plan = detail.cash_plan;
+  // Accepting an offer fixes a payment day (the day of the issue) unless the client chose one.
+  const defaultDay = plan ? null : (detail.schedule?.payment_day ?? null);
+  if (open) {
+    return (
+      <CashCalendar
+        detail={detail}
+        onClose={() => setOpen(false)}
+        onSaved={(updated) => {
+          onChanged(updated);
+          setOpen(false);
+        }}
+      />
+    );
+  }
+  return (
+    <div className="cash-plan">
+      <div className="cash-plan__text">
+        <strong>
+          {plan
+            ? `Платёж ${plan.payment_day}-го числа`
+            : defaultDay
+              ? `Платёж ${defaultDay}-го числа — день выдачи`
+              : "Дата платежа"}
+        </strong>
+        <span className="muted small">
+          {plan
+            ? `Денежный календарь: ${cashPlanSummary(plan)}.`
+            : "Подберите день под свои поступления: банк покажет, где возникает кассовый разрыв и сколько стоит перенос платежа."}
+        </span>
+      </div>
+      <button type="button" className="button button--secondary" onClick={() => setOpen(true)}>
+        {plan ? "Изменить" : "Открыть денежный календарь"}
+      </button>
+    </div>
   );
 }
 
@@ -258,7 +309,9 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
   const [expanded, setExpanded] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [agreed, setAgreed] = useState(false);
+  // The version of the agreement the client confirmed reading: a new version needs a new tick.
+  const [agreedTo, setAgreedTo] = useState<string | null>(null);
+  const [proposing, setProposing] = useState(false);
   const [submitKey] = useState(newIdempotencyKey);
 
   const actions = detail?.available_actions ?? [];
@@ -274,6 +327,36 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
       onChanged(await action());
     } catch (caught) {
       setError(errorText(caught));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const negotiation = detail?.negotiation ?? null;
+  const negotiated = (negotiation?.proposals.length ?? 0) > 0;
+  const latestVersion = negotiation?.versions[negotiation.versions.length - 1] ?? null;
+  const waitingAnswer = summary.status === "manual_review" && Boolean(negotiation?.proposals.some((p) => !p.answered));
+  const agreements = detail?.agreements ?? [];
+  const agreement = agreements[agreements.length - 1] ?? null;
+  const agreementKey = agreement?.sha256 ?? "terms";
+  const agreed = agreedTo === agreementKey;
+
+  /** Signs the version of the agreement on the screen; a newer one is shown instead of signed. */
+  async function signAgreement() {
+    setBusy("sign");
+    setError("");
+    try {
+      onChanged(await api.sign(summary.id, agreement?.sha256));
+    } catch (caught) {
+      setError(errorText(caught));
+      if (caught instanceof ApiError && caught.status === 409) {
+        setAgreedTo(null);
+        try {
+          onChanged(await api.application(summary.id));
+        } catch {
+          // The message above is enough; the card refreshes on the next poll.
+        }
+      }
     } finally {
       setBusy(null);
     }
@@ -331,8 +414,20 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
 
       {detail && (actions.includes("accept") || actions.includes("decline")) && terms && (
         <div className="panel panel--success">
-          <h4>{summary.status === "counter_offer" ? "Банк предлагает другие условия" : "Условия банка"}</h4>
-          {summary.status === "counter_offer" ? (
+          <h4>
+            {latestVersion?.in_reply_to
+              ? `Банк ответил на ваши условия — версия ${latestVersion.version}`
+              : summary.status === "counter_offer"
+                ? "Банк предлагает другие условия"
+                : "Условия банка"}
+          </h4>
+          {negotiated ? (
+            <>
+              {decision?.reason && <p>{decision.reason}</p>}
+              <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
+              {negotiation && <NegotiationPanel negotiation={negotiation} viewer="client" heading />}
+            </>
+          ) : summary.status === "counter_offer" ? (
             <>
               {decision?.reason && <p>{decision.reason}</p>}
               <OfferCompare summary={summary} terms={terms} />
@@ -340,7 +435,19 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
           ) : (
             <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
           )}
+          <CashPlanSection detail={detail} onChanged={onChanged} />
           {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
+          {proposing && (
+            <ProposalForm
+              detail={detail}
+              terms={terms}
+              onCancel={() => setProposing(false)}
+              onSent={(updated) => {
+                setProposing(false);
+                onChanged(updated);
+              }}
+            />
+          )}
           <div className="actions">
             <button
               type="button"
@@ -350,6 +457,16 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
             >
               {busy === "accept" ? "Принимаем…" : "Принять условия"}
             </button>
+            {actions.includes("propose") && !proposing && (
+              <button
+                type="button"
+                className="button button--secondary"
+                disabled={busy !== null}
+                onClick={() => setProposing(true)}
+              >
+                Предложить свои условия
+              </button>
+            )}
             <button
               type="button"
               className="button button--secondary"
@@ -368,14 +485,29 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         </div>
       )}
 
+      {detail && waitingAnswer && negotiation && (
+        <div className="panel">
+          <h4>Ваши условия у банка</h4>
+          <NegotiationPanel negotiation={negotiation} viewer="client" />
+        </div>
+      )}
+
       {detail && actions.includes("sign") && (
         <div className="panel panel--accent">
           <h4>Подписание документов</h4>
           {terms && <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />}
+          <CashPlanSection detail={detail} onChanged={onChanged} />
           {detail.schedule && <PaymentScheduleView schedule={detail.schedule} open />}
+          {agreement && <AgreementPanel key={agreement.sha256} applicationId={summary.id} agreements={agreements} />}
           <label className="checkbox">
-            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
-            Я ознакомился с условиями кредитного договора и графиком платежей
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreedTo(e.target.checked ? agreementKey : null)}
+            />
+            {agreement
+              ? `Я ознакомился с договором № ${agreement.number} (редакция ${agreement.version}) и графиком платежей`
+              : "Я ознакомился с условиями кредитного договора и графиком платежей"}
           </label>
           <p className="muted small">Подписание смоделировано: электронная подпись и перевод денег не выполняются.</p>
           <div className="actions">
@@ -383,7 +515,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
               type="button"
               className="button button--primary"
               disabled={!agreed || busy !== null}
-              onClick={() => void run("sign", () => api.sign(summary.id))}
+              onClick={() => void signAgreement()}
             >
               {busy === "sign" ? "Подписываем…" : "Подписать и получить деньги"}
             </button>
@@ -403,7 +535,8 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         <div className="panel panel--success">
           <h4>Кредит выдан</h4>
           <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
-          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
+          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} issued />}
+          {agreement && <AgreementPanel key={agreement.sha256} applicationId={summary.id} agreements={agreements} />}
         </div>
       )}
 

@@ -2,10 +2,13 @@
 
 import { money } from "../utils/format";
 import type {
+  AgreementDocument,
   ApplicationDetail,
   ApplicationSummary,
   AuthUser,
   Availability,
+  CashCalendarData,
+  CashPreview,
   ClarificationAnswer,
   Company,
   DraftInput,
@@ -17,6 +20,7 @@ import type {
   OpsSummary,
   Preapproval,
   Product,
+  ProposalInput,
   PurposeCategory,
   Recommendation,
   RegistrationInput,
@@ -71,6 +75,16 @@ const KNOWN_ERRORS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^Only clients can do this$/, () => "Действие доступно только клиенту."],
   [/^Only bank employees can do this$/, () => "Действие доступно только сотруднику банка."],
   [/^Invalid login or password$/, () => "Неверный логин или пароль."],
+  [/^The payment day is chosen for an offer, before signing$/, () =>
+    "Дату платежа выбирают для предложения банка, до подписания."],
+  [/^There is no offer to plan payments for$/, () => "Пока нет предложения банка — планировать платежи рано."],
+  [/^There is no offer to negotiate$/, () => "Сейчас нет предложения банка, на которое можно ответить."],
+  [/^No negotiation rounds left$/, () => "Раунды переговоров закончились: примите условия банка или откажитесь."],
+  [/^The proposal repeats the bank's offer$/, () => "Это условия банка без изменений — их можно просто принять."],
+  [/^The agreement has changed, review the new version$/, () =>
+    "Договор изменился — проверьте новую редакцию и подпишите её."],
+  [/^There is nothing to sign$/, () => "Подписывать пока нечего."],
+  [/^There is no agreement yet$/, () => "Договор появится, когда вы примете условия банка."],
   [/^Company is already registered$/, () =>
     "Эта компания уже зарегистрирована — войдите под её учётной записью."],
   [/^Login is already taken$/, () => "Этот логин уже занят, выберите другой."],
@@ -187,7 +201,23 @@ export const api = {
     }),
   respondToOffer: (id: string, accept: boolean) =>
     request<ApplicationDetail>(app(id, "accept"), { method: "POST", body: json({ accept }) }),
-  sign: (id: string) => request<ApplicationDetail>(app(id, "sign"), { method: "POST" }),
+  propose: (id: string, proposal: ProposalInput) =>
+    request<ApplicationDetail>(app(id, "proposals"), { method: "POST", body: json(proposal) }),
+  agreement: (id: string, version?: number) =>
+    request<AgreementDocument>(app(id, version ? `agreement?version=${version}` : "agreement")),
+  /** Signs the agreement the client has read: 409 if it has changed since. */
+  sign: (id: string, agreementSha256?: string) =>
+    request<ApplicationDetail>(app(id, "sign"), {
+      method: "POST",
+      body: json(agreementSha256 ? { agreement_sha256: agreementSha256 } : {}),
+    }),
+  cashPreview: (id: string, body: { calendar?: CashCalendarData; payment_day?: number }) =>
+    request<CashPreview>(app(id, "cash-calendar/preview"), { method: "POST", body: json(body) }),
+  saveCashPlan: (id: string, calendar: CashCalendarData, payment_day: number) =>
+    request<ApplicationDetail>(app(id, "cash-calendar"), {
+      method: "PUT",
+      body: json({ calendar, payment_day }),
+    }),
   withdraw: (id: string, reason?: string) =>
     request<ApplicationDetail>(app(id, "withdraw"), {
       method: "POST",

@@ -53,7 +53,7 @@ def transition(
             comment=comment,
         )
     )
-    record_event(session, application, target)
+    record_event(session, application, target, actor)
     if TURN_OWNER[target] is Actor.SYSTEM:
         session.add(
             PipelineJob(application_id=application.id, stage=target, status=JobStatus.PENDING)

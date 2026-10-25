@@ -66,6 +66,33 @@ Idempotency-Key: demo-submit-{{app1}}
 GET {{base}}/applications/{{app1}}
 Authorization: Bearer {{client1Token}}
 
+### Денежный календарь: шаблон месяца из выручки, сравнение дней платежа, совет банка.
+### Ничего не сохраняет. Свой месяц и день: {"calendar": {...}, "payment_day": 12}
+POST {{base}}/applications/{{app1}}/cash-calendar/preview
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{}
+
+### Сохранить месяц и день платежа — у платежей в графике появятся даты (due_date)
+PUT {{base}}/applications/{{app1}}/cash-calendar
+Authorization: Bearer {{client1Token}}
+Content-Type: application/json
+
+{
+  "calendar": {
+    "opening_balance": 1000000,
+    "reserve": 0,
+    "events": [
+      {"day": 5, "amount": -700000, "label": "Зарплата и налоги"},
+      {"day": 10, "amount": 1000000, "label": "Оплата от покупателей"},
+      {"day": 20, "amount": -1050000, "label": "Поставщики и аренда"},
+      {"day": 25, "amount": 1000000, "label": "Оплата от покупателей"}
+    ]
+  },
+  "payment_day": 28
+}
+
 ### Принять условия → signing
 POST {{base}}/applications/{{app1}}/accept
 Authorization: Bearer {{client1Token}}
@@ -185,6 +212,41 @@ Content-Type: application/json
   "comment": "Сезонная выручка: снижаем сумму и растягиваем срок",
   "terms": {"product_id": "working_capital", "amount": 1500000, "term_months": 18}
 }
+
+### ==== Переговоры и договор: продолжение сценария 5 ====
+
+### Клиент отвечает своими условиями (до трёх раундов) — заявка снова у сотрудника
+POST {{base}}/applications/{{app5}}/proposals
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"amount": 1800000, "term_months": 18, "rate": 20, "comment": "Сезонная закупка: нужна сумма побольше"}
+
+### Сотрудник: в переговорах «approved» принимает условия клиента вместе с его ставкой
+POST {{base}}/applications/{{app5}}/decision
+Authorization: Bearer {{analystToken}}
+Content-Type: application/json
+
+{"outcome": "approved", "comment": "Согласовано"}
+
+### Версии и раунды — в negotiation. Принять условия → signing и договор с хешем
+POST {{base}}/applications/{{app5}}/accept
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"accept": true}
+
+### Текст договора, SHA-256 и проверка подлинности (verified)
+# @name agreement5
+GET {{base}}/applications/{{app5}}/agreement
+Authorization: Bearer {{client5Token}}
+
+### Подписать именно эту редакцию: другой хеш — 409
+POST {{base}}/applications/{{app5}}/sign
+Authorization: Bearer {{client5Token}}
+Content-Type: application/json
+
+{"agreement_sha256": "{{agreement5.response.body.sha256}}"}
 
 
 ### ==== Сценарий 7: сбой внешнего источника (демо-переключатель через nginx) ====

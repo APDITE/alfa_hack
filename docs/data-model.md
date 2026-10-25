@@ -67,6 +67,20 @@ erDiagram
         timestamptz created_at
         timestamptz updated_at
         timestamptz submitted_at
+        int payment_day
+        json cash_calendar
+    }
+    agreements {
+        uuid id PK
+        uuid application_id FK
+        int version
+        int offer_version
+        string number
+        string reason
+        text text
+        string sha256
+        timestamptz created_at
+        timestamptz signed_at
     }
     check_results {
         uuid id PK
@@ -121,6 +135,20 @@ erDiagram
         timestamptz created_at
         timestamptz updated_at
     }
+    proposals {
+        uuid id PK
+        uuid application_id FK
+        int round
+        int offer_version
+        bigint amount
+        int term_months
+        float rate
+        text comment
+        uuid created_by_user_id FK
+        timestamptz created_at
+        timestamptz answered_at
+        int answer_version
+    }
     score_results {
         uuid id PK
         uuid application_id FK
@@ -146,6 +174,7 @@ erDiagram
     applications }o--|| users : "client_id"
     applications }o--|| companies : "company_inn"
     applications }o--|| products : "product_id"
+    agreements }o--|| applications : "application_id"
     check_results }o--|| applications : "application_id"
     clarifications }o--|| applications : "application_id"
     decisions }o--|| applications : "application_id"
@@ -153,6 +182,8 @@ erDiagram
     feed_items }o--|| users : "user_id"
     feed_items }o--o| applications : "application_id"
     pipeline_jobs }o--|| applications : "application_id"
+    proposals }o--|| applications : "application_id"
+    proposals }o--o| users : "created_by_user_id"
     score_results }o--|| applications : "application_id"
     status_history }o--|| applications : "application_id"
     status_history }o--o| users : "actor_user_id"
@@ -165,10 +196,12 @@ erDiagram
 | `financial_statements` | Зарезервирована под историю отчётности; в текущей версии не заполняется. |
 | `users` | Учётные записи клиентов и сотрудников банка; пароли хранятся в bcrypt. |
 | `applications` | Заявка: продукт, сумма, срок, цель, финпоказатели клиента, статус, ключ идемпотентности. |
+| `agreements` |  |
 | `check_results` | Результаты проверок: полнота, ЕГРЮЛ/ЕГРИП, «Прозрачный бизнес», БКИ — с исходным ответом источника. |
 | `clarifications` | Запросы уточнений (системы или сотрудника) и ответы клиента. |
 | `decisions` | Решения системы и сотрудника: правило, объяснение для клиента, условия. |
 | `feed_items` | Уведомления клиента о ходе заявки; создаются при переходах статуса. |
 | `pipeline_jobs` | Очередь задач конвейера: этап, попытка, время следующего запуска (`SELECT … FOR UPDATE SKIP LOCKED`). |
+| `proposals` |  |
 | `score_results` | Оценка риска: PD, класс риска, баллы, факторы, версия модели. |
 | `status_history` | Журнал переходов: откуда, куда, кто (клиент, система, сотрудник), комментарий. Это аудит заявки. |

@@ -18,6 +18,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     Uuid,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -137,6 +138,10 @@ class Application(Base):
         DateTime(timezone=True), default=_now, onupdate=_now
     )
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Chosen by the client with the cash calendar before signing (1–28).
+    payment_day: Mapped[int | None] = mapped_column(Integer)
+    # The client's typical month: opening balance, reserve, receipts and payments by day.
+    cash_calendar: Mapped[dict[str, Any] | None] = mapped_column(JSON)
 
     company: Mapped[Company] = relationship()
     product: Mapped[Product] = relationship()
@@ -210,6 +215,45 @@ class DecisionRecord(Base):
     decided_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
     comment: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class Proposal(Base):
+    """The client's own terms in answer to an offer: one round of negotiation."""
+
+    __tablename__ = "proposals"
+    __table_args__ = (UniqueConstraint("application_id", "round", name="uq_proposals_round"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id"), index=True)
+    round: Mapped[int] = mapped_column(Integer)
+    offer_version: Mapped[int] = mapped_column(Integer)
+    amount: Mapped[int] = mapped_column(BigInteger)
+    term_months: Mapped[int] = mapped_column(Integer)
+    rate: Mapped[float | None] = mapped_column(Float)
+    comment: Mapped[str] = mapped_column(Text)
+    created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    # Set by the employee's decision: when, and which offer version answered (if any).
+    answered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    answer_version: Mapped[int | None] = mapped_column(Integer)
+
+
+class Agreement(Base):
+    """A version of the loan agreement: the text the client signs and its SHA-256."""
+
+    __tablename__ = "agreements"
+    __table_args__ = (UniqueConstraint("application_id", "version", name="uq_agreements_version"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    application_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("applications.id"), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    offer_version: Mapped[int] = mapped_column(Integer)
+    number: Mapped[str] = mapped_column(String(32))
+    reason: Mapped[str] = mapped_column(String(200))
+    text: Mapped[str] = mapped_column(Text)
+    sha256: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    signed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class PipelineJob(Base):

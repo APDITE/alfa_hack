@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { api, errorText } from "../api/client";
-import type { ApplicationDetail, DecisionOutcome, ManualDecision, Product, ProductId } from "../api/types";
+import type {
+  ApplicationDetail,
+  DecisionOutcome,
+  LoanTerms,
+  ManualDecision,
+  Product,
+  ProductId,
+  Proposal,
+} from "../api/types";
 import { annuityPayment, date, dateTime, groupDigits, money, months, parseInteger, percent } from "../utils/format";
 import { usePolling } from "../utils/hooks";
 import {
@@ -16,6 +24,9 @@ import {
   RISK_LABELS,
   RULE_LABELS,
 } from "../utils/labels";
+import { cashPlanSummary } from "../utils/cash";
+import AgreementPanel from "./AgreementPanel";
+import { NegotiationPanel } from "./Negotiation";
 import StatusBadge from "./StatusBadge";
 import Timeline from "./Timeline";
 
@@ -40,13 +51,21 @@ const CHECK_TONE: Record<string, string> = {
   unavailable: "warning",
 };
 
+const rateInput = (rate: number | null) => (rate !== null ? String(rate).replace(".", ",") : "");
+
 function DecisionForm({
   detail,
   products,
+  proposal,
+  previous,
   onDone,
 }: {
   detail: ApplicationDetail;
   products: Product[];
+  /** The client's terms waiting for an answer, if the client is negotiating. */
+  proposal: Proposal | null;
+  /** The bank's latest offer, to keep it in a negotiation. */
+  previous: { version: number; terms: LoanTerms } | null;
   onDone: (detail: ApplicationDetail) => void;
 }) {
   const [outcome, setOutcome] = useState<DecisionOutcome>("approved");
@@ -55,7 +74,15 @@ function DecisionForm({
   const [productId, setProductId] = useState<ProductId>(detail.product_id);
   const [amountText, setAmountText] = useState(detail.amount ? groupDigits(String(detail.amount)) : "");
   const [termText, setTermText] = useState(detail.term_months ? String(detail.term_months) : "");
-  const [rateText, setRateText] = useState("");
+  const [rateText, setRateText] = useState(rateInput(proposal?.rate ?? null));
+
+  function fill(terms: { product_id?: ProductId; amount: number; term_months: number; rate: number | null }) {
+    setOutcome("counter_offer");
+    if (terms.product_id) setProductId(terms.product_id);
+    setAmountText(groupDigits(String(terms.amount)));
+    setTermText(String(terms.term_months));
+    setRateText(rateInput(terms.rate));
+  }
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -99,7 +126,11 @@ function DecisionForm({
       body.terms = { product_id: product.id, amount, term_months: term, rate };
     }
     const confirmText = {
-      approved: "Одобрить заявку на запрошенных условиях?",
+      approved: proposal
+        ? `Принять условия клиента: ${money(proposal.amount)} на ${months(proposal.term_months)}${
+            proposal.rate !== null ? `, ставка ${percent(proposal.rate)}` : ""
+          }?`
+        : "Одобрить заявку на запрошенных условиях?",
       counter_offer: "Отправить клиенту предложение на других условиях?",
       clarification: "Запросить у клиента недостающие данные?",
       rejected: "Отказать по заявке?",
@@ -119,7 +150,7 @@ function DecisionForm({
 
   return (
     <form className="card decision-form" onSubmit={handleSubmit} noValidate>
-      <h3>Решение по заявке</h3>
+      <h3>{proposal ? `Ответ на условия клиента, раунд ${proposal.round}` : "Решение по заявке"}</h3>
       <div className="segmented" role="radiogroup" aria-label="Решение">
         {OUTCOMES.map((item) => (
           <button
@@ -130,10 +161,35 @@ function DecisionForm({
             className={`segmented__item segmented__item--${item.id}${outcome === item.id ? " is-active" : ""}`}
             onClick={() => setOutcome(item.id)}
           >
-            {item.label}
+            {proposal && item.id === "approved" ? "Принять условия клиента" : item.label}
           </button>
         ))}
       </div>
+      {proposal && (
+        <div className="decision-form__prefill">
+          <span className="muted small">
+            «Принять» — одобрить сумму и срок клиента
+            {proposal.rate !== null ? ` по его ставке ${percent(proposal.rate)}` : " по ставке с надбавкой за риск"}.
+            Подставить в «Другие условия»:
+          </span>
+          <button
+            type="button"
+            className="button button--secondary button--small"
+            onClick={() => fill({ amount: proposal.amount, term_months: proposal.term_months, rate: proposal.rate })}
+          >
+            Условия клиента
+          </button>
+          {previous && (
+            <button
+              type="button"
+              className="button button--secondary button--small"
+              onClick={() => fill(previous.terms)}
+            >
+              Прежнее предложение, версия {previous.version}
+            </button>
+          )}
+        </div>
+      )}
 
       {outcome === "counter_offer" && (
         <div className="counter-offer">
@@ -252,7 +308,10 @@ export default function BankApplication({ id, products, onBack, onDecided }: Pro
   }
 
   const canDecide = detail.available_actions.includes("decide");
-  const { company, score, decision } = detail;
+  const { company, score, decision, negotiation } = detail;
+  const openProposal = negotiation?.proposals.find((p) => !p.answered) ?? null;
+  const lastVersion = negotiation?.versions[negotiation.versions.length - 1] ?? null;
+  const agreement = detail.agreements[detail.agreements.length - 1] ?? null;
   const clientFinancials = detail.revenue_year !== null || detail.expenses_year !== null || detail.liabilities_total !== null;
 
   return (
@@ -383,6 +442,51 @@ export default function BankApplication({ id, products, onBack, onDecided }: Pro
             )}
           </div>
 
+          {negotiation && negotiation.proposals.length > 0 && (
+            <div className={`card${openProposal && canDecide ? " card--attention" : ""}`}>
+              <h3>{openProposal && canDecide ? "Клиент предлагает свои условия" : "Переговоры"}</h3>
+              <NegotiationPanel negotiation={negotiation} viewer="bank" />
+            </div>
+          )}
+
+          {agreement && (
+            <div className="card">
+              <h3>Кредитный договор</h3>
+              <AgreementPanel key={agreement.sha256} applicationId={detail.id} agreements={detail.agreements} />
+            </div>
+          )}
+
+          {detail.cash_plan && (
+            <div className="card">
+              <h3>Денежный календарь клиента</h3>
+              <p>
+                <strong>Платёж {detail.cash_plan.payment_day}-го числа</strong>: {cashPlanSummary(detail.cash_plan)}.
+              </p>
+              <dl className="facts">
+                <dt>Остаток на 1-е</dt>
+                <dd>{money(detail.cash_plan.calendar.opening_balance)}</dd>
+                <dt>Поступления</dt>
+                <dd>
+                  {money(
+                    detail.cash_plan.calendar.events
+                      .filter((e) => e.amount > 0)
+                      .reduce((sum, e) => sum + e.amount, 0),
+                  )}{" "}
+                  в месяц
+                </dd>
+                <dt>Расходы</dt>
+                <dd>
+                  {money(
+                    -detail.cash_plan.calendar.events
+                      .filter((e) => e.amount < 0)
+                      .reduce((sum, e) => sum + e.amount, 0),
+                  )}{" "}
+                  в месяц
+                </dd>
+              </dl>
+            </div>
+          )}
+
           {decision && (
             <div className="card">
               <h3>Последнее решение</h3>
@@ -419,8 +523,11 @@ export default function BankApplication({ id, products, onBack, onDecided }: Pro
 
           {canDecide ? (
             <DecisionForm
+              key={openProposal ? `round-${openProposal.round}` : "decision"}
               detail={detail}
               products={products}
+              proposal={openProposal}
+              previous={lastVersion}
               onDone={(updated) => {
                 setDetail(updated);
                 setSaved(`Решение сохранено: ${updated.status_label}. Клиент увидит его в кабинете.`);
