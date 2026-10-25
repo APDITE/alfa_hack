@@ -835,6 +835,124 @@
         }
       }
     },
+    "/api/applications/{application_id}/cash-calendar/preview": {
+      "post": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Preview Cash Calendar",
+        "description": "Compare payment days against the client's cash flow, as planned and with receipts a week\nlate; nothing is saved. Without a calendar: the saved one or a template from revenue.",
+        "operationId": "preview_cash_calendar_api_applications__application_id__cash_calendar_preview_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashPreviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashPreviewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/cash-calendar": {
+      "put": {
+        "tags": [
+          "applications"
+        ],
+        "summary": "Save Cash Calendar",
+        "description": "Save the client's typical month and the payment day; the schedule gets dates.",
+        "operationId": "save_cash_calendar_api_applications__application_id__cash_calendar_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Application Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CashPlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/feed": {
       "get": {
         "tags": [
@@ -1180,6 +1298,17 @@
             ],
             "description": "Payment schedule for the offered or signed terms"
           },
+          "cash_plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CashPlanView"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Payment day chosen with the cash calendar"
+          },
           "clarification": {
             "anyOf": [
               {
@@ -1326,6 +1455,272 @@
           "updated_at"
         ],
         "title": "ApplicationSummary"
+      },
+      "BalancePoint": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day",
+            "description": "The first day the point covers"
+          },
+          "balance": {
+            "type": "integer",
+            "title": "Balance",
+            "description": "The lowest balance of the day, or of the few days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "balance"
+        ],
+        "title": "BalancePoint"
+      },
+      "CashCalendarIn": {
+        "properties": {
+          "opening_balance": {
+            "type": "integer",
+            "maximum": 10000000000.0,
+            "minimum": -10000000000.0,
+            "title": "Opening Balance",
+            "description": "Balance at the start of the month of the first loan payment"
+          },
+          "reserve": {
+            "type": "integer",
+            "maximum": 10000000000.0,
+            "minimum": 0.0,
+            "title": "Reserve",
+            "description": "Balance to keep; below it is a cash gap",
+            "default": 0
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/CashEventIn"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening_balance",
+          "events"
+        ],
+        "title": "CashCalendarIn",
+        "description": "The company's typical month."
+      },
+      "CashEventIn": {
+        "properties": {
+          "day": {
+            "type": "integer",
+            "maximum": 31.0,
+            "minimum": 1.0,
+            "title": "Day",
+            "description": "Day of month; past the month's end means its last day"
+          },
+          "amount": {
+            "type": "integer",
+            "maximum": 10000000000.0,
+            "minimum": -10000000000.0,
+            "title": "Amount",
+            "description": "Rubles: positive — a receipt, negative — a payment"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Label",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "amount"
+        ],
+        "title": "CashEventIn"
+      },
+      "CashPlanRequest": {
+        "properties": {
+          "calendar": {
+            "$ref": "#/components/schemas/CashCalendarIn"
+          },
+          "payment_day": {
+            "type": "integer",
+            "maximum": 28.0,
+            "minimum": 1.0,
+            "title": "Payment Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "calendar",
+          "payment_day"
+        ],
+        "title": "CashPlanRequest"
+      },
+      "CashPlanView": {
+        "properties": {
+          "payment_day": {
+            "type": "integer",
+            "title": "Payment Day"
+          },
+          "calendar": {
+            "$ref": "#/components/schemas/CashCalendarIn"
+          },
+          "base": {
+            "$ref": "#/components/schemas/CashSimulationView"
+          },
+          "delayed": {
+            "$ref": "#/components/schemas/CashSimulationView"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payment_day",
+          "calendar",
+          "base",
+          "delayed"
+        ],
+        "title": "CashPlanView",
+        "description": "The saved choice, for the client and the employee."
+      },
+      "CashPreviewRequest": {
+        "properties": {
+          "calendar": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CashCalendarIn"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omit to use the saved calendar or a template from revenue"
+          },
+          "payment_day": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 28.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Day",
+            "description": "Day for the chart; omit for the recommended one"
+          }
+        },
+        "type": "object",
+        "title": "CashPreviewRequest"
+      },
+      "CashPreviewResponse": {
+        "properties": {
+          "calendar": {
+            "$ref": "#/components/schemas/CashCalendarIn"
+          },
+          "template": {
+            "type": "boolean",
+            "title": "Template",
+            "description": "The calendar is a template from yearly revenue"
+          },
+          "payment_day": {
+            "type": "integer",
+            "title": "Payment Day",
+            "description": "The day the chart is drawn for"
+          },
+          "recommended_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Day"
+          },
+          "recommendation": {
+            "type": "string",
+            "title": "Recommendation"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentDayOption"
+            },
+            "type": "array",
+            "title": "Options"
+          },
+          "chart_base": {
+            "items": {
+              "$ref": "#/components/schemas/BalancePoint"
+            },
+            "type": "array",
+            "title": "Chart Base",
+            "description": "The whole term: daily up to two years, then a few days per point"
+          },
+          "chart_delayed": {
+            "items": {
+              "$ref": "#/components/schemas/BalancePoint"
+            },
+            "type": "array",
+            "title": "Chart Delayed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "calendar",
+          "template",
+          "payment_day",
+          "recommended_day",
+          "recommendation",
+          "options",
+          "chart_base",
+          "chart_delayed"
+        ],
+        "title": "CashPreviewResponse"
+      },
+      "CashSimulationView": {
+        "properties": {
+          "min_balance": {
+            "type": "integer",
+            "title": "Min Balance"
+          },
+          "min_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Min Date"
+          },
+          "first_gap": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Gap",
+            "description": "First day below the reserve; null — no gap"
+          },
+          "shortfall": {
+            "type": "integer",
+            "title": "Shortfall",
+            "description": "Missing below the reserve at the worst moment, rubles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min_balance",
+          "min_date",
+          "first_gap",
+          "shortfall"
+        ],
+        "title": "CashSimulationView"
       },
       "CheckOutcome": {
         "type": "string",
@@ -1939,6 +2334,46 @@
         "title": "OpsSummary",
         "description": "Pipeline health for the bank workplace; thresholds match monitoring/alerts.yml."
       },
+      "PaymentDayOption": {
+        "properties": {
+          "payment_day": {
+            "type": "integer",
+            "title": "Payment Day"
+          },
+          "first_payment_date": {
+            "type": "string",
+            "format": "date",
+            "title": "First Payment Date"
+          },
+          "first_payment": {
+            "type": "integer",
+            "title": "First Payment",
+            "description": "Includes interest from the issue, by days"
+          },
+          "extra_cost": {
+            "type": "integer",
+            "title": "Extra Cost",
+            "description": "Interest above the cheapest compared day, rubles"
+          },
+          "base": {
+            "$ref": "#/components/schemas/CashSimulationView"
+          },
+          "delayed": {
+            "$ref": "#/components/schemas/CashSimulationView",
+            "description": "Every receipt a week late"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payment_day",
+          "first_payment_date",
+          "first_payment",
+          "extra_cost",
+          "base",
+          "delayed"
+        ],
+        "title": "PaymentDayOption"
+      },
       "PaymentSchedule": {
         "properties": {
           "payments": {
@@ -1956,6 +2391,31 @@
             "type": "integer",
             "title": "Overpayment",
             "description": "Interest over the whole term, rubles"
+          },
+          "payment_day": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Day",
+            "description": "Chosen with the cash calendar"
+          },
+          "issue_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issue Date",
+            "description": "Issue date the dates count from: actual, or today until issued"
           }
         },
         "type": "object",
@@ -2222,6 +2682,19 @@
             "type": "integer",
             "title": "Balance",
             "description": "Debt left after this payment"
+          },
+          "due_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due Date",
+            "description": "Once a payment day is chosen"
           }
         },
         "type": "object",

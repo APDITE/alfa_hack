@@ -13,6 +13,8 @@ import {
   percent,
 } from "../utils/format";
 import { FIELD_LABELS, IN_PROGRESS, PRODUCT_NAMES, PURPOSE_LABELS } from "../utils/labels";
+import { cashPlanSummary } from "../utils/cash";
+import CashCalendar from "./CashCalendar";
 import PaymentScheduleView from "./PaymentScheduleView";
 import StatusBadge from "./StatusBadge";
 import Timeline from "./Timeline";
@@ -59,6 +61,45 @@ function CheckIcon() {
     >
       <path d="M5 12.5l4.5 4.5L19 7.5" />
     </svg>
+  );
+}
+
+/** Payment day: the saved choice in one line, or the cash calendar to choose it. */
+function CashPlanSection({
+  detail,
+  onChanged,
+}: {
+  detail: ApplicationDetail;
+  onChanged: (detail: ApplicationDetail) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const plan = detail.cash_plan;
+  if (open) {
+    return (
+      <CashCalendar
+        detail={detail}
+        onClose={() => setOpen(false)}
+        onSaved={(updated) => {
+          onChanged(updated);
+          setOpen(false);
+        }}
+      />
+    );
+  }
+  return (
+    <div className="cash-plan">
+      <div className="cash-plan__text">
+        <strong>{plan ? `Платёж ${plan.payment_day}-го числа` : "Дата платежа"}</strong>
+        <span className="muted small">
+          {plan
+            ? `Денежный календарь: ${cashPlanSummary(plan)}.`
+            : "Подберите день под свои поступления: банк покажет, где возникает кассовый разрыв и сколько стоит перенос платежа."}
+        </span>
+      </div>
+      <button type="button" className="button button--secondary" onClick={() => setOpen(true)}>
+        {plan ? "Изменить" : "Открыть денежный календарь"}
+      </button>
+    </div>
   );
 }
 
@@ -340,6 +381,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
           ) : (
             <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
           )}
+          <CashPlanSection detail={detail} onChanged={onChanged} />
           {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
           <div className="actions">
             <button
@@ -372,6 +414,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         <div className="panel panel--accent">
           <h4>Подписание документов</h4>
           {terms && <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />}
+          <CashPlanSection detail={detail} onChanged={onChanged} />
           {detail.schedule && <PaymentScheduleView schedule={detail.schedule} open />}
           <label className="checkbox">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
@@ -403,7 +446,7 @@ export default function ApplicationCard({ summary, detail, highlighted, onChange
         <div className="panel panel--success">
           <h4>Кредит выдан</h4>
           <TermsList terms={terms} showProduct={terms.product_id !== summary.product_id} />
-          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} />}
+          {detail.schedule && <PaymentScheduleView schedule={detail.schedule} issued />}
         </div>
       )}
 

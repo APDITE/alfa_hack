@@ -137,6 +137,10 @@ class Application(Base):
         DateTime(timezone=True), default=_now, onupdate=_now
     )
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Chosen by the client with the cash calendar before signing (1–28).
+    payment_day: Mapped[int | None] = mapped_column(Integer)
+    # The client's typical month: opening balance, reserve, receipts and payments by day.
+    cash_calendar: Mapped[dict[str, Any] | None] = mapped_column(JSON)
 
     company: Mapped[Company] = relationship()
     product: Mapped[Product] = relationship()

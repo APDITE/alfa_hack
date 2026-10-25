@@ -175,6 +175,8 @@ export type ApplicationDetail = ApplicationSummary & {
   decision: Decision | null;
   /** Payment schedule for the offered or signed terms. */
   schedule: PaymentSchedule | null;
+  /** Payment day chosen with the cash calendar. */
+  cash_plan: CashPlan | null;
   clarification: Clarification | null;
 };
 
@@ -185,6 +187,8 @@ export type SchedulePayment = {
   interest: number;
   /** Debt left after this payment. */
   balance: number;
+  /** Once a payment day is chosen. */
+  due_date: string | null;
 };
 
 export type PaymentSchedule = {
@@ -192,6 +196,60 @@ export type PaymentSchedule = {
   total_paid: number;
   /** Interest over the whole term. */
   overpayment: number;
+  payment_day: number | null;
+  /** Actual issue date, or today until the loan is issued. */
+  issue_date: string | null;
+};
+
+/** One line of the client's typical month: positive — a receipt, negative — a payment. */
+export type CashEvent = { day: number; amount: number; label: string };
+
+export type CashCalendarData = {
+  /** Balance at the start of the month of the first loan payment. */
+  opening_balance: number;
+  /** Balance to keep; below it is a cash gap. */
+  reserve: number;
+  events: CashEvent[];
+};
+
+export type CashSimulation = {
+  min_balance: number;
+  min_date: string;
+  first_gap: string | null;
+  /** Missing below the reserve at the worst moment. */
+  shortfall: number;
+};
+
+export type PaymentDayOption = {
+  payment_day: number;
+  first_payment_date: string;
+  first_payment: number;
+  /** Interest above the cheapest compared day. */
+  extra_cost: number;
+  base: CashSimulation;
+  /** Every receipt a week late. */
+  delayed: CashSimulation;
+};
+
+/** The lowest balance of a day; for loans longer than two years, of a few days. */
+export type BalancePoint = { day: string; balance: number };
+
+export type CashPreview = {
+  calendar: CashCalendarData;
+  template: boolean;
+  payment_day: number;
+  recommended_day: number | null;
+  recommendation: string;
+  options: PaymentDayOption[];
+  chart_base: BalancePoint[];
+  chart_delayed: BalancePoint[];
+};
+
+export type CashPlan = {
+  payment_day: number;
+  calendar: CashCalendarData;
+  base: CashSimulation;
+  delayed: CashSimulation;
 };
 
 /** What the bank would approve automatically right now, per product. */

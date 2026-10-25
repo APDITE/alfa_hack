@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app import cash_plans
 from app.credit_decision import annuity_payment
 from app.lifecycle import record_created, transition
 from app.models import (
@@ -472,14 +473,18 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
     schedule = None
     terms = decision_view.terms if decision_view is not None else None
     if terms is not None:
+        day = application.payment_day
+        issue = cash_plans.issue_date(session, application) if day is not None else None
         payments = annuity_schedule(
-            terms.amount, terms.rate, terms.term_months, terms.monthly_payment
+            terms.amount, terms.rate, terms.term_months, terms.monthly_payment, issue, day
         )
         total_paid = sum(p.payment for p in payments)
         schedule = PaymentSchedule(
             payments=[SchedulePayment.model_validate(p, from_attributes=True) for p in payments],
             total_paid=total_paid,
             overpayment=total_paid - terms.amount,
+            payment_day=day,
+            issue_date=issue,
         )
 
     clarification = _latest(session, Clarification, application.id)
@@ -529,5 +534,6 @@ def to_detail(session: Session, application: Application, user: CurrentUser) -> 
         score=score_view,
         decision=decision_view,
         schedule=schedule,
+        cash_plan=cash_plans.plan_view(session, application),
         clarification=clarification_view,
     )

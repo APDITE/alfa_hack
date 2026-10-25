@@ -6,6 +6,8 @@ import type {
   ApplicationSummary,
   AuthUser,
   Availability,
+  CashCalendarData,
+  CashPreview,
   ClarificationAnswer,
   Company,
   DraftInput,
@@ -71,6 +73,9 @@ const KNOWN_ERRORS: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^Only clients can do this$/, () => "Действие доступно только клиенту."],
   [/^Only bank employees can do this$/, () => "Действие доступно только сотруднику банка."],
   [/^Invalid login or password$/, () => "Неверный логин или пароль."],
+  [/^The payment day is chosen for an offer, before signing$/, () =>
+    "Дату платежа выбирают для предложения банка, до подписания."],
+  [/^There is no offer to plan payments for$/, () => "Пока нет предложения банка — планировать платежи рано."],
   [/^Company is already registered$/, () =>
     "Эта компания уже зарегистрирована — войдите под её учётной записью."],
   [/^Login is already taken$/, () => "Этот логин уже занят, выберите другой."],
@@ -188,6 +193,13 @@ export const api = {
   respondToOffer: (id: string, accept: boolean) =>
     request<ApplicationDetail>(app(id, "accept"), { method: "POST", body: json({ accept }) }),
   sign: (id: string) => request<ApplicationDetail>(app(id, "sign"), { method: "POST" }),
+  cashPreview: (id: string, body: { calendar?: CashCalendarData; payment_day?: number }) =>
+    request<CashPreview>(app(id, "cash-calendar/preview"), { method: "POST", body: json(body) }),
+  saveCashPlan: (id: string, calendar: CashCalendarData, payment_day: number) =>
+    request<ApplicationDetail>(app(id, "cash-calendar"), {
+      method: "PUT",
+      body: json({ calendar, payment_day }),
+    }),
   withdraw: (id: string, reason?: string) =>
     request<ApplicationDetail>(app(id, "withdraw"), {
       method: "POST",

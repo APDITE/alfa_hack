@@ -4,12 +4,16 @@ from uuid import UUID
 from fastapi import APIRouter, Header, Query, status
 
 from app import applications as service
+from app import cash_plans
 from app.db import SessionDep
 from app.products import ProductsDep
 from app.schemas import (
     AcceptOfferRequest,
     ApplicationDetail,
     ApplicationSummary,
+    CashPlanRequest,
+    CashPreviewRequest,
+    CashPreviewResponse,
     CreateApplicationRequest,
     ManualDecisionRequest,
     UpdateApplicationRequest,
@@ -118,4 +122,24 @@ def sign_documents(
     """Simulated signing and disbursement."""
     application = service.get_for_user(session, application_id, user)
     service.sign(session, user, application)
+    return service.to_detail(session, application, user)
+
+
+@router.post("/{application_id}/cash-calendar/preview", response_model=CashPreviewResponse)
+def preview_cash_calendar(
+    application_id: UUID, body: CashPreviewRequest, session: SessionDep, user: CurrentUserDep
+) -> CashPreviewResponse:
+    """Compare payment days against the client's cash flow, as planned and with receipts a week
+    late; nothing is saved. Without a calendar: the saved one or a template from revenue."""
+    application = service.get_for_user(session, application_id, user)
+    return cash_plans.preview(session, user, application, body)
+
+
+@router.put("/{application_id}/cash-calendar", response_model=ApplicationDetail)
+def save_cash_calendar(
+    application_id: UUID, body: CashPlanRequest, session: SessionDep, user: CurrentUserDep
+) -> ApplicationDetail:
+    """Save the client's typical month and the payment day; the schedule gets dates."""
+    application = service.get_for_user(session, application_id, user)
+    cash_plans.save(session, user, application, body)
     return service.to_detail(session, application, user)

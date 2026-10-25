@@ -16,6 +16,7 @@ import {
   RISK_LABELS,
   RULE_LABELS,
 } from "../utils/labels";
+import { cashPlanSummary } from "../utils/cash";
 import StatusBadge from "./StatusBadge";
 import Timeline from "./Timeline";
 
@@ -382,6 +383,37 @@ export default function BankApplication({ id, products, onBack, onDecided }: Pro
               <p className="muted">Оценки нет: заявка остановилась до скоринга или сервис был недоступен.</p>
             )}
           </div>
+
+          {detail.cash_plan && (
+            <div className="card">
+              <h3>Денежный календарь клиента</h3>
+              <p>
+                <strong>Платёж {detail.cash_plan.payment_day}-го числа</strong>: {cashPlanSummary(detail.cash_plan)}.
+              </p>
+              <dl className="facts">
+                <dt>Остаток на 1-е</dt>
+                <dd>{money(detail.cash_plan.calendar.opening_balance)}</dd>
+                <dt>Поступления</dt>
+                <dd>
+                  {money(
+                    detail.cash_plan.calendar.events
+                      .filter((e) => e.amount > 0)
+                      .reduce((sum, e) => sum + e.amount, 0),
+                  )}{" "}
+                  в месяц
+                </dd>
+                <dt>Расходы</dt>
+                <dd>
+                  {money(
+                    -detail.cash_plan.calendar.events
+                      .filter((e) => e.amount < 0)
+                      .reduce((sum, e) => sum + e.amount, 0),
+                  )}{" "}
+                  в месяц
+                </dd>
+              </dl>
+            </div>
+          )}
 
           {decision && (
             <div className="card">

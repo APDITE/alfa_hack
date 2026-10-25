@@ -67,6 +67,8 @@ erDiagram
         timestamptz created_at
         timestamptz updated_at
         timestamptz submitted_at
+        int payment_day
+        json cash_calendar
     }
     check_results {
         uuid id PK

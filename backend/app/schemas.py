@@ -212,6 +212,7 @@ class SchedulePayment(BaseModel):
     principal: int
     interest: int
     balance: int = Field(description="Debt left after this payment")
+    due_date: date | None = Field(default=None, description="Once a payment day is chosen")
 
 
 class PaymentSchedule(BaseModel):
@@ -220,6 +221,96 @@ class PaymentSchedule(BaseModel):
     payments: list[SchedulePayment]
     total_paid: int
     overpayment: int = Field(description="Interest over the whole term, rubles")
+    payment_day: int | None = Field(default=None, description="Chosen with the cash calendar")
+    issue_date: date | None = Field(
+        default=None, description="Issue date the dates count from: actual, or today until issued"
+    )
+
+
+# --- Cash calendar ----------------------------------------------------------------
+
+
+class CashEventIn(BaseModel):
+    day: int = Field(
+        ge=1, le=31, description="Day of month; past the month's end means its last day"
+    )
+    amount: int = Field(
+        ge=-10_000_000_000,
+        le=10_000_000_000,
+        description="Rubles: positive — a receipt, negative — a payment",
+    )
+    label: str = Field(default="", max_length=60)
+
+
+class CashCalendarIn(BaseModel):
+    """The company's typical month."""
+
+    opening_balance: int = Field(
+        ge=-10_000_000_000,
+        le=10_000_000_000,
+        description="Balance at the start of the month of the first loan payment",
+    )
+    reserve: int = Field(
+        default=0, ge=0, le=10_000_000_000, description="Balance to keep; below it is a cash gap"
+    )
+    events: list[CashEventIn] = Field(max_length=40)
+
+
+class CashPreviewRequest(BaseModel):
+    calendar: CashCalendarIn | None = Field(
+        default=None, description="Omit to use the saved calendar or a template from revenue"
+    )
+    payment_day: int | None = Field(
+        default=None, ge=1, le=28, description="Day for the chart; omit for the recommended one"
+    )
+
+
+class CashPlanRequest(BaseModel):
+    calendar: CashCalendarIn
+    payment_day: int = Field(ge=1, le=28)
+
+
+class CashSimulationView(BaseModel):
+    min_balance: int
+    min_date: date
+    first_gap: date | None = Field(description="First day below the reserve; null — no gap")
+    shortfall: int = Field(description="Missing below the reserve at the worst moment, rubles")
+
+
+class PaymentDayOption(BaseModel):
+    payment_day: int
+    first_payment_date: date
+    first_payment: int = Field(description="Includes interest from the issue, by days")
+    extra_cost: int = Field(description="Interest above the cheapest compared day, rubles")
+    base: CashSimulationView
+    delayed: CashSimulationView = Field(description="Every receipt a week late")
+
+
+class BalancePoint(BaseModel):
+    day: date = Field(description="The first day the point covers")
+    balance: int = Field(description="The lowest balance of the day, or of the few days")
+
+
+class CashPreviewResponse(BaseModel):
+    calendar: CashCalendarIn
+    template: bool = Field(description="The calendar is a template from yearly revenue")
+    payment_day: int = Field(description="The day the chart is drawn for")
+    recommended_day: int | None
+    recommendation: str
+    options: list[PaymentDayOption]
+    chart_base: list[BalancePoint] = Field(
+        description="The whole term: daily up to two years, then a few days per point"
+    )
+    chart_delayed: list[BalancePoint]
+
+
+class CashPlanView(BaseModel):
+    """The saved choice, for the client and the employee."""
+
+    payment_day: int
+    calendar: CashCalendarIn
+    base: CashSimulationView
+    delayed: CashSimulationView
 
 
 class ClarificationView(BaseModel):
@@ -276,6 +367,9 @@ class ApplicationDetail(ApplicationSummary):
     decision: DecisionView | None = None
     schedule: PaymentSchedule | None = Field(
         default=None, description="Payment schedule for the offered or signed terms"
+    )
+    cash_plan: CashPlanView | None = Field(
+        default=None, description="Payment day chosen with the cash calendar"
     )
     clarification: ClarificationView | None = None
 
